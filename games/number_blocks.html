@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>60s Math Sprint - Voice & Layout Fixed</title>
+    <style>
+        :root {
+            --unit: calc((100vh - 180px) / 10); 
+            --ten-color: #e67e22;
+            --one-color: #3498db;
+            --border: 3px solid #2c3e50;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background: #2c3e50;
+            overflow: hidden;
+            touch-action: none; 
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            color: white;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(26, 37, 47, 0.98);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        #header {
+            background: #1a252f;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 28px;
+            border-bottom: 4px solid #f1c40f;
+        }
+
+        .stat-box { background: rgba(0,0,0,0.4); padding: 10px 25px; border-radius: 12px; min-width: 120px; text-align: center; }
+        #target-number { color: #f1c40f; font-size: 45px; font-weight: bold; }
+
+        #game-area { display: flex; flex: 1; position: relative; }
+
+        #sidebar {
+            width: 320px;
+            background: #34495e;
+            border-right: 6px solid #f1c40f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            z-index: 10;
+        }
+
+        #drag-sources {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .source-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .block-one { 
+            width: var(--unit); height: var(--unit); 
+            background: var(--one-color); border: var(--border); 
+            border-radius: 4px; box-sizing: border-box;
+        }
+        
+        .block-ten { 
+            width: var(--unit); height: calc(var(--unit) * 10); 
+            background: var(--ten-color); border: var(--border); 
+            border-radius: 4px; box-sizing: border-box;
+            background-image: linear-gradient(to bottom, transparent calc(var(--unit) - 3px), #2c3e50 3px); 
+            background-size: 100% var(--unit); 
+        }
+
+        #workspace {
+            flex: 1; 
+            position: relative;
+            background: #ecf0f1;
+            background-image: radial-gradient(#bdc3c7 2px, transparent 2px);
+            background-size: var(--unit) var(--unit);
+            overflow: hidden;
+        }
+
+        .placed { position: absolute; touch-action: none; z-index: 20; }
+
+        .particle {
+            position: absolute; width: 15px; height: 15px; pointer-events: none; z-index: 100;
+            animation: explode 0.6s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0,0); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+        }
+
+        #btn-group { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 15px; }
+        .game-btn { padding: 15px 35px; font-size: 24px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; color: white; }
+        .btn-clear { background: #e74c3c; box-shadow: 0 5px 0 #c0392b; }
+        .btn-menu { background: #3498db; box-shadow: 0 5px 0 #2980b9; text-decoration: none; display: flex; align-items: center; }
+    </style>
+</head>
+<body>
+
+<div id="overlay" onclick="startGame()">
+    <h1>MATH SPRINT</h1>
+    <div id="final-score" style="font-size:80px; color:#2ecc71; display:none;">0</div>
+    <p id="msg-sub">TAP TO START (60s)</p>
+</div>
+
+<div id="header">
+    <div class="stat-box">🕒 <span id="timer-display">60</span>s</div>
+    <div class="stat-box">GOAL: <span id="target-number">?</span></div>
+    <div class="stat-box">⭐ <span id="score-display">0</span></div>
+</div>
+
+<div id="game-area">
+    <div id="sidebar">
+        <div id="drag-sources">
+            <div class="source-wrapper" onpointerdown="createNewBlock(event, 'one')">
+                <span style="color:#f1c40f; font-weight:bold; margin-bottom:10px;">ONE</span>
+                <div class="block-one"></div>
+            </div>
+            <div class="source-wrapper" onpointerdown="createNewBlock(event, 'ten')">
+                <span style="color:#f1c40f; font-weight:bold; margin-bottom:10px;">TEN</span>
+                <div class="block-ten"></div>
+            </div>
+        </div>
+        <p style="margin-top:auto; color:#f1c40f; text-align:center; padding:10px;">
+            Drag to Board!<br>Tap to Delete.
+        </p>
+    </div>
+    <div id="workspace"></div>
+</div>
+
+<div id="btn-group">
+    <a href="../index.html" class="game-btn btn-menu">BACK TO MENU</a>
+    <button class="game-btn btn-clear" onclick="clearWorkspace()">CLEAR BOARD</button>
+</div>
+
+<script>
+    let targetNumber = 0, score = 0, timeLeft = 60, gameActive = false, timerInterval;
+    const workspace = document.getElementById('workspace'), targetDisplay = document.getElementById('target-number');
+    const scoreDisplay = document.getElementById('score-display'), timerDisplay = document.getElementById('timer-display');
+    let audioCtx, beatInterval;
+
+    function startGame() {
+        if (gameActive) return;
+        score = 0; timeLeft = 60; gameActive = true;
+        scoreDisplay.textContent = "0"; timerDisplay.textContent = "60";
+        document.getElementById('overlay').style.display = 'none';
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+        initPeppyMusic();
+        initRound();
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+            if (timeLeft <= 0) endGame();
+        }, 1000);
+    }
+
+    function endGame() {
+        gameActive = false;
+        clearInterval(timerInterval);
+        clearInterval(beatInterval);
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('final-score').style.display = 'block';
+        if (audioCtx) audioCtx.close().then(() => audioCtx = null);
+    }
+
+    function initPeppyMusic() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const master = audioCtx.createGain();
+        master.gain.value = 0.05; master.connect(audioCtx.destination);
+        const melody = [261, 329, 392, 523, 440, 392, 349, 329]; 
+        let step = 0;
+        beatInterval = setInterval(() => {
+            if (!gameActive) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = (step % 4 === 0) ? 'square' : 'triangle';
+            osc.frequency.setValueAtTime(melody[step % melody.length], now);
+            g.gain.setValueAtTime(0.1, now);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+            osc.connect(g); g.connect(master);
+            osc.start(); osc.stop(now + 0.15);
+            step++;
+        }, 180);
+    }
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US'; 
+        msg.rate = 1.1;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function announceTotal() {
+        let total = 0;
+        workspace.querySelectorAll('.placed').forEach(b => total += parseInt(b.dataset.value));
+        if (total > 0 && total !== targetNumber) {
+            speak(total.toString());
+        }
+    }
+
+    function initRound() {
+        targetNumber = Math.floor(Math.random() * 89) + 11;
+        targetDisplay.textContent = targetNumber;
+        clearWorkspace();
+        speak("Make " + targetNumber);
+    }
+
+    function createNewBlock(e, type) {
+        if (!gameActive) return;
+        const el = document.createElement('div');
+        el.className = (type === 'ten' ? 'block-ten' : 'block-one') + ' placed';
+        el.dataset.value = type === 'ten' ? 10 : 1;
+        workspace.appendChild(el);
+        const bRect = workspace.getBoundingClientRect();
+        const offX = parseFloat(getComputedStyle(el).width) / 2;
+        const offY = type === 'one' ? offX : 40;
+        
+        const moveAt = (x, y) => {
+            el.style.left = (x - bRect.left - offX) + 'px';
+            el.style.top = (y - bRect.top - offY) + 'px';
+        };
+        moveAt(e.clientX, e.clientY);
+        el.setPointerCapture(e.pointerId);
+        el.onpointermove = (ev) => moveAt(ev.clientX, ev.clientY);
+        el.onpointerup = (ev) => {
+            el.onpointermove = null;
+            el.releasePointerCapture(ev.pointerId);
+            if (el.getBoundingClientRect().left < bRect.left) {
+                el.remove();
+            } else {
+                attachDragLogic(el);
+            }
+            checkAutoVerify();
+        };
+    }
+
+    function attachDragLogic(el) {
+        let moved = false, sx, sy;
+        el.onpointerdown = (e) => {
+            e.stopPropagation();
+            el.setPointerCapture(e.pointerId);
+            const r = el.getBoundingClientRect();
+            sx = e.clientX - r.left; sy = e.clientY - r.top; moved = false;
+        };
+        el.onpointermove = (e) => {
+            if (el.hasPointerCapture(e.pointerId)) {
+                moved = true; 
+                const pr = workspace.getBoundingClientRect();
+                el.style.left = (e.clientX - pr.left - sx) + 'px';
+                el.style.top = (e.clientY - pr.top - sy) + 'px';
+            }
+        };
+        el.onpointerup = (e) => {
+            el.releasePointerCapture(e.pointerId);
+            if (!moved || parseInt(el.style.left) < -10) el.remove();
+            checkAutoVerify();
+        };
+    }
+
+    function checkAutoVerify() {
+        let total = 0;
+        workspace.querySelectorAll('.placed').forEach(b => total += parseInt(b.dataset.value));
+        
+        if (total === targetNumber) {
+            score++; scoreDisplay.textContent = score;
+            speak("Correct!");
+            createPartyPop();
+            setTimeout(initRound, 400);
+        } else {
+            announceTotal();
+        }
+    }
+
+    function createPartyPop() {
+        const colors = ['#f1c40f', '#e74c3c', '#2ecc71', '#9b59b6', '#3498db'];
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            p.style.left = '50%'; p.style.top = '50%';
+            p.style.setProperty('--dx', (Math.random() - 0.5) * 400 + 'px');
+            p.style.setProperty('--dy', (Math.random() - 0.5) * 400 + 'px');
+            workspace.appendChild(p);
+            setTimeout(() => p.remove(), 600);
+        }
+    }
+
+    function clearWorkspace() { workspace.innerHTML = ""; }
+</script>
+</body>
+</html>

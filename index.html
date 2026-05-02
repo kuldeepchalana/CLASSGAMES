@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMS Pakka Khurd - Classroom Games Hub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Fullscreen Landing Overlay */
+        #launcher {
+            position: fixed;
+            inset: 0;
+            background: #006064;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            text-align: center;
+        }
+
+        .launch-btn {
+            padding: 25px 60px;
+            font-size: 2rem;
+            background: #ff9800;
+            color: black;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+
+        .launch-btn:hover { transform: scale(1.1); background: #ffa726; }
+        
+        header {
+            background-color: #006064;
+            color: white;
+            width: 100%;
+            padding: 40px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        h1 { margin: 0; font-size: 48px; letter-spacing: 2px; }
+        .subtitle { font-size: 22px; margin-top: 10px; color: #b2dfdb; }
+        
+        .container {
+            max-width: 1200px;
+            width: 95%;
+            margin: 50px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding-bottom: 50px;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 8px solid transparent;
+            position: relative;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .icon { font-size: 70px; margin-bottom: 20px; }
+        h2 { margin: 0 0 15px 0; font-size: 28px; color: #263238; }
+        p { margin: 0; color: #607d8b; font-size: 18px; line-height: 1.4; }
+        
+        /* Card Colors */
+        .card-math { border-bottom-color: #e91e63 !important; }
+        .card-spell { border-bottom-color: #2196f3 !important; }
+        .card-add { border-bottom-color: #4caf50 !important; }
+        .card-number { border-bottom-color: #ff9800 !important; }
+        .card-count { border-bottom-color: #9c27b0 !important; } 
+        .card-balloon { border-bottom-color: #f44336 !important; }
+        .card-blocks { border-bottom-color: #009688 !important; }
+        .card-magic { border-bottom-color: #3f51b5 !important; }
+        .card-ninja { border-bottom-color: #d32f2f !important; }
+        .card-gladiator { border-bottom-color: #673ab7 !important; }
+        .card-wordwar { border-bottom-color: #ff5722 !important; }
+        .card-wordwar2 { border-bottom-color: #ff9800 !important; }
+        .card-money { border-bottom-color: #2e7d32 !important; } /* New Color for Money Math */
+        
+    </style>
+</head>
+<body>
+
+    <div id="launcher">
+        <h1 style="margin-bottom:20px;">GMS Pakka Khurd</h1>
+        <button class="launch-btn" onclick="goFullscreen()">ENTER GAMES HUB 🚀</button>
+        <p style="margin-top:20px; color:#b2dfdb;">Tap to play in Fullscreen Mode</p>
+    </div>
+
+    <header>
+        <h1>GMS Pakka Khurd Games Hub</h1>
+        <div class="subtitle">Interactive Classroom Activities</div>
+    </header>
+
+    <div class="container" id="game-container">
+        <a href="games/money_math.html" class="game-card card-money">
+            <div class="icon">💰</div>
+            <h2>Money Math</h2>
+            <p>Rupee Duel! Practice counting currency in Single or 2-Player modes.</p>
+        </a>
+
+        <a href="games/word_war_1.html" class="game-card card-wordwar">
+            <div class="icon">🎖️</div>
+            <h2>Word War 1</h2>
+            <p>2-Player Battle! Jumbled words and 8-bit music. Drag 3 letters to win!</p>
+        </a>
+
+        <a href="games/word_war_2.html" class="game-card card-wordwar2">
+            <div class="icon">🎖️🎖️</div>
+            <h2>Word War 2</h2>
+            <p>The Siege! Master 100 common 4-letter words in this intense 2-player duel.</p>
+        </a>
+
+        <a href="games/grammar_gladiator.html" class="game-card card-gladiator">
+            <div class="icon">🤺</div>
+            <h2>Grammar Gladiator</h2>
+            <p>ਵਿਆਕਰਣ ਦੇ ਯੋਧੇ: 90s English Duel with Punjabi translations!</p>
+        </a>
+
+        <a href="games/factor_ninja.html" class="game-card card-ninja">
+            <div class="icon">⚔️</div>
+            <h2>Factor Ninja</h2>
+            <p>3D Duel! Be the fastest Ninja to tap the factors of the target number.</p>
+        </a>
+
+        <a href="games/magic_square.html" class="game-card card-magic">
+            <div class="icon">🔮</div>
+            <h2>Magic Square Duel</h2>
+            <p>Split-Screen Challenge! Be the fastest to complete the 3x3 Magic Square.</p>
+        </a>
+
+        <a href="games/number_blocks.html" class="game-card card-blocks">
+            <div class="icon">🧱</div>
+            <h2>Number Blocks</h2>
+            <p>60s Sprint! Drag tens and ones to build the goal number fast!</p>
+        </a>
+
+        <a href="games/MathTugOfWar.html" class="game-card card-math">
+            <div class="icon">🪢</div>
+            <h2>Math Tug of War</h2>
+            <p>Test your math skills in an exciting tug of war battle!</p>
+        </a>
+
+        <a href="games/spell_bee.html" class="game-card card-spell">
+            <div class="icon">🐝</div>
+            <h2>Spell Bee</h2>
+            <p>Practice your spelling and phonics step by step.</p>
+        </a>
+
+        <a href="games/learn_addition.html" class="game-card card-add">
+            <div class="icon">➕</div>
+            <h2>Learn Addition</h2>
+            <p>Master the basics of addition with visual tools.</p>
+        </a>
+
+        <a href="games/number_system.html" class="game-card card-number">
+            <div class="icon">🔢</div>
+            <h2>Number System</h2>
+            <p>ਸੰਖਿਆਵਾਂ ਦੀ ਖੇਡ - Master Natural, Whole, and Integers!</p>
+        </a>
+
+        <a href="games/counting.html" class="game-card card-count">
+            <div class="icon">💯</div>
+            <h2>Count to 100!</h2>
+            <p>Find the missing numbers at your own pace.</p>
+        </a>
+
+        <a href="games/math_balloons.html" class="game-card card-balloon">
+            <div class="icon">🎈</div>
+            <h2>Math Balloons</h2>
+            <p>Split-Screen! Compete head-to-head to pop the correct addition problems.</p>
+        </a>
+    </div>
+
+    <script>
+        function goFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+            document.getElementById('launcher').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('game-container');
+            const cards = Array.from(container.children);
+            
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            
+            container.innerHTML = "";
+            cards.forEach(card => container.appendChild(card));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rupee Maker Duel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #1b5e20;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            touch-action: none;
+        }
+
+        /* START PAGE */
+        #start-page {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, #2e7d32, #1b5e20);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .name-input {
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            width: 300px;
+            text-align: center;
+        }
+
+        .menu-btn {
+            padding: 20px 40px;
+            font-size: 1.8rem;
+            margin: 10px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: 0.2s;
+            width: 350px;
+        }
+
+        #btn-single { background: #2196f3; color: white; }
+        #btn-double { background: #ff9800; color: white; }
+
+        /* SHARED TIMER BAR */
+        #timer-bar {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #d32f2f;
+            padding: 10px 30px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        #music-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 6000;
+            font-size: 1.5rem;
+        }
+
+        #game-wrapper { display: flex; width: 100vw; height: 100vh; visibility: hidden; }
+
+        .player-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            border-left: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .hud { width: 100%; background: rgba(0,0,0,0.4); padding: 45px 10px 10px 10px; text-align: center; }
+        .hud h2 { margin: 5px 0; color: #ffeb3b; text-transform: uppercase; }
+
+        .target-box {
+            font-size: 2.2rem;
+            background: #ffeb3b;
+            color: #333;
+            padding: 10px 30px;
+            border-radius: 15px;
+            margin: 10px;
+            border: 4px solid #fbc02d;
+            font-weight: bold;
+        }
+
+        .drop-zone {
+            width: 95%;
+            height: 40%;
+            border: 3px dashed rgba(255,255,255,0.3);
+            border-radius: 20px;
+            margin: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .wallet {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0,0,0,0.6);
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            bottom: 60px;
+        }
+
+        .m-item { border-radius: 4px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s; }
+        .m-item:active { transform: scale(0.9); }
+        .n-10 { width: 85px; height: 42px; }
+        .n-20 { width: 105px; height: 52px; }
+        .n-50 { width: 125px; height: 62px; }
+        .c-1 { width: 35px; height: 35px; border-radius: 50%; }
+        .c-2 { width: 45px; height: 45px; border-radius: 50%; }
+        .c-5 { width: 60px; height: 60px; border-radius: 50%; object-fit: contain; }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            text-align: center;
+        }
+
+        .modal { padding: 30px; border-radius: 25px; transform: scale(0); transition: 0.3s; width: 85%; }
+        .success { background: #ffeb3b; color: #333; border: 8px solid #4caf50; }
+        .error { background: #f44336; color: white; border: 8px solid #b71c1c; }
+        .finish { background: #2196f3; color: white; border: 8px solid #fff; }
+
+        .back-btn { position: fixed; bottom: 10px; left: 10px; padding: 10px 20px; background: #d32f2f; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; z-index: 4000; }
+    </style>
+</head>
+<body>
+
+    <button id="music-toggle" onclick="toggleMusic()">🔊</button>
+
+    <div id="start-page">
+        <h1 style="font-size: 3.5rem; margin-bottom: 5px;">Rupee Maker Duel</h1>
+        <div class="input-group">
+            <input type="text" id="p1-name-input" class="name-input" placeholder="Player 1 Name" maxlength="12">
+            <input type="text" id="p2-name-input" class="name-input" placeholder="Player 2 Name" maxlength="12">
+        </div>
+        <button id="btn-single" class="menu-btn" onclick="startGame('single')">SINGLE PLAYER 🙋‍♂️</button>
+        <button id="btn-double" class="menu-btn" onclick="startGame('double')">2-PLAYER DUEL ⚔️</button>
+    </div>
+
+    <div id="timer-bar">⏱ <span id="time-left">60</span>s</div>
+
+    <a href="../index.html" class="back-btn">⬅ EXIT HUB</a>
+
+    <div id="game-wrapper">
+        <div id="side-p1" class="player-side">
+            <div class="hud">
+                <h2 id="p1-display-name">Player 1</h2>
+                <div>Points: <span id="pts1">0</span> | Current: ₹<span id="curr1">0</span></div>
+            </div>
+            <div class="target-box">Make ₹<span id="big-t1">0</span></div>
+            <div id="dz1" class="drop-zone"></div>
+            <div id="wallet1" class="wallet"></div>
+            <div id="overlay1" class="overlay"><div id="modal1" class="modal"><h2 id="msg1">...</h2><button class="menu-btn" style="width:auto; font-size:1rem;" onclick="nextRound(1)">NEXT</button></div></div>
+        </div>
+
+        <div id="side-p2" class="player-side">
+            <div class="hud">
+                <h2 id="p2-display-name">Player 2</h2>
+                <div>Points: <span id="pts2">0</span> | Current: ₹<span id="curr2">0</span></div>
+            </div>
+            <div class="target-box">Make ₹<span id="big-t2">0</span></div>
+            <div id="dz2" class="drop-zone"></div>
+            <div id="wallet2" class="wallet"></div>
+            <div id="overlay2" class="overlay"><div id="modal2" class="modal"><h2 id="msg2">...</h2><button class="menu-btn" style="width:auto; font-size:1rem;" onclick="nextRound(2)">NEXT</button></div></div>
+        </div>
+    </div>
+
+    <script>
+        let mode = 'single';
+        let timeLeft = 60;
+        let gameActive = false;
+        let musicOn = true;
+        let audioCtx, musicLoop;
+        let sharedTarget = 0;
+        let p1Name = "Player 1";
+        let p2Name = "Player 2";
+
+        let pData = {
+            1: { target: 0, current: 0, points: 0 },
+            2: { target: 0, current: 0, points: 0 }
+        };
+
+        const money = [
+            {v: 10, t: 'note', c: 'n-10'}, {v: 20, t: 'note', c: 'n-20'}, {v: 50, t: 'note', c: 'n-50'},
+            {v: 1, t: 'coin', c: 'c-1'}, {v: 2, t: 'coin', c: 'c-2'}, {v: 5, t: 'coin', c: 'c-5'}
+        ];
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(freq, type, duration) {
+            if (!musicOn || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function startBGM() {
+            if (!musicOn) return;
+            const melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
+            let i = 0;
+            musicLoop = setInterval(() => {
+                if (gameActive && musicOn) {
+                    playSound(melody[i % melody.length], 'square', 0.15);
+                    i++;
+                }
+            }, 500);
+        }
+
+        function toggleMusic() {
+            musicOn = !musicOn;
+            document.getElementById('music-toggle').innerText = musicOn ? "🔊" : "🔇";
+            if (!musicOn) clearInterval(musicLoop);
+            else if (gameActive) startBGM();
+        }
+
+        function startGame(m) {
+            initAudio();
+            mode = m;
+            let val1 = document.getElementById('p1-name-input').value.trim();
+            let val2 = document.getElementById('p2-name-input').value.trim();
+            if(val1) p1Name = val1;
+            if(val2) p2Name = val2;
+
+            document.getElementById('p1-display-name').innerText = p1Name;
+            document.getElementById('p2-display-name').innerText = p2Name;
+
+            gameActive = true;
+            document.getElementById('start-page').style.display = 'none';
+            document.getElementById('game-wrapper').style.visibility = 'visible';
+            document.getElementById('timer-bar').style.display = 'block';
+
+            let elem = document.documentElement;
+            if (elem.requestFullscreen) elem.requestFullscreen();
+
+            if (mode === 'single') document.getElementById('side-p2').style.display = 'none';
+            
+            setupWallets();
+            initPlayer(1);
+            if(mode === 'double') initPlayer(2);
+            startTimer();
+            startBGM();
+        }
+
+        function setupWallets() {
+            [1, 2].forEach(p => {
+                const w = document.getElementById('wallet' + p);
+                money.forEach(m => {
+                    let img = document.createElement('img');
+                    img.src = `files/${m.v}.png`;
+                    img.className = `${m.t} ${m.c} m-item`;
+                    img.dataset.val = m.v;
+                    img.dataset.p = p;
+                    // TAP TO ADD
+                    img.onclick = () => addToWorkspace(m.v, m.t, m.c, img.src, p);
+                    w.appendChild(img);
+                });
+            });
+        }
+
+        function addToWorkspace(val, type, className, src, p) {
+            if(!gameActive) return;
+            playSound(400, 'sine', 0.05);
+
+            const dz = document.getElementById('dz' + p);
+            let clone = document.createElement('img');
+            clone.src = src;
+            clone.className = `${type} ${className} m-item`;
+            clone.style.margin = "5px";
+            
+            // TAP TO DELETE
+            clone.onclick = () => removeFromWorkspace(clone, val, p);
+
+            dz.appendChild(clone);
+            pData[p].current += val;
+            document.getElementById('curr' + p).innerText = pData[p].current;
+
+            checkWin(p);
+        }
+
+        function removeFromWorkspace(element, val, p) {
+            if(!gameActive) return;
+            playSound(200, 'sine', 0.05);
+            element.remove();
+            pData[p].current -= val;
+            document.getElementById('curr' + p).innerText = pData[p].current;
+        }
+
+        function initPlayer(p) {
+            if (mode === 'double') {
+                if (p === 1) sharedTarget = Math.floor(Math.random() * 95) + 5;
+                pData[p].target = sharedTarget;
+            } else {
+                pData[p].target = Math.floor(Math.random() * 95) + 5;
+            }
+            pData[p].current = 0;
+            document.getElementById('big-t' + p).innerText = pData[p].target;
+            document.getElementById('curr' + p).innerText = "0";
+            document.getElementById('dz' + p).innerHTML = "";
+            document.getElementById('overlay' + p).style.display = "none";
+            document.getElementById('modal' + p).style.transform = "scale(0)";
+        }
+
+        function nextRound(p) {
+            if (mode === 'double') { initPlayer(1); initPlayer(2); }
+            else { initPlayer(p); }
+        }
+
+        function checkWin(p) {
+            if (pData[p].current === pData[p].target) {
+                pData[p].points++;
+                document.getElementById('pts' + p).innerText = pData[p].points;
+                playSound(800, 'triangle', 0.2);
+                showModal(p, "SHABASH! 🌟", "success");
+            } else if (pData[p].current > pData[p].target) {
+                playSound(100, 'sawtooth', 0.2);
+                showModal(p, "TOO MUCH! 🛑", "error");
+            }
+        }
+
+        function showModal(p, txt, type) {
+            const ov = document.getElementById('overlay' + p);
+            const mod = document.getElementById('modal' + p);
+            document.getElementById('msg' + p).innerText = txt;
+            mod.className = `modal ${type}`;
+            ov.style.display = "flex";
+            setTimeout(() => { mod.style.transform = "scale(1)"; }, 50);
+        }
+
+        function startTimer() {
+            let clock = setInterval(() => {
+                if(timeLeft > 0 && gameActive) {
+                    timeLeft--;
+                    document.getElementById('time-left').innerText = timeLeft;
+                } else {
+                    clearInterval(clock);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(musicLoop);
+            playSound(150, 'square', 0.8);
+            let finalMsg = "";
+            if(mode === 'double') {
+                if(pData[1].points > pData[2].points) finalMsg = p1Name + " WINS! 🏆";
+                else if(pData[2].points > pData[1].points) finalMsg = p2Name + " WINS! 🏆";
+                else finalMsg = "IT'S A TIE! 🤝";
+            } else {
+                finalMsg = "TIME UP! SCORE: " + pData[1].points;
+            }
+            showModal(1, finalMsg, "finish");
+            if(mode === 'double') showModal(2, finalMsg, "finish");
+        }
+
+        window.oncontextmenu = (e) => e.preventDefault();
+    </script>
+</body>
+</html>

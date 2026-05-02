@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tug of War - Full Game</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #eef2f7; margin: 0; overflow: hidden; }
+        
+        /* Start Screen */
+        #start-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #3498db, #e74c3c);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; color: white;
+        }
+        .input-group { margin: 10px; }
+        label { font-size: 18px; font-weight: bold; }
+        input[type="text"], select { 
+            padding: 12px; border-radius: 8px; border: none; font-size: 18px; 
+            width: 300px; text-align: center; margin-top: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        select { cursor: pointer; background-color: white; color: #333; }
+        
+        #play-btn { 
+            padding: 15px 40px; font-size: 24px; cursor: pointer; border: none; 
+            border-radius: 50px; background: #2ecc71; color: white; font-weight: bold; margin-top: 25px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2); transition: transform 0.1s, background 0.2s;
+        }
+        #play-btn:hover { background: #27ae60; transform: translateY(-2px); }
+        #play-btn:active { transform: translateY(0); }
+
+        /* Countdown & Victory Overlays */
+        #countdown-overlay, #victory-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; align-items: center;
+            justify-content: center; flex-direction: column;
+            z-index: 200; color: #fff; font-weight: bold;
+        }
+        #countdown-overlay { font-size: 150px; }
+        #victory-message { font-size: 80px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 201; }
+        
+        /* Fireworks Canvas */
+        #fireworks-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 200; pointer-events: none; display: none;
+        }
+
+        /* Game Container */
+        #game-container { max-width: 1100px; margin: 20px auto; background: white; padding: 20px; border-radius: 20px; display: none; }
+        
+        /* Stage Setup */
+        #stage { height: 200px; position: relative; border-bottom: 5px solid #ddd; margin-bottom: 30px; overflow: hidden; }
+        #rope { position: absolute; width: 200%; height: 12px; background: #a67c52; top: 60%; left: -50%; transition: left 0.4s ease; }
+        #marker { position: absolute; width: 6px; height: 50px; background: #ffdf00; left: 50%; top: -20px; border: 2px solid #555; }
+        
+        /* Players and Flags */
+        .player-container { position: absolute; top: 20px; transition: left 0.4s ease; text-align: center; width: 100px; z-index: 2; }
+        .player-icon { font-size: 60px; line-height: 1; }
+        .player-label { background: rgba(0,0,0,0.7); color: white; padding: 2px 8px; border-radius: 4px; font-size: 14px; margin-top: 5px; display: block; }
+        
+        #team1-pos { left: 35%; }
+        #team2-pos { left: 55%; }
+
+        .flag { font-size: 50px; position: absolute; top: 40px; z-index: 1; }
+        #flag1 { left: 5%; transform: scaleX(-1); }
+        #flag2 { left: 90%; }
+
+        /* Competition Layout */
+        .sides { display: flex; justify-content: space-between; gap: 20px; }
+        .team-box { width: 48%; padding: 15px; border-radius: 15px; color: white; display: flex; flex-direction: column; align-items: center; }
+        #team1 { background-color: #2980b9; }
+        #team2 { background-color: #c0392b; }
+        .equation { font-size: 32px; font-weight: bold; margin-bottom: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        
+        /* Keypad Input Panels */
+        .input-panel { width: 100%; margin-top: 15px; display: flex; flex-direction: column; align-items: center; }
+        .input-display {
+            width: 100%; max-width: 250px; background: rgba(255,255,255,0.9);
+            border: 2px solid #999; border-radius: 10px; padding: 10px;
+            font-size: 28px; font-weight: bold; color: #333; min-height: 35px;
+            text-align: center; margin-bottom: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 250px; }
+        .key-btn {
+            padding: 15px 0; font-size: 24px; font-weight: bold; cursor: pointer; border: none;
+            border-radius: 12px; background: white; color: #333;
+            transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;
+        }
+        .key-btn:hover { background: #f9f9f9; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.15); }
+        .key-btn:active { transform: translateY(0); box-shadow: 0 2px 3px rgba(0,0,0,0.1); }
+        
+        .key-clear { background-color: #e74c3c; color: white; font-size: 20px; grid-column: 1 / 2; }
+        .key-clear:hover { background-color: #c0392b; }
+        .key-zero { grid-column: 2 / 3; }
+        .key-submit { background-color: #3498db; color: white; font-size: 20px; grid-column: 3 / 4; }
+        .key-submit:hover { background-color: #2980b9; }
+
+        /* Animations */
+        .victory-dance { animation: bounce 0.5s ease-out infinite; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0) scale(1);}
+            40% {transform: translateY(-20px) scale(1.1);}
+            60% {transform: translateY(-10px) scale(1.05);}
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="start-screen">
+    <h1 style="font-size: 48px; margin-bottom: 10px;">Math Tug of War</h1>
+    
+    <div class="input-group">
+        <label>Difficulty Level:</label><br>
+        <select id="difficulty-select">
+            <option value="1">Level 1: 1-Digit Addition</option>
+            <option value="2">Level 2: 1-Digit (+, -, ×)</option>
+            <option value="3">Level 3: 2-Digit (+, -), 1-Digit (×, ÷)</option>
+        </select>
+    </div>
+
+    <div class="input-group" style="margin-top: 20px;">
+        <label>Left Player Name:</label><br>
+        <input type="text" id="name1" placeholder="Player 1" value="Team Blue">
+    </div>
+    
+    <div class="input-group">
+        <label>Right Player Name:</label><br>
+        <input type="text" id="name2" placeholder="Player 2" value="Team Red">
+    </div>
+    
+    <button id="play-btn" onclick="startGame()">START GAME</button>
+</div>
+
+<div id="countdown-overlay"></div>
+
+<canvas id="fireworks-canvas"></canvas>
+<div id="victory-overlay">
+    <div id="victory-message">🎉 Team Wins! 🎉</div>
+</div>
+
+<div id="game-container">
+    <div id="stage">
+        <div id="rope"><div id="marker"></div></div>
+        <div id="flag1" class="flag">🏁</div>
+        <div id="flag2" class="flag">🏁</div>
+
+        <div id="team1-pos" class="player-container">
+            <div class="player-icon">👦</div>
+            <span id="label1" class="player-label">Name 1</span>
+        </div>
+        <div id="team2-pos" class="player-container">
+            <div class="player-icon">👧</div>
+            <span id="label2" class="player-label">Name 2</span>
+        </div>
+    </div>
+
+    <div class="sides">
+        <div id="team1" class="team-box">
+            <div id="q1" class="equation">...</div>
+            <div class="input-panel">
+              <div id="display1" class="input-display">0</div>
+              <div class="keypad-grid">
+                <button class="key-btn" onclick="addKeyToDisplay(1, '1')">1</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '2')">2</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '3')">3</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '4')">4</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '5')">5</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '6')">6</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '7')">7</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '8')">8</button>
+                <button class="key-btn" onclick="addKeyToDisplay(1, '9')">9</button>
+                <button class="key-btn key-clear" onclick="clearDisplay(1)">&#10005;</button> 
+                <button class="key-btn key-zero" onclick="addKeyToDisplay(1, '0')">0</button>
+                <button class="key-btn key-submit" onclick="submitAnswer(1)">&#10003;</button> 
+              </div>
+            </div>
+        </div>
+        <div id="team2" class="team-box">
+            <div id="q2" class="equation">...</div>
+            <div class="input-panel">
+              <div id="display2" class="input-display">0</div>
+              <div class="keypad-grid">
+                <button class="key-btn" onclick="addKeyToDisplay(2, '1')">1</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '2')">2</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '3')">3</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '4')">4</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '5')">5</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '6')">6</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '7')">7</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '8')">8</button>
+                <button class="key-btn" onclick="addKeyToDisplay(2, '9')">9</button>
+                <button class="key-btn key-clear" onclick="clearDisplay(2)">&#10005;</button>
+                <button class="key-btn key-zero" onclick="addKeyToDisplay(2, '0')">0</button>
+                <button class="key-btn key-submit" onclick="submitAnswer(2)">&#10003;</button>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Game state variables
+    let position = 0;
+    const winThreshold = 250;
+    let currentCorrectAnswers = { 1: null, 2: null };
+    let audioCtx; 
+    let gameActive = false;
+    
+    // Level & Operation Sync variables
+    let gameLevel = 1;
+    let sharedOperation = '+';
+    let totalCorrectAnswers = 0;
+
+    // --- AUDIO SYSTEM ---
+    function initAudio() {
+        if (!audioCtx) { 
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+        }
+        // Force audio context to unlock immediately on the click
+        if (audioCtx.state === 'suspended') { 
+            audioCtx.resume(); 
+        }
+        
+        // Play an initial silent sound to permanently un-suspend the audio context on mobile/Safari
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        gainNode.gain.value = 0;
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.01);
+    }
+
+    // --- BACKGROUND MUSIC SYSTEM (8-bit style) ---
+    let bgmActive = false;
+    let nextNoteTime = 0;
+    let currentNote = 0;
+    const bpm = 160;
+    const beatLen = 60 / bpm; 
+    
+    // Pitched up one octave so it's audible on standard speakers (C4, G3, E4, etc.)
+    const melodyNotes = [261.63, 196.00, 329.63, 196.00, 349.23, 196.00, 293.66, 196.00];
+
+    function playBGM() {
+        if (!bgmActive || !audioCtx) return;
+        
+        while (nextNoteTime < audioCtx.currentTime + 0.1) {
+            scheduleBGMNote(melodyNotes[currentNote], nextNoteTime);
+            nextNoteTime += beatLen / 2; 
+            currentNote = (currentNote + 1) % melodyNotes.length;
+        }
+        setTimeout(playBGM, 25);
+    }
+
+    function scheduleBGMNote(freq, time) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        // Square wave cuts through better on cheap speakers
+        osc.type = 'square'; 
+        osc.frequency.value = freq;
+        
+        // Slightly higher volume
+        gain.gain.setValueAtTime(0.04, time); 
+        gain.gain.exponentialRampToValueAtTime(0.001, time + (beatLen / 2) - 0.01);
+        
+        osc.start(time);
+        osc.stop(time + (beatLen / 2));
+    }
+
+    function startBGM() {
+        if (bgmActive) return;
+        // Make sure audio is awake before trying to loop
+        if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
+        bgmActive = true;
+        nextNoteTime = audioCtx.currentTime + 0.05;
+        playBGM();
+    }
+
+    function stopBGM() {
+        bgmActive = false;
+    }
+
+    // --- SOUND EFFECTS ---
+    function playTeamSound(team) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        if (team === 1) {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(987.77, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(1318.51, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        } else {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        }
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function playWrongSound(team) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        if (team === 1) {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        } else {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        }
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function speak(text) {
+        window.speechSynthesis.cancel(); 
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.rate = 1.3; 
+        window.speechSynthesis.speak(msg);
+    }
+
+    // --- FIREWORKS SYSTEM ---
+    const canvas = document.getElementById('fireworks-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let fireworksActive = false;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x; this.y = y;
+            this.color = color;
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 8 + 2;
+            this.vx = Math.cos(angle) * speed;
+            this.vy = Math.sin(angle) * speed;
+            this.alpha = 1;
+            this.decay = Math.random() * 0.015 + 0.015;
+            this.gravity = 0.05;
+        }
+        update() {
+            this.vx *= 0.98; 
+            this.vy *= 0.98;
+            this.vy += this.gravity;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.alpha -= this.decay;
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.globalAlpha = this.alpha;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    function launchFirework() {
+        if (!fireworksActive) return;
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * 0.5; 
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        for (let i = 0; i < 80; i++) {
+            particles.push(new Particle(x, y, color));
+        }
+        
+        setTimeout(launchFirework, Math.random() * 400 + 200);
+    }
+
+    function animateFireworks() {
+        if (!fireworksActive && particles.length === 0) return;
+        requestAnimationFrame(animateFireworks);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            particles[i].draw(ctx);
+            if (particles[i].alpha <= 0) {
+                particles.splice(i, 1);
+            }
+        }
+    }
+
+    function triggerVictory(winnerName) {
+        gameActive = false; 
+        stopBGM(); 
+        
+        document.getElementById('victory-overlay').style.display = 'flex';
+        document.getElementById('victory-message').innerText = `🎉 ${winnerName} Wins! 🎉`;
+        canvas.style.display = 'block';
+        
+        fireworksActive = true;
+        animateFireworks();
+        launchFirework();
+        speak(winnerName + " wins!");
+
+        setTimeout(() => {
+            fireworksActive = false; 
+            setTimeout(() => {
+                location.reload(); 
+            }, 1000); 
+        }, 5000);
+    }
+
+    // --- CORE GAME FLOW ---
+    function startGame() {
+        initAudio(); // Immediately unlock the sound system!
+        
+        gameLevel = parseInt(document.getElementById('difficulty-select').value);
+        updateSharedOperation();
+
+        document.getElementById('label1').innerText = document.getElementById('name1').value || "Team Blue";
+        document.getElementById('label2').innerText = document.getElementById('name2').value || "Team Red";
+
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(err => console.log("Fullscreen blocked"));
+        }
+
+        document.getElementById('start-screen').style.display = 'none';
+        startCountdown();
+    }
+
+    function startCountdown() {
+        const overlay = document.getElementById('countdown-overlay');
+        overlay.style.display = 'flex';
+        let count = 5;
+
+        overlay.innerText = count;
+        speak(count.toString());
+        count--;
+
+        const interval = setInterval(() => {
+            if (count > 0) {
+                overlay.innerText = count;
+                speak(count.toString());
+                count--;
+            } else {
+                clearInterval(interval);
+                overlay.innerText = "GO!";
+                speak("Go!");
+                
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.getElementById('game-container').style.display = 'block';
+                    gameActive = true;
+                    startBGM(); // Safely start the music now!
+                    generateRound(1);
+                    generateRound(2);
+                }, 1000);
+            }
+        }, 1000);
+    }
+
+    function updateSharedOperation() {
+        let opPool = ['+'];
+        if (gameLevel === 2) opPool = ['+', '-', '*'];
+        if (gameLevel === 3) opPool = ['+', '-', '*', '/'];
+        sharedOperation = opPool[Math.floor(Math.random() * opPool.length)];
+    }
+
+    function generateRound(team) {
+        let n1, n2, answer, text;
+        let op = sharedOperation; 
+
+        if (gameLevel === 1) {
+            n1 = Math.floor(Math.random() * 9) + 1;
+            n2 = Math.floor(Math.random() * 9) + 1;
+            answer = n1 + n2;
+            text = `${n1} + ${n2} = ?`;
+        } 
+        else if (gameLevel === 2) {
+            if (op === '+') {
+                n1 = Math.floor(Math.random() * 9) + 1; n2 = Math.floor(Math.random() * 9) + 1;
+                answer = n1 + n2; text = `${n1} + ${n2} = ?`;
+            } else if (op === '-') {
+                n1 = Math.floor(Math.random() * 9) + 1; n2 = Math.floor(Math.random() * 9) + 1;
+                let sum = n1 + n2; answer = n2; text = `${sum} - ${n1} = ?`; 
+            } else if (op === '*') {
+                n1 = Math.floor(Math.random() * 9) + 1; n2 = Math.floor(Math.random() * 9) + 1;
+                answer = n1 * n2; text = `${n1} × ${n2} = ?`;
+            }
+        } 
+        else if (gameLevel === 3) {
+            if (op === '+') {
+                n1 = Math.floor(Math.random() * 90) + 10; n2 = Math.floor(Math.random() * 90) + 10;
+                answer = n1 + n2; text = `${n1} + ${n2} = ?`;
+            } else if (op === '-') {
+                n1 = Math.floor(Math.random() * 90) + 10; n2 = Math.floor(Math.random() * 90) + 10;
+                if (n2 > n1) { let temp = n1; n1 = n2; n2 = temp; } 
+                answer = n1 - n2; text = `${n1} - ${n2} = ?`;
+            } else if (op === '*') {
+                n1 = Math.floor(Math.random() * 9) + 1; n2 = Math.floor(Math.random() * 9) + 1;
+                answer = n1 * n2; text = `${n1} × ${n2} = ?`;
+            } else if (op === '/') {
+                n1 = Math.floor(Math.random() * 9) + 1; n2 = Math.floor(Math.random() * 9) + 1;
+                let product = n1 * n2; answer = n2; text = `${product} ÷ ${n1} = ?`; 
+            }
+        }
+
+        currentCorrectAnswers[team] = answer;
+        document.getElementById(`q${team}`).innerText = text;
+        clearDisplay(team); 
+    }
+
+    function addKeyToDisplay(team, digit) {
+        if (!gameActive) return;
+        const display = document.getElementById(`display${team}`);
+        let currentText = display.innerText;
+        
+        if (currentText === '0' || currentText === '...') {
+            currentText = digit;
+        } else if (currentText.length < 3) { 
+            currentText += digit;
+        }
+        display.innerText = currentText;
+    }
+
+    function clearDisplay(team) {
+        if (!gameActive) return;
+        document.getElementById(`display${team}`).innerText = '0';
+    }
+
+    function submitAnswer(team) {
+        if (!gameActive) return;
+        const userAnswerStr = document.getElementById(`display${team}`).innerText;
+        const userAnswer = parseInt(userAnswerStr, 10);
+        
+        if (userAnswer === currentCorrectAnswers[team]) {
+            playTeamSound(team);
+            position += (team === 1 ? -30 : 30);
+            
+            totalCorrectAnswers++;
+            if (totalCorrectAnswers % 3 === 0) {
+                updateSharedOperation();
+            }
+
+            updateView();
+            generateRound(team);
+        } else {
+            playWrongSound(team);
+            const box = document.getElementById(`team${team}`);
+            box.style.animation = "shake 0.3s";
+            setTimeout(() => {
+                box.style.animation = "";
+                clearDisplay(team);
+            }, 300);
+        }
+    }
+
+    function updateView() {
+        document.getElementById('rope').style.left = `calc(-50% + ${position}px)`;
+        document.getElementById('team1-pos').style.left = `calc(35% + ${position}px)`;
+        document.getElementById('team2-pos').style.left = `calc(55% + ${position}px)`;
+
+        if (Math.abs(position) >= winThreshold) {
+            const winnerId = position < 0 ? 'team1-pos' : 'team2-pos';
+            const winnerName = position < 0 ? document.getElementById('label1').innerText : document.getElementById('label2').innerText;
+            
+            const winnerIcon = document.getElementById(winnerId).querySelector('.player-icon');
+            winnerIcon.classList.add('victory-dance');
+            
+            triggerVictory(winnerName);
+        }
+    }
+</script>
+<a href="../index.html" id="back-to-menu">🏠 Back to Menu</a>
+<style>
+    #back-to-menu {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background-color: #f39c12;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-family: 'Segoe UI', sans-serif;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        z-index: 9999; /* Keeps it on top of everything */
+        transition: transform 0.2s, background 0.2s;
+    }
+    #back-to-menu:hover {
+        background-color: #e67e22;
+        transform: translateY(-2px);
+    }
+</style>
+</body>
+</html>

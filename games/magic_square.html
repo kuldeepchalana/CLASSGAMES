@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Square Duel - Touch Edition</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: #222;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+        }
+
+        .name-inputs { display: flex; gap: 20px; margin: 20px 0; }
+        .name-inputs input { padding: 10px; font-size: 1.2rem; border-radius: 5px; border: none; text-align: center; }
+
+        #start-btn, .rematch-btn {
+            padding: 15px 40px; font-size: 1.8rem; background: #ffcc00;
+            border: none; border-radius: 50px; cursor: pointer; font-weight: bold;
+            box-shadow: 0 6px #b89400;
+        }
+
+        /* Top Bar for Timer and Menu */
+        #top-bar {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 50;
+        }
+
+        #timer-display {
+            font-size: 2.5rem; font-weight: bold; color: #ffcc00;
+            background: rgba(0,0,0,0.6); padding: 5px 30px; border-radius: 40px;
+            border: 2px solid #ffcc00;
+        }
+
+        .menu-btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px #2980b9;
+        }
+        .menu-btn:active { box-shadow: 0 0; transform: translateY(4px); }
+
+        .rematch-btn { font-size: 1.2rem; padding: 10px 25px; display: none; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100; }
+
+        .player-section {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; transition: background 0.3s;
+        }
+
+        #player1 { border-right: 5px solid #444; background: #fff5f5; }
+        #player2 { background: #f5faff; }
+
+        h2 { margin-bottom: 10px; font-size: 2rem; color: #333; text-transform: uppercase; }
+
+        .grid {
+            display: grid; grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px); gap: 10px;
+            padding: 15px; background: #333; border-radius: 12px;
+        }
+
+        .cell {
+            width: 80px; height: 80px; display: flex; align-items: center;
+            justify-content: center; font-size: 1.8rem; font-weight: bold;
+            border-radius: 8px; background: white; cursor: pointer;
+        }
+
+        .cell.selected { border: 4px solid #3498db; box-shadow: inset 0 0 10px rgba(52, 152, 219, 0.5); }
+
+        .prefilled { background: #e74c3c; color: white; cursor: not-allowed; }
+
+        /* Numeric Pad Styling */
+        .numpad {
+            display: grid; grid-template-columns: repeat(3, 60px);
+            gap: 8px; margin-top: 20px;
+        }
+
+        .num-btn {
+            width: 60px; height: 60px; background: #34495e; color: white;
+            border: none; border-radius: 8px; font-size: 1.5rem; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+
+        .num-btn:active { background: #2c3e50; transform: scale(0.95); }
+        .num-btn.clear { background: #95a5a6; grid-column: span 3; width: 100%; height: 40px; font-size: 1rem; }
+
+        .winner-overlay { background: #27ae60 !important; color: white !important; }
+    </style>
+</head>
+<body>
+
+<div id="overlay">
+    <h1>Magic Square Duel</h1>
+    <div class="name-inputs">
+        <input type="text" id="p1NameInput" placeholder="Player 1" value="Player 1">
+        <input type="text" id="p2NameInput" placeholder="Player 2" value="Player 2">
+    </div>
+    <button id="start-btn" onclick="startGame()">START DUEL ⚔️</button>
+</div>
+
+<div id="top-bar">
+    <a href="../index.html" class="menu-btn">⬅ MENU</a>
+    <div id="timer-display">03:00</div>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+</audio>
+
+<button class="rematch-btn" id="rematchBtn" onclick="resetGame()">REMATCH 🔄</button>
+
+<div id="player1" class="player-section">
+    <h2 id="disp1">Player 1</h2>
+    <div class="grid" id="grid1"></div>
+    <div class="numpad" id="pad1"></div>
+</div>
+
+<div id="player2" class="player-section">
+    <h2 id="disp2">Player 2</h2>
+    <div class="grid" id="grid2"></div>
+    <div class="numpad" id="pad2"></div>
+</div>
+
+<script>
+    const music = document.getElementById('bgMusic');
+    const timerText = document.getElementById('timer-display');
+    music.volume = 0.2; 
+
+    let timerInterval, timeLeft = 180, gameActive = false;
+    let selectedCell = { 1: null, 2: null };
+    const magicTemplate = [8, 1, 6, 3, 5, 7, 4, 9, 2];
+
+    function startGame() {
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+        document.getElementById('disp1').textContent = document.getElementById('p1NameInput').value;
+        document.getElementById('disp2').textContent = document.getElementById('p2NameInput').value;
+        document.getElementById('overlay').style.display = 'none';
+        music.play();
+        createPads();
+        resetGame();
+    }
+
+    function createPads() {
+        [1, 2].forEach(p => {
+            const pad = document.getElementById(`pad${p}`);
+            pad.innerHTML = "";
+            for (let i = 1; i <= 9; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'num-btn';
+                btn.textContent = i;
+                btn.onclick = () => inputNumber(p, i);
+                pad.appendChild(btn);
+            }
+            const clear = document.createElement('button');
+            clear.className = 'num-btn clear';
+            clear.textContent = "CLEAR";
+            clear.onclick = () => inputNumber(p, "");
+            pad.appendChild(clear);
+        });
+    }
+
+    function resetGame() {
+        gameActive = true;
+        timeLeft = 180;
+        selectedCell = { 1: null, 2: null };
+        document.querySelectorAll('.player-section').forEach(s => s.className = 'player-section');
+        document.getElementById('rematchBtn').style.display = 'none';
+        
+        let indices = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        let randomHints = indices.sort(() => Math.random() - 0.5).slice(0, 4);
+
+        [1, 2].forEach(p => {
+            const container = document.getElementById(`grid${p}`);
+            container.innerHTML = "";
+            magicTemplate.forEach((val, idx) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                if (randomHints.includes(idx)) {
+                    cell.textContent = val;
+                    cell.classList.add('prefilled');
+                } else {
+                    cell.onclick = () => selectCell(p, cell, idx);
+                }
+                container.appendChild(cell);
+            });
+        });
+        startTimer();
+    }
+
+    function selectCell(player, cellElement, index) {
+        if (!gameActive) return;
+        if (selectedCell[player]) selectedCell[player].el.classList.remove('selected');
+        selectedCell[player] = { el: cellElement, index: index };
+        cellElement.classList.add('selected');
+    }
+
+    function inputNumber(player, num) {
+        if (!gameActive || !selectedCell[player]) return;
+        selectedCell[player].el.textContent = num;
+        checkWin(player);
+    }
+
+    function checkWin(playerNum) {
+        const cells = document.getElementById(`grid${playerNum}`).children;
+        const currentGrid = [];
+        for (let i = 0; i < cells.length; i++) {
+            currentGrid.push(parseInt(cells[i].textContent) || NaN);
+        }
+        
+        const s = 15;
+        const g = currentGrid;
+        const rows = [g[0]+g[1]+g[2], g[3]+g[4]+g[5], g[6]+g[7]+g[8]];
+        const cols = [g[0]+g[3]+g[6], g[1]+g[4]+g[7], g[2]+g[5]+g[8]];
+        const diag = [g[0]+g[4]+g[8], g[2]+g[4]+g[6]];
+        
+        if ([...rows, ...cols, ...diag].every(sum => sum === s) && !g.includes(NaN)) {
+            endGame(playerNum);
+        }
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60), secs = timeLeft % 60;
+            timerText.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            if (timeLeft <= 0) endGame(null);
+        }, 1000);
+    }
+
+    function endGame(winner) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        if (winner) {
+            const p = document.getElementById(`player${winner}`);
+            p.classList.add('winner-overlay');
+            p.querySelector('h2').textContent = "WINNER! 🎉";
+        }
+        document.getElementById('rematchBtn').style.display = 'block';
+    }
+</script>
+</body>
+</html>

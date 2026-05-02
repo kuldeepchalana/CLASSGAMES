@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Gladiator - GMS Pakka Khurd</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: white;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+        }
+
+        .top-ui {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            z-index: 300;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .back-btn {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #950740;
+        }
+
+        #timer-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff4757;
+            background: #2f3542;
+            padding: 5px 20px;
+            border-radius: 30px;
+            border: 2px solid #ff4757;
+        }
+
+        .player-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 100px 20px 30px 20px;
+            position: relative;
+        }
+
+        #side-1 { border-right: 4px solid #fff; background-color: #16213e; }
+        #side-2 { background-color: #0f3460; }
+
+        .player-name-label { font-size: 24px; color: #fff; margin-bottom: 5px; text-transform: uppercase; }
+        .score { font-size: 32px; font-weight: bold; color: #f9ed69; }
+        
+        .word-display {
+            font-size: 42px;
+            background: #e94560;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 0 #950740;
+            width: 85%;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .punjabi-text { display: block; font-size: 28px; color: #ffda79; margin-top: 10px; }
+
+        .buckets { display: flex; gap: 15px; width: 95%; justify-content: center; }
+
+        .bucket {
+            flex: 1;
+            padding: 40px 10px;
+            text-align: center;
+            background: #4e4e50;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            user-select: none;
+        }
+
+        .noun-btn { border-bottom: 10px solid #2196f3; }
+        .verb-btn { border-bottom: 10px solid #4caf50; }
+        .adj-btn { border-bottom: 10px solid #ff9800; }
+
+        .correct { background: #2ecc71 !important; }
+        .wrong { background: #e74c3c !important; }
+
+        /* Start Screen Inputs */
+        .input-group { margin: 20px 0; display: flex; gap: 20px; }
+        .name-input {
+            padding: 15px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: 2px solid #e94560;
+            background: #16213e;
+            color: white;
+            width: 200px;
+            text-align: center;
+        }
+
+        .winner-overlay, #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+        }
+
+        .main-btn {
+            padding: 25px 50px;
+            font-size: 30px;
+            cursor: pointer;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 0 #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-ui">
+    <a href="../index.html" class="back-btn">⬅ BACK TO HUB</a>
+    <div id="timer-display">1:30</div>
+    <div style="width: 120px;"></div>
+</div>
+
+<div id="start-screen">
+    <h1 style="font-size: 60px; margin-bottom: 10px;">GRAMMAR GLADIATOR</h1>
+    <h2 style="color: #f9ed69; margin-bottom: 20px;">Enter Player Names</h2>
+    
+    <div class="input-group">
+        <input type="text" id="p1-name-in" class="name-input" placeholder="Player 1 Name" value="Player 1">
+        <input type="text" id="p2-name-in" class="name-input" placeholder="Player 2 Name" value="Player 2">
+    </div>
+
+    <button class="main-btn" onclick="startGame()">START DUEL</button>
+</div>
+
+<div id="side-1" class="player-side">
+    <div class="player-name-label" id="p1-label">Player 1</div>
+    <div class="score">SCORE: <span id="p1-score">0</span></div>
+    <div id="p1-word" class="word-display">...</div>
+    <div class="buckets">
+        <div class="bucket noun-btn" onclick="checkAnswer(1, 'noun', this)">NOUN</div>
+        <div class="bucket verb-btn" onclick="checkAnswer(1, 'verb', this)">VERB</div>
+        <div class="bucket adj-btn" onclick="checkAnswer(1, 'adj', this)">ADJ</div>
+    </div>
+</div>
+
+<div id="side-2" class="player-side">
+    <div class="player-name-label" id="p2-label">Player 2</div>
+    <div class="score">SCORE: <span id="p2-score">0</span></div>
+    <div id="p2-word" class="word-display">...</div>
+    <div class="buckets">
+        <div class="bucket noun-btn" onclick="checkAnswer(2, 'noun', this)">NOUN</div>
+        <div class="bucket verb-btn" onclick="checkAnswer(2, 'verb', this)">VERB</div>
+        <div class="bucket adj-btn" onclick="checkAnswer(2, 'adj', this)">ADJ</div>
+    </div>
+</div>
+
+<div id="overlay" class="winner-overlay" style="display:none;">
+    <h1 id="win-text" style="font-size: 50px; color: #f9ed69; text-align: center;">-</h1>
+    <button class="main-btn" onclick="location.reload()">NEXT ROUND</button>
+    <br>
+    <a href="CLASS_GAMES.html" style="color: white; font-size: 20px;">Return to Menu</a>
+</div>
+
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let gameActive = false;
+    let timeLeft = 90;
+    let p1Score = 0, p2Score = 0;
+    let p1Current, p2Current;
+    let p1Name = "Player 1", p2Name = "Player 2";
+
+    function startGame() {
+        // Get names from inputs
+        p1Name = document.getElementById('p1-name-in').value || "Player 1";
+        p2Name = document.getElementById('p2-name-in').value || "Player 2";
+
+        // Update labels on game sides
+        document.getElementById('p1-label').innerText = p1Name;
+        document.getElementById('p2-label').innerText = p2Name;
+
+        let elem = document.documentElement;
+        if (elem.requestFullscreen) { elem.requestFullscreen(); }
+        else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
+
+        document.getElementById('start-screen').style.display = 'none';
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        gameActive = true;
+        startTimer();
+        playBgMusic();
+        newWord(1);
+        newWord(2);
+    }
+
+    function startTimer() {
+        let timerInterval = setInterval(() => {
+            if (!gameActive) { clearInterval(timerInterval); return; }
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            if (timeLeft <= 0) { endGame(); }
+        }, 1000);
+    }
+
+    function playTone(freq, type, duration, volume) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playBgMusic() {
+        const notes = [261.63, 329.63, 392.00, 349.23];
+        let i = 0;
+        setInterval(() => {
+            if(gameActive) playTone(notes[i], 'triangle', 0.6, 0.12);
+            i = (i + 1) % notes.length;
+        }, 500);
+    }
+
+    const wordBank = [
+        {w: "STUDENT", p: "ਵਿਦਿਆਰਥੀ", c: "noun"}, {w: "FARMER", p: "ਕਿਸਾਨ", c: "noun"}, {w: "VILLAGE", p: "ਪਿੰਡ", c: "noun"}, {w: "PENCIL", p: "ਪੈਨਸਿਲ", c: "noun"},
+        {w: "DOCTOR", p: "ਡਾਕਟਰ", c: "noun"}, {w: "MARKET", p: "ਬਾਜ਼ਾਰ", c: "noun"}, {w: "WINDOW", p: "ਬਾਰੀ", c: "noun"}, {w: "RIVER", p: "ਦਰਿਆ", c: "noun"},
+        {w: "WALK", p: "ਤੁਰਨਾ", c: "verb"}, {w: "SLEEP", p: "ਸੌਣਾ", c: "verb"}, {w: "CLEAN", p: "ਸਫਾਈ", c: "verb"}, {w: "BUILD", p: "ਬਣਾਉਣਾ", c: "verb"},
+        {w: "THINK", p: "ਸੋਚਣਾ", c: "verb"}, {w: "DRINK", p: "ਪੀਣਾ", c: "verb"}, {w: "CATCH", p: "ਫੜਨਾ", c: "verb"}, {w: "LEARN", p: "ਸਿੱਖਣਾ", c: "verb"},
+        {w: "BRAVE", p: "ਬਹਾਦਰ", c: "adj"}, {w: "SMALL", p: "ਛੋਟਾ", c: "adj"}, {w: "CLEAN", p: "ਸਾਫ਼", c: "adj"}, {w: "STRONG", p: "ਤਾਕਤਵਰ", c: "adj"},
+        {w: "WEAK", p: "ਕਮਜ਼ੋਰ", c: "adj"}, {w: "HEAVY", p: "ਭਾਰੀ", c: "adj"}, {w: "HAPPY", p: "ਖੁਸ਼", c: "adj"}, {w: "OLD", p: "ਪੁਰਾਣਾ", c: "adj"}
+    ];
+
+    function newWord(player) {
+        if(!gameActive) return;
+        const random = wordBank[Math.floor(Math.random() * wordBank.length)];
+        const wordHtml = `${random.w}<span class="punjabi-text">${random.p}</span>`;
+        if(player === 1) { p1Current = random; document.getElementById('p1-word').innerHTML = wordHtml; }
+        else { p2Current = random; document.getElementById('p2-word').innerHTML = wordHtml; }
+    }
+
+    function checkAnswer(player, category, element) {
+        if(!gameActive) return;
+        const current = (player === 1) ? p1Current : p2Current;
+        if (current.c === category) {
+            playTone(880, 'square', 0.2, 0.15); 
+            element.classList.add('correct');
+            if(player === 1) { p1Score++; document.getElementById('p1-score').innerText = p1Score; }
+            else { p2Score++; document.getElementById('p2-score').innerText = p2Score; }
+            setTimeout(() => { element.classList.remove('correct'); newWord(player); }, 150);
+        } else {
+            playTone(150, 'sawtooth', 0.4, 0.15); 
+            element.classList.add('wrong');
+            setTimeout(() => element.classList.remove('wrong'), 300);
+        }
+    }
+
+    function endGame() {
+        gameActive = false;
+        document.getElementById('overlay').style.display = 'flex';
+        let winnerName = p1Score > p2Score ? p1Name : (p2Score > p1Score ? p2Name : "Both");
+        let res = p1Score === p2Score ? "IT'S A DRAW!" : winnerName + " WINS!";
+        document.getElementById('win-text').innerText = `${res}\nFinal Score: ${p1Score} - ${p2Score}`;
+    }
+</script>
+</body>
+</html>
