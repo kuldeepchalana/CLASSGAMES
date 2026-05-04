@@ -44,6 +44,27 @@
             text-align: center;
         }
 
+        .timer-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .timer-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .timer-btn.selected {
+            background: white;
+            color: #1b5e20;
+        }
+
         .menu-btn {
             padding: 20px 40px;
             font-size: 1.8rem;
@@ -128,6 +149,16 @@
             justify-content: center;
             background: rgba(255,255,255,0.05);
             overflow: hidden;
+            position: relative;
+        }
+
+        .feedback-gif {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            z-index: 10;
+            display: none;
+            pointer-events: none;
         }
 
         .wallet {
@@ -166,10 +197,19 @@
 
         .modal { padding: 30px; border-radius: 25px; transform: scale(0); transition: 0.3s; width: 85%; }
         .success { background: #ffeb3b; color: #333; border: 8px solid #4caf50; }
-        .error { background: #f44336; color: white; border: 8px solid #b71c1c; }
         .finish { background: #2196f3; color: white; border: 8px solid #fff; }
 
+        #final-overlay { z-index: 10000; display: none; }
         .back-btn { position: fixed; bottom: 10px; left: 10px; padding: 10px 20px; background: #d32f2f; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; z-index: 4000; }
+        
+        .error-shake { animation: shake 0.5s; border-color: #f44336 !important; }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
     </style>
 </head>
 <body>
@@ -182,6 +222,12 @@
             <input type="text" id="p1-name-input" class="name-input" placeholder="Player 1 Name" maxlength="12">
             <input type="text" id="p2-name-input" class="name-input" placeholder="Player 2 Name" maxlength="12">
         </div>
+        
+        <div class="timer-options">
+            <button class="timer-btn selected" onclick="setTimer(60, this)">1 MIN</button>
+            <button class="timer-btn" onclick="setTimer(120, this)">2 MINS</button>
+        </div>
+
         <button id="btn-single" class="menu-btn" onclick="startGame('single')">SINGLE PLAYER 🙋‍♂️</button>
         <button id="btn-double" class="menu-btn" onclick="startGame('double')">2-PLAYER DUEL ⚔️</button>
     </div>
@@ -196,10 +242,13 @@
                 <h2 id="p1-display-name">Player 1</h2>
                 <div>Points: <span id="pts1">0</span> | Current: ₹<span id="curr1">0</span></div>
             </div>
-            <div class="target-box">Make ₹<span id="big-t1">0</span></div>
-            <div id="dz1" class="drop-zone"></div>
+            <div id="box-p1" class="target-box">Make ₹<span id="big-t1">0</span></div>
+            <div id="dz1" class="drop-zone">
+                <img id="gif-right1" class="feedback-gif" src="files/right.gif">
+                <img id="gif-wrong1" class="feedback-gif" src="files/wrong.gif">
+            </div>
             <div id="wallet1" class="wallet"></div>
-            <div id="overlay1" class="overlay"><div id="modal1" class="modal"><h2 id="msg1">...</h2><button class="menu-btn" style="width:auto; font-size:1rem;" onclick="nextRound(1)">NEXT</button></div></div>
+            <div id="overlay1" class="overlay"><div id="modal1" class="modal"><h2 id="msg1">...</h2><button class="menu-btn" style="width:auto; font-size:1rem;" onclick="initPlayer(1)">NEXT</button></div></div>
         </div>
 
         <div id="side-p2" class="player-side">
@@ -207,10 +256,20 @@
                 <h2 id="p2-display-name">Player 2</h2>
                 <div>Points: <span id="pts2">0</span> | Current: ₹<span id="curr2">0</span></div>
             </div>
-            <div class="target-box">Make ₹<span id="big-t2">0</span></div>
-            <div id="dz2" class="drop-zone"></div>
+            <div id="box-p2" class="target-box">Make ₹<span id="big-t2">0</span></div>
+            <div id="dz2" class="drop-zone">
+                <img id="gif-right2" class="feedback-gif" src="files/right.gif">
+                <img id="gif-wrong2" class="feedback-gif" src="files/wrong.gif">
+            </div>
             <div id="wallet2" class="wallet"></div>
-            <div id="overlay2" class="overlay"><div id="modal2" class="modal"><h2 id="msg2">...</h2><button class="menu-btn" style="width:auto; font-size:1rem;" onclick="nextRound(2)">NEXT</button></div></div>
+            <div id="overlay2" class="overlay"><div id="modal2" class="modal"><h2 id="msg2">...</h2><button class="menu-btn" style="width:auto; font-size:1rem;" onclick="initPlayer(2)">NEXT</button></div></div>
+        </div>
+    </div>
+
+    <div id="final-overlay" class="overlay">
+        <div class="modal finish" style="transform: scale(1)">
+            <h1 id="winner-text">WINNER!</h1>
+            <button class="menu-btn" onclick="location.reload()">REMATCH 🔄</button>
         </div>
     </div>
 
@@ -220,9 +279,7 @@
         let gameActive = false;
         let musicOn = true;
         let audioCtx, musicLoop;
-        let sharedTarget = 0;
-        let p1Name = "Player 1";
-        let p2Name = "Player 2";
+        let p1Name = "Player 1", p2Name = "Player 2";
 
         let pData = {
             1: { target: 0, current: 0, points: 0 },
@@ -234,9 +291,14 @@
             {v: 1, t: 'coin', c: 'c-1'}, {v: 2, t: 'coin', c: 'c-2'}, {v: 5, t: 'coin', c: 'c-5'}
         ];
 
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function setTimer(seconds, btn) {
+            timeLeft = seconds;
+            document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('time-left').innerText = timeLeft;
         }
+
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
         function playSound(freq, type, duration) {
             if (!musicOn || !audioCtx) return;
@@ -248,55 +310,38 @@
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
         function startBGM() {
             if (!musicOn) return;
             const melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
             let i = 0;
-            musicLoop = setInterval(() => {
-                if (gameActive && musicOn) {
-                    playSound(melody[i % melody.length], 'square', 0.15);
-                    i++;
-                }
-            }, 500);
+            musicLoop = setInterval(() => { if (gameActive && musicOn) { playSound(melody[i % melody.length], 'square', 0.15); i++; } }, 500);
         }
 
         function toggleMusic() {
             musicOn = !musicOn;
             document.getElementById('music-toggle').innerText = musicOn ? "🔊" : "🔇";
-            if (!musicOn) clearInterval(musicLoop);
-            else if (gameActive) startBGM();
+            if (!musicOn) clearInterval(musicLoop); else if (gameActive) startBGM();
         }
 
         function startGame(m) {
-            initAudio();
-            mode = m;
+            initAudio(); mode = m;
             let val1 = document.getElementById('p1-name-input').value.trim();
             let val2 = document.getElementById('p2-name-input').value.trim();
-            if(val1) p1Name = val1;
-            if(val2) p2Name = val2;
-
+            if(val1) p1Name = val1; if(val2) p2Name = val2;
             document.getElementById('p1-display-name').innerText = p1Name;
             document.getElementById('p2-display-name').innerText = p2Name;
-
             gameActive = true;
             document.getElementById('start-page').style.display = 'none';
             document.getElementById('game-wrapper').style.visibility = 'visible';
             document.getElementById('timer-bar').style.display = 'block';
-
-            let elem = document.documentElement;
-            if (elem.requestFullscreen) elem.requestFullscreen();
-
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
             if (mode === 'single') document.getElementById('side-p2').style.display = 'none';
-            
             setupWallets();
-            initPlayer(1);
-            if(mode === 'double') initPlayer(2);
-            startTimer();
-            startBGM();
+            initPlayer(1); if(mode === 'double') initPlayer(2);
+            startTimer(); startBGM();
         }
 
         function setupWallets() {
@@ -306,9 +351,6 @@
                     let img = document.createElement('img');
                     img.src = `files/${m.v}.png`;
                     img.className = `${m.t} ${m.c} m-item`;
-                    img.dataset.val = m.v;
-                    img.dataset.p = p;
-                    // TAP TO ADD
                     img.onclick = () => addToWorkspace(m.v, m.t, m.c, img.src, p);
                     w.appendChild(img);
                 });
@@ -318,20 +360,13 @@
         function addToWorkspace(val, type, className, src, p) {
             if(!gameActive) return;
             playSound(400, 'sine', 0.05);
-
             const dz = document.getElementById('dz' + p);
             let clone = document.createElement('img');
-            clone.src = src;
-            clone.className = `${type} ${className} m-item`;
-            clone.style.margin = "5px";
-            
-            // TAP TO DELETE
-            clone.onclick = () => removeFromWorkspace(clone, val, p);
-
+            clone.src = src; clone.className = `${type} ${className} m-item`;
+            clone.style.margin = "5px"; clone.onclick = () => removeFromWorkspace(clone, val, p);
             dz.appendChild(clone);
             pData[p].current += val;
             document.getElementById('curr' + p).innerText = pData[p].current;
-
             checkWin(p);
         }
 
@@ -341,37 +376,48 @@
             element.remove();
             pData[p].current -= val;
             document.getElementById('curr' + p).innerText = pData[p].current;
+            if(pData[p].current <= pData[p].target) {
+                document.getElementById('box-p' + p).classList.remove('error-shake');
+                document.getElementById('gif-wrong' + p).style.display = 'none';
+            }
         }
 
         function initPlayer(p) {
-            if (mode === 'double') {
-                if (p === 1) sharedTarget = Math.floor(Math.random() * 95) + 5;
-                pData[p].target = sharedTarget;
-            } else {
-                pData[p].target = Math.floor(Math.random() * 95) + 5;
-            }
+            pData[p].target = Math.floor(Math.random() * 95) + 5;
             pData[p].current = 0;
             document.getElementById('big-t' + p).innerText = pData[p].target;
             document.getElementById('curr' + p).innerText = "0";
-            document.getElementById('dz' + p).innerHTML = "";
+            document.getElementById('dz' + p).querySelectorAll('.m-item').forEach(el => el.remove());
             document.getElementById('overlay' + p).style.display = "none";
             document.getElementById('modal' + p).style.transform = "scale(0)";
-        }
-
-        function nextRound(p) {
-            if (mode === 'double') { initPlayer(1); initPlayer(2); }
-            else { initPlayer(p); }
+            document.getElementById('box-p' + p).classList.remove('error-shake');
+            document.getElementById('gif-right' + p).style.display = 'none';
+            document.getElementById('gif-wrong' + p).style.display = 'none';
         }
 
         function checkWin(p) {
             if (pData[p].current === pData[p].target) {
                 pData[p].points++;
                 document.getElementById('pts' + p).innerText = pData[p].points;
-                playSound(800, 'triangle', 0.2);
-                showModal(p, "SHABASH! 🌟", "success");
+                playSound(880, 'triangle', 0.3);
+                
+                // Show Success GIF
+                const gif = document.getElementById('gif-right' + p);
+                gif.style.display = 'block';
+                
+                setTimeout(() => { showModal(p, "SHABASH! 🌟", "success"); }, 1000);
             } else if (pData[p].current > pData[p].target) {
-                playSound(100, 'sawtooth', 0.2);
-                showModal(p, "TOO MUCH! 🛑", "error");
+                playSound(100, 'sawtooth', 0.3);
+                
+                // Show Error GIF and Shake
+                document.getElementById('box-p' + p).classList.add('error-shake');
+                const gif = document.getElementById('gif-wrong' + p);
+                gif.style.display = 'block';
+                
+                setTimeout(() => { 
+                    document.getElementById('box-p' + p).classList.remove('error-shake');
+                    // We keep gif visible until they remove a note
+                }, 500);
             }
         }
 
@@ -387,32 +433,22 @@
         function startTimer() {
             let clock = setInterval(() => {
                 if(timeLeft > 0 && gameActive) {
-                    timeLeft--;
-                    document.getElementById('time-left').innerText = timeLeft;
-                } else {
-                    clearInterval(clock);
-                    endGame();
-                }
+                    timeLeft--; document.getElementById('time-left').innerText = timeLeft;
+                } else { clearInterval(clock); endGame(); }
             }, 1000);
         }
 
         function endGame() {
-            gameActive = false;
-            clearInterval(musicLoop);
-            playSound(150, 'square', 0.8);
+            gameActive = false; clearInterval(musicLoop); playSound(150, 'square', 0.8);
             let finalMsg = "";
             if(mode === 'double') {
                 if(pData[1].points > pData[2].points) finalMsg = p1Name + " WINS! 🏆";
                 else if(pData[2].points > pData[1].points) finalMsg = p2Name + " WINS! 🏆";
                 else finalMsg = "IT'S A TIE! 🤝";
-            } else {
-                finalMsg = "TIME UP! SCORE: " + pData[1].points;
-            }
-            showModal(1, finalMsg, "finish");
-            if(mode === 'double') showModal(2, finalMsg, "finish");
+            } else { finalMsg = "TIME UP! SCORE: " + pData[1].points; }
+            document.getElementById('winner-text').innerText = finalMsg;
+            document.getElementById('final-overlay').style.display = "flex";
         }
-
-        window.oncontextmenu = (e) => e.preventDefault();
     </script>
 </body>
 </html>
