@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORD WAR 3 - RACE TO 40</title>
+    <style>
+        :root {
+            --p1-color: #ff4757;
+            --p2-color: #eab000;
+            --bg-dark: #0f0c29;
+            --neon-blue: #00d2ff;
+            --success-green: #2ecc71;
+            --win-gold: #f1c40f;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            margin: 0;
+            background: linear-gradient(to bottom, #1a1a2e, #16213e, #0f3460);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* PERSISTENT HUB BUTTON */
+        .hub-exit-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .hub-exit-btn:hover { background: #ff4757; border-color: #fff; }
+
+        /* START SCREEN */
+        #setup-screen {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 6px solid #fff;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+            z-index: 100;
+        }
+
+        .funky-title {
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            text-shadow: 
+                0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 
+                0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 
+                0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 
+                0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2);
+            animation: bounce 2s ease-in-out infinite;
+            display: block;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) skew(-5deg); }
+            50% { transform: translateY(-15px) skew(-5deg); }
+        }
+
+        .internet-note { font-size: 0.85rem; color: #ff7675; margin-bottom: 1.5rem; font-weight: bold; }
+
+        .input-group input {
+            width: 260px; padding: 12px; border-radius: 50px; border: 4px solid #444;
+            margin-bottom: 10px; text-align: center; font-weight: bold; font-size: 1.1rem;
+        }
+
+        .start-btn {
+            padding: 12px 50px; font-size: 1.6rem; background: var(--success-green);
+            color: white; border: none; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 6px 0 #1e8449; transition: 0.1s; text-transform: uppercase;
+        }
+
+        /* OVERLAYS */
+        #turn-overlay, #definition-overlay, #win-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.98); display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 2000; text-align: center; padding: 30px;
+        }
+
+        #definition-overlay { border: 20px solid var(--success-green); }
+        
+        #win-overlay { background: radial-gradient(circle, #2c3e50, #000); z-index: 5000; border: 20px solid var(--win-gold); }
+        .win-text { font-size: 6rem; color: var(--win-gold); text-shadow: 0 0 30px var(--win-gold); margin: 0; }
+        .win-name { font-size: 4rem; color: #fff; margin-bottom: 30px; text-transform: uppercase; }
+
+        .def-title { font-size: 4rem; color: var(--success-green); text-transform: uppercase; margin: 0; }
+        .punjabi-trans { font-size: 3.5rem; color: var(--p2-color); margin: 10px 0; font-family: 'Gurmukhi', Arial, sans-serif; }
+        .def-text { font-size: 1.6rem; max-width: 850px; color: #ddd; font-style: italic; margin-bottom: 30px; line-height: 1.4;}
+
+        #overlay-text { font-size: 6rem; text-transform: uppercase; animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { transform: scale(0.9); } to { transform: scale(1.1); } }
+
+        /* GAME LAYOUT */
+        #game-container {
+            display: none; width: 100vw; height: 100vh;
+            grid-template-columns: 200px 1fr 200px; align-items: center; padding: 20px;
+        }
+
+        .sidebar {
+            height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 20px; border: 4px solid rgba(255,255,255,0.1);
+        }
+
+        #p1-sidebar { background: var(--p1-color); box-shadow: 0 0 30px var(--p1-color); }
+        #p2-sidebar { background: var(--p2-color); color: #000; box-shadow: 0 0 30px var(--p2-color); }
+
+        .score-val { font-size: 5rem; font-weight: 900; }
+        .side-name { font-size: 1.3rem; margin-top: 10px; }
+
+        .main-area { display: flex; flex-direction: column; align-items: center; }
+        #timer { font-size: 2.5rem; color: #ff4757; margin-bottom: 10px; font-weight: 900;}
+
+        .grid {
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px;
+            background: #222; padding: 10px; border: 4px solid #fff;
+            width: 100%; max-width: 440px; aspect-ratio: 1/1;
+        }
+
+        .cell {
+            aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.2rem; cursor: pointer; border-radius: 4px; color: #333;
+        }
+
+        .cell.selected { background: #fff !important; color: #000; box-shadow: 0 0 15px #fff; transform: scale(1.1); z-index: 5;}
+        .c1 { background: #ffebeb; } .c2 { background: #ebf5ff; } .c3 { background: #ebffed; } 
+        .c4 { background: #fffdeb; } .c5 { background: #f2ebff; } .c6 { background: #ffebf9; }
+
+        .controls { margin-top: 20px; display: flex; gap: 15px; }
+        #current-word { font-size: 2.2rem; min-width: 160px; background: #111; padding: 8px 25px; border: 2px solid #fff; color: var(--neon-blue); text-align: center; border-radius: 8px;}
+
+        #game-notice {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: #ff4757; color: #fff; padding: 15px 40px; border: 4px solid #fff;
+            font-size: 1.8rem; z-index: 5000; transition: 0.4s;
+        }
+        #game-notice.show { top: 40px; }
+    </style>
+</head>
+<body>
+
+    <a href="../index.html" class="hub-exit-btn">EXIT TO HUB</a>
+
+    <div id="game-notice">NOT ADJACENT!</div>
+
+    <!-- WINNER OVERLAY -->
+    <div id="win-overlay">
+        <div class="win-text">🏆 WINNER 🏆</div>
+        <div id="winner-name" class="win-name">PLAYER NAME</div>
+        <button class="start-btn" onclick="location.reload()" style="background: var(--win-gold); color: #000; box-shadow: 0 6px 0 #b89500;">BATTLE AGAIN</button>
+    </div>
+
+    <!-- DEFINITION OVERLAY -->
+    <div id="definition-overlay">
+        <div id="def-word" class="def-title">WORD</div>
+        <div id="def-punjabi" class="punjabi-trans">ਅਨੁਵਾਦ</div>
+        <div id="def-meaning" class="def-text">"Definition..."</div>
+        <div style="margin-bottom: 20px; font-size: 2rem; color: var(--success-green);">+ <span id="pts">0</span> POINTS!</div>
+        <div id="target-note" style="margin-bottom: 20px; color: #aaa;">Target: 40 Points</div>
+        <button class="start-btn" onclick="closeDef()">Continue Battle</button>
+    </div>
+
+    <!-- TURN OVERLAY -->
+    <div id="turn-overlay">
+        <div id="overlay-text">PLAYER 1</div>
+        <div style="font-size: 2rem; color: #aaa; margin-top: 10px;">PREPARE FOR BATTLE</div>
+    </div>
+
+    <div id="setup-screen">
+        <div class="funky-title">WORD WAR 3</div>
+        <div class="internet-note">⚠️ This Game requires working internet connection</div>
+        <div class="input-group">
+            <input type="text" id="p1-n" placeholder="Hero 1 Name" value="WARRIOR 1">
+            <br>
+            <input type="text" id="p2-n" placeholder="Hero 2 Name" value="WARRIOR 2">
+        </div>
+        <button class="start-btn" onclick="startGame()">BATTLE START</button>
+    </div>
+
+    <div id="game-container">
+        <div id="p1-sidebar" class="sidebar">
+            <div class="score-val" id="p1-s">0</div>
+            <div class="side-name" id="p1-label">P1</div>
+        </div>
+        <div class="main-area">
+            <div id="timer">15s</div>
+            <div class="grid" id="grid"></div>
+            <div class="controls">
+                <div id="current-word">---</div>
+                <button class="start-btn" onclick="submitWord()" style="padding: 10px 25px; font-size: 1.2rem; box-shadow: 0 4px 0 #1e8449;">OK</button>
+                <button class="start-btn" onclick="clearSelection()" style="background:#555; padding: 10px 25px; font-size: 1.2rem; box-shadow: 0 4px 0 #333;">X</button>
+            </div>
+        </div>
+        <div id="p2-sidebar" class="sidebar">
+            <div class="score-val" id="p2-s">0</div>
+            <div class="side-name" id="p2-label">P2</div>
+        </div>
+    </div>
+
+    <script>
+        const PUNJABI_MAP = {
+            "TO": "ਨੂੰ", "IS": "ਹੈ", "IN": "ਵਿੱਚ", "IT": "ਇਹ", "GO": "ਜਾਓ", "ON": "ਉੱਤੇ", "AM": "ਹਾਂ", "HE": "ਉਹ", "UP": "ਉੱਪਰ", "BUT": "ਪਰ", "RAIN": "ਮੀਂਹ", "BRAIN": "ਦਿਮਾਗ", "DOG": "ਕੁੱਤਾ", "CAT": "ਬਿੱਲੀ", "FISH": "ਮੱਛੀ", "TREE": "ਰੁੱਖ", "FIRE": "ਅੱਗ", "WATER": "ਪਾਣੀ", "APPLE": "ਸੇਬ", "HOUSE": "ਘਰ", "SPACE": "ਪੁਲਾੜ", "MUSIC": "ਸੰਗੀਤ", "LIGHT": "ਰੌਸ਼ਨੀ", "GREEN": "ਹਰਾ", "SMART": "ਹੁਸ਼ਿਆਰ", "POWER": "ਤਾਕਤ", "SMILE": "ਮੁਸਕਾਨ", "BOOKS": "ਕਿਤਾਬਾਂ", "PIZZA": "ਪੀਜ਼ਾ", "EARTH": "ਧਰਤੀ", "LUCKY": "ਕਿਸਮਤਵਾਲਾ", "DREAM": "ਸੁਪਨਾ", "FLOWER": "ਫੁੱਲ", "STORM": "ਤੂਫ਼ਾਨ", "PHONE": "ਫੋਨ", "TABLE": "ਮੇਜ਼", "CHAIR": "ਕੁਰਸੀ", "CLOCK": "ਘੜੀ", "WATCH": "ਘੜੀ", "BOY": "ਮੁੰਡਾ", "GIRL": "ਕੁੜੀ", "FOOD": "ਖਾਣਾ", "GOOD": "ਚੰਗਾ", "FAST": "ਤੇਜ਼", "SCHOOL": "ਸਕੂਲ", "BIRD": "ਪੰਛੀ", "MOON": "ਚੰਦਰਮਾ", "SUN": "ਸੂਰਜ", "SKY": "ਅਸਮਾਨ", "STAR": "ਤਾਰਾ", "TIME": "ਸਮਾਂ", "HAND": "ਹੱਥ", "FOOT": "ਪੈਰ", "EYE": "ਅੱਖ", "HEAD": "ਸਿਰ", "MILK": "ਦੁੱਧ", "FRUIT": "ਫਲ", "PEN": "ਕਲਮ", "PAPER": "ਕਾਗਜ਼", "CITY": "ਸ਼ਹਿਰ", "ROAD": "ਸੜਕ", "PLAY": "ਖੇਡੋ", "RUN": "ਦੌੜੋ", "SING": "ਗਾਓ", "SLEEP": "ਸੌਂਵੋ", "DANCE": "ਨਾਚ", "CLOTH": "ਕੱਪੜਾ", "GOLD": "ਸੋਨਾ", "BLUE": "ਨੀਲਾ", "RED": "ਲਾਲ", "WHITE": "ਚਿੱਟਾ", "BLACK": "ਕਾਲਾ", "SWEET": "ਮਿੱਠਾ", "COLD": "ਠੰਡਾ", "HOT": "ਗਰਮ", "SMALL": "ਛੋਟਾ", "BIG": "ਵੱਡਾ", "HAPPY": "ਖੁਸ਼", "SAD": "ਉਦਾਸ", "BRAVE": "ਬਹਾਦਰ", "STRONG": "ਮਜ਼ਬੂਤ", "BREAD": "ਰੋਟੀ", "EGG": "ਅੰਡਾ", "TEA": "ਚਾਹ"
+        };
+
+        let players = [{n:"", s:0}, {n:"", s:0}];
+        let used = [];
+        let cur = 0;
+        let time = 15;
+        let timer;
+        let word = "";
+        let ids = [];
+        let audio;
+        let busy = false;
+
+        function play(f, t='square', d=0.1) {
+            if(!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+            let o = audio.createOscillator(); let g = audio.createGain();
+            o.type = t; o.frequency.value = f;
+            g.gain.setValueAtTime(0.05, audio.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime+d);
+            o.connect(g); g.connect(audio.destination);
+            o.start(); o.stop(audio.currentTime+d);
+        }
+
+        function startGame() {
+            players[0].n = document.getElementById('p1-n').value;
+            players[1].n = document.getElementById('p2-n').value;
+            document.getElementById('setup-screen').style.display='none';
+            document.getElementById('game-container').style.display='grid';
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+            initGrid();
+            showTurn();
+        }
+
+        function initGrid() {
+            const g = document.getElementById('grid'); g.innerHTML = '';
+            const c = ['c1','c2','c3','c4','c5','c6'];
+            for(let i=0; i<100; i++) {
+                let div = document.createElement('div');
+                div.className = 'cell ' + c[Math.floor(Math.random()*6)];
+                div.textContent = String.fromCharCode(65 + Math.floor(Math.random()*26));
+                div.dataset.idx = i;
+                div.onclick = () => selectLetter(div);
+                g.appendChild(div);
+            }
+            Object.keys(PUNJABI_MAP).sort(() => Math.random() - 0.5).slice(0, 20).forEach(w => {
+                let s = Math.floor(Math.random()*(100-w.length));
+                for(let j=0; j<w.length; j++) if(g.children[s+j]) g.children[s+j].textContent = w[j];
+            });
+        }
+
+        function selectLetter(div) {
+            if(busy) return;
+            const idx = parseInt(div.dataset.idx);
+            if(ids.length > 0) {
+                const lastIdx = parseInt(ids[ids.length - 1]);
+                const r1 = Math.floor(lastIdx / 10), c1 = lastIdx % 10;
+                const r2 = Math.floor(idx / 10), c2 = idx % 10;
+                if(Math.abs(r1-r2) > 1 || Math.abs(c1-c2) > 1) { notice("NOT ADJACENT!"); return; }
+            }
+            if(ids.includes(div.dataset.idx)) return;
+            play(400 + (ids.length*50));
+            div.classList.add('selected');
+            ids.push(div.dataset.idx);
+            word += div.textContent;
+            document.getElementById('current-word').textContent = word;
+        }
+
+        function showTurn() {
+            busy = true; clearInterval(timer);
+            const ov = document.getElementById('turn-overlay');
+            const txt = document.getElementById('overlay-text');
+            txt.textContent = players[cur].n;
+            txt.style.color = cur===0 ? 'var(--p1-color)' : 'var(--p2-color)';
+            ov.style.display = 'flex';
+            setTimeout(() => { ov.style.display='none'; busy=false; startTurn(); }, 5000);
+        }
+
+        function startTurn() {
+            time = 15; clearSelection(); updateUI();
+            timer = setInterval(() => {
+                if(!busy) {
+                    time--; document.getElementById('timer').textContent = time+"s";
+                    if(time <= 0) { play(100, 'square', 0.5); next(); }
+                }
+            }, 1000);
+        }
+
+        async function submitWord() {
+            // NEW: Allow length 2 or more
+            if(word.length < 2 || busy) return;
+            if(used.includes(word)) { notice("ALREADY USED!"); return; }
+
+            busy = true;
+            try {
+                const dict = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
+                if(dict.ok) {
+                    const data = await dict.json();
+                    const def = data[0].meanings[0].definitions[0].definition;
+                    let pun = PUNJABI_MAP[word.toUpperCase()] || "";
+                    if(!pun) {
+                        const tr = await fetch(`https://api.mymemory.translated.net/get?q=${word}&langpair=en|pa`);
+                        const trData = await tr.json();
+                        pun = trData.responseData.translatedText;
+                        if(pun.toUpperCase() === word.toUpperCase()) pun = "ਸ਼ਬਦ"; 
+                    }
+                    players[cur].s += word.length;
+                    used.push(word);
+                    play(800); play(1100, 'square', 0.2);
+                    showDef(word, def, pun);
+                } else {
+                    notice("NOT A WORD!"); busy = false; clearSelection();
+                }
+            } catch(e) { notice("CONN ERROR"); busy=false; }
+        }
+
+        function showDef(w, d, p) {
+            busy = true;
+            const ov = document.getElementById('definition-overlay');
+            document.getElementById('def-word').textContent = w;
+            document.getElementById('def-punjabi').textContent = p;
+            document.getElementById('def-meaning').textContent = `"${d}"`;
+            document.getElementById('pts').textContent = w.length;
+            ov.style.display = 'flex';
+        }
+
+        function closeDef() {
+            document.getElementById('definition-overlay').style.display = 'none';
+            if(players[cur].s >= 40) {
+                showWin();
+            } else {
+                next();
+            }
+        }
+
+        function showWin() {
+            busy = true;
+            const ov = document.getElementById('win-overlay');
+            const nameTxt = document.getElementById('winner-name');
+            nameTxt.textContent = players[cur].n;
+            nameTxt.style.color = cur === 0 ? 'var(--p1-color)' : 'var(--p2-color)';
+            ov.style.display = 'flex';
+            play(523, 'sine', 0.5); play(659, 'sine', 0.5); play(783, 'sine', 1);
+        }
+
+        function next() { cur = cur===0 ? 1 : 0; showTurn(); }
+
+        function clearSelection() {
+            word = ""; ids = [];
+            document.getElementById('current-word').textContent = "---";
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
+        }
+
+        function notice(m) {
+            const n = document.getElementById('game-notice');
+            n.textContent = m; n.classList.add('show');
+            play(100, 'sawtooth', 0.3);
+            setTimeout(() => n.classList.remove('show'), 2000);
+        }
+
+        function updateUI() {
+            document.getElementById('p1-s').textContent = players[0].s;
+            document.getElementById('p2-s').textContent = players[1].s;
+            document.getElementById('p1-label').textContent = players[0].n;
+            document.getElementById('p2-label').textContent = players[1].n;
+            document.getElementById('timer').textContent = time + "s";
+        }
+    </script>
+</body>
+</html>
