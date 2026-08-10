@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Daily Mindfulness Timer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .banner {
+            background: linear-gradient(90deg, #4a69bd, #60a3bc);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            width: 90%;
+        }
+
+        #activity-name {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #punjabi-name {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: #60a3bc;
+            margin-bottom: 10px;
+            min-height: 30px;
+        }
+
+        /* --- Breathing Animation Styles --- */
+        #breathing-container {
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            height: 140px;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        #breathing-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #78e08f, #38ada9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 4s ease-in-out, opacity 4s ease-in-out;
+            line-height: 1.2;
+        }
+
+        .breathe-in {
+            transform: scale(1.4);
+            opacity: 1;
+        }
+
+        .breathe-out {
+            transform: scale(1);
+            opacity: 0.6;
+        }
+        /* ---------------------------------- */
+
+        #timer {
+            font-size: clamp(4rem, 10vw, 5.5rem);
+            font-weight: bold;
+            color: #38ada9;
+            margin: 5px 0;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+        }
+
+        #up-next {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 10px;
+            min-height: 20px;
+            font-style: italic;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-weight: bold;
+        }
+
+        #start-btn { background-color: #78e08f; }
+        #start-btn:hover:not(:disabled) { background-color: #58c973; transform: translateY(-2px); }
+
+        #pause-btn { background-color: #f6b93b; }
+        #pause-btn:hover:not(:disabled) { background-color: #e5a428; transform: translateY(-2px); }
+
+        #reset-btn { background-color: #e55039; }
+        #reset-btn:hover:not(:disabled) { background-color: #c4422e; transform: translateY(-2px); }
+
+        button:disabled {
+            background-color: #dcdde1;
+            color: #a4b0be;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #progress-container {
+            width: 100%;
+            background-color: rgba(223, 228, 234, 0.6);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            height: 12px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer; 
+            transition: height 0.2s ease;
+        }
+
+        #progress-container:hover {
+            height: 18px; 
+        }
+
+        #progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #78e08f, #38ada9);
+            width: 0%;
+            transition: width 0.3s ease-out; 
+            border-radius: 10px;
+        }
+
+        .audio-settings {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #555;
+            width: 90%;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        input[type="range"] {
+            cursor: pointer;
+        }
+        
+        input[type="file"] {
+            font-size: 0.8rem;
+            max-width: 180px;
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bg-audio" loop src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3"></audio>
+
+<div class="container">
+    <div class="banner">MINDFULNESS PROGRAMME</div>
+    
+    <div id="activity-name">Ready to begin (ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਤਿਆਰ)</div>
+    <div id="punjabi-name"></div>
+    
+    <div id="breathing-container">
+        <div id="breathing-circle" class="breathe-out">Ready</div>
+    </div>
+
+    <div id="timer">20:00</div>
+    
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    
+    <div id="up-next">Total Time: 20 Minutes</div>
+
+    <div class="controls">
+        <button id="start-btn" onclick="startSequence()">Start</button>
+        <button id="pause-btn" onclick="pauseSequence()" disabled>Pause</button>
+        <button id="reset-btn" onclick="resetSequence()">Reset</button>
+    </div>
+
+    <div class="audio-settings">
+        <strong>Background Music Settings</strong>
+        <div class="audio-controls">
+            <label for="volume-slider">Volume:</label>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1">
+        </div>
+        <div class="audio-controls">
+            <label for="audio-upload">Use your own music:</label>
+            <input type="file" id="audio-upload" accept="audio/*">
+        </div>
+    </div>
+</div>
+
+<script>
+    const activities = [
+        { en: "See Around the Room & Close Eyes", pa: "ਕਮਰੇ ਵਿੱਚ ਆਲੇ ਦੁਆਲੇ ਦੇਖੋ ਤੇ ਅੱਖਾਂ ਬੰਦ ਕਰੋ", duration: 30 },
+        { en: "Gentle Smile", pa: "ਹਲਕੀ ਜਿਹੀ ਮੁਸਕਾਨ ਲਿਆਓ", duration: 15 },
+        { en: "Mindful Breathing", pa: "ਧਿਆਨ ਨਾਲ ਸਾਹ ਅੰਦਰ ਤੇ ਬਾਹਰ", duration: 120 },
+        { en: "Mindful Attention to Mind Chatter", pa: "ਆਪਣੇ ਮਨ ਵਿੱਚ ਆ ਰਹੇ ਵਿਚਾਰਾਂ ਨੂੰ ਧਿਆਨ ਨਾਲ ਦੇਖੋ", duration: 60 },
+        { en: "Mindful Attention to Heart Feelings", pa: "ਆਪਣੇ ਦਿਲ ਦੀਆਂ ਭਾਵਨਾਵਾਂ ਨੂੰ ਮਹਿਸੂਸ ਕਰੋ", duration: 15 },
+        { en: "Mindful Attention to Heartbeat", pa: "ਆਪਣੀ ਦਿਲ ਦੀ ਧੜਕਣ ਨੂੰ ਸੁਣੋ", duration: 60 },
+        { en: "Guided Meditation", pa: "ਅਧਿਆਪਕ ਦੀ ਮਦਦ ਨਾਲ ਧਿਆਨ ਕਰੋ", duration: 300 },
+        { en: "Positive Manifestation & Affirmations", pa: "ਆਪਣੇ ਲਈ ਚੰਗੀਆਂ ਗੱਲਾਂ ਸੋਚੋ ਤੇ ਬੋਲੋ", duration: 120 },
+        { en: "Success Visualization", pa: "ਆਪਣੀ ਸਫਲਤਾ ਦੀ ਕਲਪਨਾ ਕਰੋ", duration: 60 },
+        { en: "Gratitude Practice", pa: "ਧੰਨਵਾਦ ਕਰਨਾ ਸਿੱਖੋ", duration: 120 },
+        { en: "Parents Gratitude Sharing", pa: "ਆਪਣੇ ਮਾਪਿਆਂ ਲਈ ਧੰਨਵਾਦ ਸਾਂਝਾ ਕਰੋ", duration: 240 },
+        { en: "Closure and Gratitude", pa: "ਅੰਤ ਵਿੱਚ ਸਭ ਦਾ ਧੰਨਵਾਦ ਕਰੋ", duration: 60 }
+    ];
+
+    let currentIndex = 0;
+    let timeRemaining = 0;
+    let timerInterval = null;
+    let isRunning = false;
+    let totalTimeSec = 1200; 
+    let elapsedTime = 0;
+    let isBreathingIn = true; 
+
+    const activityNameEl = document.getElementById('activity-name');
+    const punjabiNameEl = document.getElementById('punjabi-name');
+    const timerEl = document.getElementById('timer');
+    const upNextEl = document.getElementById('up-next');
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const progressBarEl = document.getElementById('progress-bar');
+    const progressContainerEl = document.getElementById('progress-container');
+    
+    const breathContainer = document.getElementById('breathing-container');
+    const breathCircle = document.getElementById('breathing-circle');
+
+    const bgAudio = document.getElementById('bg-audio');
+    const volumeSlider = document.getElementById('volume-slider');
+    const audioUpload = document.getElementById('audio-upload');
+    
+    // --- Voiceover Audio Element ---
+    const voiceAudio = new Audio();
+
+    bgAudio.volume = 1.0;
+
+    volumeSlider.addEventListener('input', function(e) {
+        bgAudio.volume = e.target.value;
+    });
+
+    audioUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const objectURL = URL.createObjectURL(file);
+            bgAudio.src = objectURL;
+            if (isRunning) bgAudio.play();
+        }
+    });
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(() => {});
+        } else if (elem.webkitRequestFullscreen) { 
+            elem.webkitRequestFullscreen().catch(() => {});
+        } else if (elem.msRequestFullscreen) { 
+            elem.msRequestFullscreen().catch(() => {});
+        }
+    }
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // --- Play Voice Instruction Function ---
+    function playVoiceInstruction(index) {
+        if (index >= activities.length) return;
+        voiceAudio.pause(); // Stop any currently playing voice
+        voiceAudio.currentTime = 0;
+        // Dynamically load mind1.mp3, mind2.mp3, etc.
+        voiceAudio.src = `files/audio/mind${index + 1}.mp3`;
+        voiceAudio.play().catch(error => {
+            console.log("Voice audio play blocked or missing file:", error);
+        });
+    }
+
+    function updateDisplay() {
+        if (currentIndex < activities.length) {
+            activityNameEl.textContent = `${currentIndex + 1}. ${activities[currentIndex].en}`;
+            punjabiNameEl.textContent = activities[currentIndex].pa;
+            timerEl.textContent = formatTime(timeRemaining);
+            
+            if (currentIndex + 1 < activities.length) {
+                upNextEl.textContent = `Up Next: ${activities[currentIndex + 1].en}`;
+            } else {
+                upNextEl.textContent = "Final Activity";
+            }
+
+            if (currentIndex === 2) {
+                breathContainer.style.display = 'flex';
+            } else {
+                breathContainer.style.display = 'none';
+            }
+
+        } else {
+            activityNameEl.textContent = "Session Complete";
+            punjabiNameEl.textContent = "ਸੈਸ਼ਨ ਪੂਰਾ ਹੋਇਆ";
+            timerEl.textContent = "00:00";
+            upNextEl.textContent = "Great job!";
+            progressBarEl.style.width = "100%";
+            breathContainer.style.display = 'none';
+            
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.disabled = false;
+            startBtn.textContent = "Start";
+            pauseBtn.disabled = true;
+        }
+    }
+
+    progressContainerEl.addEventListener('click', function(e) {
+        const rect = progressContainerEl.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        let progressPercent = clickX / rect.width;
+        
+        progressPercent = Math.max(0, Math.min(1, progressPercent));
+
+        const targetElapsedTime = Math.floor(progressPercent * totalTimeSec);
+
+        let accumulatedTime = 0;
+        let newIndex = 0;
+        let newTimeRemaining = 0;
+
+        for (let i = 0; i < activities.length; i++) {
+            accumulatedTime += activities[i].duration;
+            if (targetElapsedTime < accumulatedTime) {
+                newIndex = i;
+                newTimeRemaining = accumulatedTime - targetElapsedTime;
+                break;
+            }
+        }
+
+        if (targetElapsedTime >= totalTimeSec) {
+            newIndex = activities.length;
+            newTimeRemaining = 0;
+        }
+
+        let oldIndex = currentIndex;
+
+        // Apply the new state
+        currentIndex = newIndex;
+        timeRemaining = newTimeRemaining;
+        elapsedTime = targetElapsedTime;
+
+        progressBarEl.style.width = `${(elapsedTime / totalTimeSec) * 100}%`;
+
+        if (currentIndex === 2) {
+            breathCircle.innerHTML = "Breathe<br>In";
+            breathCircle.className = "breathe-in";
+            isBreathingIn = false;
+        }
+
+        updateDisplay();
+
+        // If the user skipped to a DIFFERENT activity, play its instruction audio
+        if (oldIndex !== currentIndex && isRunning) {
+            playVoiceInstruction(currentIndex);
+        }
+    });
+
+    function startSequence() {
+        if (currentIndex >= activities.length) return;
+        
+        if (!isRunning) {
+            openFullscreen();
+
+            bgAudio.play().catch(error => {
+                console.log("Audio requires interaction or source is missing.");
+            });
+
+            if (timeRemaining === 0) {
+                timeRemaining = activities[currentIndex].duration;
+            }
+            
+            // Trigger voice instruction on very first start or if starting exactly at the beginning of a step
+            if (timeRemaining === activities[currentIndex].duration) {
+                playVoiceInstruction(currentIndex);
+            }
+
+            updateDisplay();
+            
+            if (currentIndex === 2 && timeRemaining === activities[2].duration) {
+                breathCircle.innerHTML = "Breathe<br>In";
+                breathCircle.className = "breathe-in";
+                isBreathingIn = false;
+            }
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                elapsedTime++;
+                
+                let progressPercent = (elapsedTime / totalTimeSec) * 100;
+                progressBarEl.style.width = `${progressPercent}%`;
+
+                if (currentIndex === 2 && timeRemaining % 4 === 0 && timeRemaining !== activities[2].duration) {
+                    if (isBreathingIn) {
+                        breathCircle.className = 'breathe-in';
+                        breathCircle.innerHTML = "Breathe<br>In";
+                    } else {
+                        breathCircle.className = 'breathe-out';
+                        breathCircle.innerHTML = "Breathe<br>Out";
+                    }
+                    isBreathingIn = !isBreathingIn;
+                }
+
+                if (timeRemaining <= 0) {
+                    currentIndex++;
+                    if (currentIndex < activities.length) {
+                        timeRemaining = activities[currentIndex].duration;
+                        
+                        // Play voice instruction for the new activity naturally
+                        playVoiceInstruction(currentIndex);
+                        
+                        if (currentIndex === 2) {
+                            breathCircle.innerHTML = "Breathe<br>In";
+                            breathCircle.className = "breathe-in";
+                            isBreathingIn = false; 
+                        }
+                        
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        startBtn.disabled = false;
+                        pauseBtn.disabled = true;
+                        bgAudio.pause(); 
+                        voiceAudio.pause();
+                    }
+                }
+                updateDisplay();
+            }, 1000);
+            
+            isRunning = true;
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+        }
+    }
+
+    function pauseSequence() {
+        if (isRunning) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.disabled = false;
+            startBtn.textContent = "Resume";
+            pauseBtn.disabled = true;
+            bgAudio.pause(); 
+            voiceAudio.pause(); // Pause voice instruction if user hits pause
+        }
+    }
+
+    function resetSequence() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        currentIndex = 0;
+        timeRemaining = 0;
+        elapsedTime = 0;
+        isBreathingIn = true;
+        
+        bgAudio.pause();
+        bgAudio.currentTime = 0;
+        
+        // Reset Voiceover
+        voiceAudio.pause();
+        voiceAudio.currentTime = 0;
+        
+        breathCircle.className = 'breathe-out';
+        breathCircle.innerHTML = 'Ready';
+        breathContainer.style.display = 'none';
+
+        activityNameEl.textContent = "Ready to begin (ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਤਿਆਰ)";
+        punjabiNameEl.textContent = "";
+        timerEl.textContent = "20:00";
+        upNextEl.textContent = "Total Time: 20 Minutes";
+        progressBarEl.style.width = "0%";
+        
+        startBtn.disabled = false;
+        startBtn.textContent = "Start";
+        pauseBtn.disabled = true;
+        
+        if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+        }
+    }
+</script>
+
+</body>
+</html>
