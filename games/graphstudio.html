@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph Studio - Interactive Graph</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --accent: #f59e0b;
+      --bg-warm: #f0fdf4;
+      --panel-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #ecfdf5 0%, #e0e7ff 50%, #fef3c7 100%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    /* Fullscreen Launcher Overlay */
+    #launcher {
+      position: fixed;
+      inset: 0;
+      background: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      color: white;
+      text-align: center;
+    }
+
+    .launch-btn {
+      padding: 25px 60px;
+      font-size: 2rem;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      transition: 0.2s;
+      margin-top: 20px;
+    }
+
+    .launch-btn:hover { 
+      transform: scale(1.1); 
+      background: #4338ca; 
+    }
+
+    /* Top Bar */
+    header {
+      background: white;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-back {
+      background: #fee2e2;
+      border: 2px solid #fca5a5;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #dc2626;
+      text-decoration: none;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      margin-right: 10px;
+    }
+
+    .btn-back:hover {
+      background: #fecaca;
+      transform: scale(1.05);
+    }
+
+    .brand-icon {
+      font-size: 32px;
+      background: #fef08a;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 0 #ca8a04;
+    }
+
+    .brand h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+    }
+
+    .brand span {
+      font-size: 13px;
+      color: #6366f1;
+      font-weight: 600;
+      display: block;
+    }
+
+    .top-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stat-pill {
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #334155;
+    }
+
+    .stat-pill span {
+      color: #4f46e5;
+    }
+    
+    .btn-fullscreen {
+      background: #eef2ff;
+      border: 2px solid #a5b4fc;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #4338ca;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-fullscreen:hover {
+      background: #e0e7ff;
+      transform: scale(1.05);
+    }
+
+    /* Main Layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    /* Sidebar Toolbox */
+    .toolbox {
+      width: 320px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      overflow-y: auto;
+      border: 3px solid #ffffff;
+      z-index: 10;
+    }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      padding: 10px 8px;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      transition: all 0.15s ease;
+    }
+
+    .tool-btn .icon {
+      font-size: 22px;
+    }
+
+    .tool-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+    }
+
+    .tool-btn.active {
+      background: #eef2ff;
+      border-color: #6366f1;
+      color: #4338ca;
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Colors and Sliders */
+    .color-palette {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: 0.15s transform;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.15);
+    }
+
+    .color-swatch.active {
+      transform: scale(1.2);
+      outline: 3px solid #0f172a;
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #4f46e5;
+      cursor: pointer;
+    }
+    
+    input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      font-weight: 700;
+      color: #334155;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Action Buttons */
+    .action-row {
+      display: flex;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: 0.15s transform, 0.15s background;
+    }
+
+    .btn-undo {
+      background: #fef08a;
+      color: #a16207;
+    }
+
+    .btn-undo:hover {
+      background: #fde047;
+    }
+
+    .btn-clear {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .btn-clear:hover {
+      background: #fecaca;
+    }
+
+    .btn-export {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .btn-export:hover {
+      background: #bbf7d0;
+    }
+
+    /* Workspace / Canvas Area */
+    .workspace {
+      flex: 1;
+      background: white;
+      border-radius: 20px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Instruction banner */
+    .help-banner {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border: 2px solid #818cf8;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #3730a3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fullscreen Entry Overlay -->
+  <div id="launcher">
+    <h1 style="font-size: 3rem; margin-bottom: 10px;">Graph Studio</h1>
+    <p style="font-size: 1.2rem; color: #cbd5e1; margin-bottom: 20px;">Interactive Coordinate & Graphing Tool</p>
+    <button class="launch-btn" onclick="startApp()">START STUDIO 🚀</button>
+    <p style="margin-top:20px; color:#94a3b8;">Tap to launch in Fullscreen Mode</p>
+  </div>
+
+  <header>
+    <div class="brand">
+      <a href="../index.html" class="btn-back">⬅ Back to Hub</a>
+      <div class="brand-icon">📈</div>
+      <div>
+        <h1>Graph Studio</h1>
+        <span>Interactive Coordinate & Graph Studio</span>
+      </div>
+    </div>
+    <div class="top-stats">
+      <div class="stat-pill">📍 Points: <span id="point-count">0</span></div>
+      <div class="stat-pill">📊 Bars: <span id="bar-count">0</span></div>
+      <button class="btn-fullscreen" id="btn-fullscreen">⛶ Fullscreen</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Tools Panel -->
+    <aside class="toolbox">
+      <div>
+        <div class="section-title">Select Mode</div>
+        <div class="tool-grid">
+          <button class="tool-btn active" data-mode="axes">
+            <span class="icon">📐</span>
+            <span>Draw Axes</span>
+          </button>
+          <button class="tool-btn" data-mode="doodle">
+            <span class="icon">✏️</span>
+            <span>Doodle</span>
+          </button>
+          <button class="tool-btn" data-mode="label">
+            <span class="icon">🏷</span>
+            <span>Add Label</span>
+          </button>
+          <button class="tool-btn" data-mode="point">
+            <span class="icon">📍</span>
+            <span>Plot Point</span>
+          </button>
+          <button class="tool-btn" data-mode="line">
+            <span class="icon">📉</span>
+            <span>Line Graph</span>
+          </button>
+          <button class="tool-btn" data-mode="bar">
+            <span class="icon">📊</span>
+            <span>Bar Graph</span>
+          </button>
+          <button class="tool-btn" data-mode="histogram" style="grid-column: span 2;">
+            <span class="icon">📶</span>
+            <span>Histogram</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Axis Scale / Step Controls -->
+      <div class="slider-group">
+        <div class="slider-header">
+          <span>X-Axis Step Size</span>
+        </div>
+        <input type="number" id="scale-x" value="1" min="0.1" step="any">
+      </div>
+      <div class="slider-group">
+        <div class="slider-header">
+          <span>Y-Axis Step Size</span>
+        </div>
+        <input type="number" id="scale-y" value="1" min="0.1" step="any">
+      </div>
+
+      <!-- Colors -->
+      <div>
+        <div class="section-title">Theme Color</div>
+        <div class="color-palette" id="palette">
+          <div class="color-swatch active" style="background: #1e293b;" data-color="#1e293b"></div>
+          <div class="color-swatch" style="background: #ef4444;" data-color="#ef4444"></div>
+          <div class="color-swatch" style="background: #f97316;" data-color="#f97316"></div>
+          <div class="color-swatch" style="background: #10b981;" data-color="#10b981"></div>
+          <div class="color-swatch" style="background: #06b6d4;" data-color="#06b6d4"></div>
+          <div class="color-swatch" style="background: #6366f1;" data-color="#6366f1"></div>
+          <div class="color-swatch" style="background: #ec4899;" data-color="#ec4899"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="slider-group">
+        <div class="slider-header">
+          <span>Bar Width</span>
+          <span id="bar-width-val">1 Grid</span>
+        </div>
+        <input type="range" id="bar-width-slider" min="1" max="4" value="1" step="1">
+      </div>
+
+      <!-- Action Footer -->
+      <div class="action-row">
+        <button class="btn btn-undo" id="btn-undo">↩ Undo</button>
+        <button class="btn btn-clear" id="btn-clear">🗑️ Clear</button>
+        <button class="btn btn-export" id="btn-save">💾 Save</button>
+      </div>
+    </aside>
+
+    <!-- Interactive Graph Paper -->
+    <main class="workspace" id="workspace">
+      <div class="help-banner" id="help-text">
+        📐 Drag horizontally or vertically on the main grid lines to draw your axes.
+      </div>
+      <canvas id="graphCanvas"></canvas>
+    </main>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    const workspace = document.getElementById('workspace');
+    const helpText = document.getElementById('help-text');
+    const pointCountEl = document.getElementById('point-count');
+    const barCountEl = document.getElementById('bar-count');
+    const barWidthSlider = document.getElementById('bar-width-slider');
+    const barWidthVal = document.getElementById('bar-width-val');
+    const fullscreenBtn = document.getElementById('btn-fullscreen');
+    const launcher = document.getElementById('launcher');
+    
+    // Scale Inputs
+    const scaleXInput = document.getElementById('scale-x');
+    const scaleYInput = document.getElementById('scale-y');
+
+    // Graph Configuration
+    const GRID_SIZE = 50; // Main Grid square size in px
+    const MINOR_STEP = GRID_SIZE / 10; // 10x10 subdivisions (5px each) for precise decimal plotting
+    
+    let currentMode = 'axes';
+    let currentColor = '#1e293b';
+    let barGridSpan = 1;
+
+    // Elements Data Store
+    let axesList = []; // [{ startX, startY, endX, endY, isHorizontal }]
+    let points = []; // [{ x, y, color }]
+    let lines = [];  // [{ from: {x, y}, to: {x, y}, color }]
+    let bars = [];   // [{ x, y, w, h, color }]
+    let labels = []; // [{ x, y, text, color }]
+    let doodles = []; // [{ color, points: [{x,y}, ...] }]
+
+    // Action History for Undo
+    let actionHistory = []; // Stores string types
+
+    // State trackers for interactions
+    let isDrawing = false;
+    let dragStart = null;
+    let tempPoint = null; 
+    let mousePos = null;
+
+    const modeHints = {
+      axes: '📐 Drag horizontally or vertically. Axes snap to MAIN grid lines.',
+      doodle: '✏️ Draw freely anywhere on the screen.',
+      label: '🏷 Click anywhere to type your custom category label or title.',
+      point: '📍 Tap to plot points. (Snaps to fine 0.1 decimal grid lines)',
+      line: '📉 Tap to join points continuously. Press ESC or change tools to stop the line.',
+      bar: '📊 Drag vertically from the X-axis. Bars base snaps perfectly between steps!',
+      histogram: '📶 Drag vertically from the X-axis. Bars base snaps perfectly adjacent to each other.'
+    };
+
+    // Fullscreen Launch Function
+    function startApp() {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+      launcher.style.display = 'none';
+      setTimeout(resizeCanvas, 200); // Give time for full screen adjustment
+    }
+
+    function resizeCanvas() {
+      const rect = workspace.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      render();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Fullscreen Toggle Button Functionality
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        fullscreenBtn.innerHTML = '🗗 Exit Full';
+      } else {
+        fullscreenBtn.innerHTML = '⛶ Fullscreen';
+      }
+      setTimeout(resizeCanvas, 100);
+    });
+
+    // Separated Snapping Functions
+    function snapMain(val) {
+      return Math.round(val / GRID_SIZE) * GRID_SIZE; // Only snaps to major 50px blocks
+    }
+
+    function snapMinor(val) {
+      return Math.round(val / MINOR_STEP) * MINOR_STEP; // Snaps to minor 5px blocks (decimal plotting)
+    }
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      if (e.changedTouches) {
+        return {
+          x: e.changedTouches[0].clientX - rect.left,
+          y: e.changedTouches[0].clientY - rect.top
+        };
+      }
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        tempPoint = null;
+        render();
+      }
+    });
+
+    // Re-render when step sizes change
+    scaleXInput.addEventListener('input', render);
+    scaleYInput.addEventListener('input', render);
+
+    function drawGridPaper() {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 10x10 Fine Subdivisions (Minor Grid Lines)
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#f1f5f9'; // Very light gray for fine lines
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x += MINOR_STEP) {
+        ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+      }
+      for (let y = 0; y < canvas.height; y += MINOR_STEP) {
+        ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+      }
+      ctx.stroke();
+
+      // Main Grid Lines
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = '#cbd5e1'; // Darker gray for main blocks
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x += GRID_SIZE) {
+        ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+      }
+      for (let y = 0; y < canvas.height; y += GRID_SIZE) {
+        ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+      }
+      ctx.stroke();
+    }
+
+    function drawAxes() {
+      const scaleX = parseFloat(scaleXInput.value) || 1;
+      const scaleY = parseFloat(scaleYInput.value) || 1;
+
+      axesList.forEach(axis => {
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#1e293b';
+        ctx.beginPath(); 
+        ctx.moveTo(axis.startX, axis.startY); 
+        ctx.lineTo(axis.endX, axis.endY); 
+        ctx.stroke();
+
+        ctx.lineWidth = 2;
+        ctx.font = '700 13px Fredoka, sans-serif';
+        ctx.fillStyle = '#475569';
+
+        if (axis.isHorizontal) {
+          const minX = Math.min(axis.startX, axis.endX);
+          const maxX = Math.max(axis.startX, axis.endX);
+          
+          for (let i = minX; i <= maxX; i += GRID_SIZE) {
+            ctx.beginPath(); ctx.moveTo(i, axis.startY - 5); ctx.lineTo(i, axis.startY + 5); ctx.stroke();
+            
+            // Labels perfectly align based on starting origin 0
+            let stepCount = (i - axis.startX) / GRID_SIZE;
+            let val = Number((stepCount * scaleX).toFixed(2));
+            
+            ctx.textBaseline = 'top';
+            if (val === 0) {
+              ctx.textAlign = 'right';
+              ctx.fillText(val, i - 6, axis.startY + 10);
+            } else {
+              ctx.textAlign = 'center';
+              ctx.fillText(val, i, axis.startY + 10);
+            }
+          }
+        } else {
+          const minY = Math.min(axis.startY, axis.endY);
+          const maxY = Math.max(axis.startY, axis.endY);
+          
+          for (let j = minY; j <= maxY; j += GRID_SIZE) {
+            ctx.beginPath(); ctx.moveTo(axis.startX - 5, j); ctx.lineTo(axis.startX + 5, j); ctx.stroke();
+            
+            let stepCount = -(j - axis.startY) / GRID_SIZE;
+            let val = Number((stepCount * scaleY).toFixed(2));
+            
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'right';
+            
+            // Prevents drawing origin '0' twice if intersecting
+            if (val !== 0) {
+              ctx.fillText(val, axis.startX - 10, j);
+            }
+          }
+        }
+      });
+    }
+
+    function drawBars() {
+      bars.forEach(b => {
+        ctx.fillStyle = b.color + 'bb';
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = b.color;
+        ctx.strokeRect(b.x, b.y, b.w, b.h);
+      });
+    }
+
+    function drawLines() {
+      lines.forEach(l => {
+        ctx.strokeStyle = l.color;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(l.from.x, l.from.y);
+        ctx.lineTo(l.to.x, l.to.y);
+        ctx.stroke();
+      });
+    }
+
+    function drawDoodles() {
+      doodles.forEach(stroke => {
+        if (stroke.points.length === 0) return;
+        ctx.strokeStyle = stroke.color;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        for (let i = 1; i < stroke.points.length; i++) {
+          ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        }
+        ctx.stroke();
+      });
+    }
+
+    function drawPoints() {
+      points.forEach(p => {
+        ctx.fillStyle = p.color + '44';
+        ctx.beginPath(); ctx.arc(p.x, p.y, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+      });
+    }
+
+    function drawLabels() {
+      labels.forEach(lb => {
+        ctx.fillStyle = lb.color;
+        ctx.font = '700 16px Fredoka, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#ffffff';
+        ctx.strokeText(lb.text, lb.x, lb.y);
+        ctx.fillText(lb.text, lb.x, lb.y);
+      });
+    }
+
+    function render() {
+      drawGridPaper();
+      drawAxes();
+      drawBars();
+      drawLines();
+      drawDoodles();
+      drawPoints();
+      drawLabels();
+
+      if (currentMode === 'axes' && isDrawing && dragStart && mousePos) {
+        const sx = dragStart.x;
+        const sy = dragStart.y;
+        const cx = snapMain(mousePos.x); // Previews snap strictly to MAIN lines
+        const cy = snapMain(mousePos.y);
+
+        const isHoriz = Math.abs(cx - sx) > Math.abs(cy - sy);
+        const ex = isHoriz ? cx : sx;
+        const ey = isHoriz ? sy : cy;
+
+        ctx.strokeStyle = '#1e293b88';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(ex, ey);
+        ctx.stroke();
+      }
+
+      if (currentMode === 'line' && tempPoint && mousePos) {
+        ctx.strokeStyle = currentColor + '88';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(tempPoint.x, tempPoint.y);
+        ctx.lineTo(snapMinor(mousePos.x), snapMinor(mousePos.y)); // Previews snap to MINOR lines
+        ctx.stroke();
+      }
+
+      if ((currentMode === 'bar' || currentMode === 'histogram') && isDrawing && dragStart && mousePos) {
+        const x = dragStart.x;
+        const y1 = dragStart.y;
+        const y2 = snapMinor(mousePos.y); // Heights snap to fine decimal lines
+        const w = (currentMode === 'histogram') ? GRID_SIZE : (barGridSpan * GRID_SIZE);
+        const topY = Math.min(y1, y2);
+        const h = Math.abs(y1 - y2);
+
+        ctx.fillStyle = currentColor + '66';
+        ctx.fillRect(x, topY, w, h);
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, topY, w, h);
+      }
+
+      pointCountEl.textContent = points.length;
+      barCountEl.textContent = bars.length;
+    }
+
+    function handleStart(e) {
+      if (e.type.startsWith('touch')) e.preventDefault(); 
+      mousePos = getPos(e);
+      
+      // CRITICAL FIX: Base and edges of Bars/Axes snap to MAIN grid lines
+      // Points and Lines snap to MINOR grid lines (for decimal precision)
+      const isMainSnapMode = currentMode === 'axes' || currentMode === 'bar' || currentMode === 'histogram';
+      const x = isMainSnapMode ? snapMain(mousePos.x) : snapMinor(mousePos.x);
+      const y = isMainSnapMode ? snapMain(mousePos.y) : snapMinor(mousePos.y);
+
+      if (currentMode === 'axes' || currentMode === 'bar' || currentMode === 'histogram') {
+        isDrawing = true;
+        dragStart = { x, y };
+        return;
+      }
+      
+      if (currentMode === 'doodle') {
+        isDrawing = true;
+        doodles.push({ color: currentColor, points: [{x: mousePos.x, y: mousePos.y}] });
+        render();
+        return;
+      }
+
+      if (currentMode === 'point') {
+        points.push({ x, y, color: currentColor });
+        actionHistory.push('point');
+        render();
+        return;
+      }
+
+      if (currentMode === 'line') {
+        const newPoint = { x, y };
+        if (tempPoint) {
+          lines.push({ from: tempPoint, to: newPoint, color: currentColor });
+          actionHistory.push('line');
+        }
+        points.push({ x, y, color: currentColor });
+        actionHistory.push('point');
+        tempPoint = newPoint;
+        render();
+        return;
+      }
+
+      if (currentMode === 'label') {
+        setTimeout(() => {
+          const text = prompt('Enter your custom text or category label:');
+          if (text) {
+            labels.push({ x: mousePos.x, y: mousePos.y, text, color: currentColor });
+            actionHistory.push('label');
+            render();
+          }
+        }, 10);
+      }
+    }
+
+    function handleMove(e) {
+      if (e.type.startsWith('touch') && isDrawing) e.preventDefault();
+      mousePos = getPos(e);
+      
+      if (currentMode === 'doodle' && isDrawing) {
+        const currentStroke = doodles[doodles.length - 1];
+        currentStroke.points.push({x: mousePos.x, y: mousePos.y});
+      }
+      
+      render(); 
+    }
+
+    function handleEnd(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+      mousePos = getPos(e);
+
+      if (currentMode === 'doodle') {
+        actionHistory.push('doodle');
+        render();
+        return;
+      }
+
+      if (currentMode === 'axes') {
+        const sx = dragStart.x;
+        const sy = dragStart.y;
+        const cx = snapMain(mousePos.x);
+        const cy = snapMain(mousePos.y);
+        const isHoriz = Math.abs(cx - sx) > Math.abs(cy - sy);
+        const ex = isHoriz ? cx : sx;
+        const ey = isHoriz ? sy : cy;
+
+        if (sx !== ex || sy !== ey) {
+          axesList.push({ startX: sx, startY: sy, endX: ex, endY: ey, isHorizontal: isHoriz });
+          actionHistory.push('axes');
+        }
+        render();
+      }
+
+      if (currentMode === 'bar' || currentMode === 'histogram') {
+        // Height of the bar continues to snap to MINOR lines for exact decimal values
+        const endY = snapMinor(mousePos.y); 
+        const w = (currentMode === 'histogram') ? GRID_SIZE : (barGridSpan * GRID_SIZE);
+        const topY = Math.min(dragStart.y, endY);
+        const h = Math.abs(dragStart.y - endY);
+        
+        if (h > 0) {
+          bars.push({ x: dragStart.x, y: topY, w: w, h: h, color: currentColor });
+          actionHistory.push('bar');
+        }
+        render();
+      }
+    }
+
+    canvas.addEventListener('mousedown', handleStart);
+    canvas.addEventListener('touchstart', handleStart, { passive: false });
+    
+    canvas.addEventListener('mousemove', handleMove);
+    canvas.addEventListener('touchmove', handleMove, { passive: false });
+    
+    window.addEventListener('mouseup', handleEnd);
+    window.addEventListener('touchend', handleEnd, { passive: false });
+
+    // Mode Switching
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMode = btn.dataset.mode;
+        tempPoint = null; 
+        isDrawing = false;
+        helpText.textContent = modeHints[currentMode];
+      });
+    });
+
+    // Color Swatches
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+        currentColor = swatch.dataset.color;
+      });
+    });
+
+    // Bar Width Slider
+    barWidthSlider.addEventListener('input', (e) => {
+      barGridSpan = parseInt(e.target.value);
+      barWidthVal.textContent = `${barGridSpan} Grid${barGridSpan > 1 ? 's' : ''}`;
+    });
+
+    // Undo Functionality
+    document.getElementById('btn-undo').addEventListener('click', () => {
+      if (actionHistory.length === 0) return;
+      
+      const lastAction = actionHistory.pop();
+      if (lastAction === 'axes') axesList.pop();
+      else if (lastAction === 'point') points.pop();
+      else if (lastAction === 'line') lines.pop();
+      else if (lastAction === 'bar') bars.pop();
+      else if (lastAction === 'label') labels.pop();
+      else if (lastAction === 'doodle') doodles.pop();
+      
+      tempPoint = null; 
+      render();
+    });
+
+    // Clear Canvas
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      if (confirm('Clear the entire graph sheet?')) {
+        axesList = [];
+        points = [];
+        lines = [];
+        bars = [];
+        labels = [];
+        doodles = [];
+        actionHistory = [];
+        tempPoint = null;
+        render();
+      }
+    });
+
+    // Save as Image
+    document.getElementById('btn-save').addEventListener('click', () => {
+      const data = canvas.toDataURL();
+      const link = document.createElement('a');
+      link.download = 'graph-studio-export.png';
+      link.href = data;
+      link.click();
+    });
+
+    resizeCanvas();
+  </script>
+</body>
+</html>
