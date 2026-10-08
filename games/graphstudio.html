@@ -68,6 +68,82 @@
       background: #4338ca; 
     }
 
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal {
+      background: white;
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      border: 4px solid #818cf8;
+    }
+
+    .modal h2 {
+      color: #1e293b;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      font-size: 18px;
+      font-family: inherit;
+      font-weight: 700;
+      text-align: center;
+      margin: 15px 0;
+      outline: none;
+    }
+
+    .modal input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .modal-btn {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+
+    .modal-btn:hover {
+      background: #4338ca;
+      transform: scale(1.02);
+    }
+
+    .modal-btn.secondary {
+      background: #f1f5f9;
+      color: #475569;
+      margin-top: 10px;
+    }
+
+    .modal-btn.secondary:hover {
+      background: #e2e8f0;
+    }
+
     /* Top Bar */
     header {
       background: white;
@@ -131,27 +207,110 @@
       display: block;
     }
 
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      padding-right: 20px;
+      border-right: 2px solid #e2e8f0;
+    }
+
+    .action-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-coord {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-color: #bae6fd;
+    }
+
+    .btn-coord:hover {
+      background: #bae6fd;
+      transform: scale(1.05);
+    }
+    
+    .btn-coord.active {
+      background: #0284c7;
+      color: white;
+      border-color: #0369a1;
+    }
+
+    .btn-undo {
+      background: #fef08a;
+      color: #a16207;
+      border-color: #fde047;
+    }
+
+    .btn-undo:hover {
+      background: #fde047;
+      transform: scale(1.05);
+    }
+
+    .btn-clear {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    .btn-clear:hover {
+      background: #fecaca;
+      transform: scale(1.05);
+    }
+
+    .btn-export {
+      background: #dcfce7;
+      color: #16a34a;
+      border-color: #bbf7d0;
+    }
+
+    .btn-export:hover {
+      background: #bbf7d0;
+      transform: scale(1.05);
+    }
+
+    .btn-gamemode {
+      background: #8b5cf6;
+      color: white;
+      border-color: #7c3aed;
+      font-size: 16px;
+      padding: 6px 18px;
+      box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+      animation: pulseGame 2s infinite;
+    }
+    
+    @keyframes pulseGame {
+      0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+    }
+
+    .btn-gamemode:hover {
+      background: #7c3aed;
+      transform: scale(1.05);
+      animation: none;
+    }
+
     .top-stats {
       display: flex;
       align-items: center;
-      gap: 16px;
-    }
-
-    .stat-pill {
-      background: #f1f5f9;
-      border: 2px solid #cbd5e1;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #334155;
-    }
-
-    .stat-pill span {
-      color: #4f46e5;
+      gap: 12px;
     }
     
     .btn-fullscreen {
@@ -182,8 +341,8 @@
       padding: 16px;
     }
 
-    /* Sidebar Toolbox */
-    .toolbox {
+    /* Sidebars */
+    .sidebar {
       width: 320px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
@@ -197,6 +356,152 @@
       border: 3px solid #ffffff;
       z-index: 10;
     }
+
+    /* Standard Toolbox */
+    .toolbox {
+      display: flex;
+    }
+
+    /* Game Mode Sidebar */
+    .game-sidebar {
+      display: none; 
+      background: #faf5ff;
+      border-color: #e9d5ff;
+    }
+
+    .game-stats {
+      display: flex;
+      justify-content: space-between;
+      background: white;
+      padding: 15px;
+      border-radius: 16px;
+      border: 2px solid #e9d5ff;
+      text-align: center;
+    }
+
+    .game-stat-box h3 {
+      font-size: 12px;
+      color: #9333ea;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .game-stat-box span {
+      font-size: 28px;
+      font-weight: 900;
+      color: #1e293b;
+    }
+
+    /* Game Input & Keypad Styles */
+    .game-input-container {
+      background: white;
+      border: 2px solid #a855f7;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.15);
+      border-radius: 12px;
+      padding: 12px;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    
+    .guess-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .guess-input {
+      flex: 1;
+      font-size: 24px !important;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #cbd5e1;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+      transition: 0.1s;
+    }
+    
+    .guess-input.active-input {
+      border-color: #a855f7;
+      background: #faf5ff;
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+    }
+    
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    
+    .key-btn {
+      background: #f1f5f9;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 22px;
+      font-weight: 800;
+      color: #334155;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.1s;
+    }
+    
+    .key-btn:active {
+      background: #cbd5e1;
+      transform: scale(0.95);
+    }
+    
+    .key-btn.action {
+      background: #e0e7ff;
+      color: #4338ca;
+      border-color: #c7d2fe;
+    }
+
+    .leaderboard {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .leaderboard-header {
+      background: #f8fafc;
+      padding: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #475569;
+      text-align: center;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .leaderboard-list {
+      list-style: none;
+      overflow-y: auto;
+      flex: 1;
+      padding: 0;
+      margin: 0;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      border-bottom: 1px solid #f1f5f9;
+      font-weight: 700;
+      font-size: 16px;
+      color: #334155;
+    }
+    
+    .leaderboard-item.rank-1 { background: #fef9c3; color: #a16207; }
+    .leaderboard-item.rank-2 { background: #f1f5f9; color: #475569; }
+    .leaderboard-item.rank-3 { background: #ffedd5; color: #c2410c; }
 
     .section-title {
       font-size: 12px;
@@ -222,6 +527,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 4px;
       font-family: inherit;
       font-size: 13px;
@@ -247,32 +553,6 @@
       box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
     }
 
-    /* Colors and Sliders */
-    .color-palette {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .color-swatch {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 3px solid white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      transition: 0.15s transform;
-    }
-
-    .color-swatch:hover {
-      transform: scale(1.15);
-    }
-
-    .color-swatch.active {
-      transform: scale(1.2);
-      outline: 3px solid #0f172a;
-    }
-
     .slider-group {
       display: flex;
       flex-direction: column;
@@ -290,14 +570,8 @@
       font-weight: 700;
       color: #475569;
     }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: #4f46e5;
-      cursor: pointer;
-    }
     
-    input[type="number"] {
+    input[type="number"], input[type="text"] {
       width: 100%;
       padding: 6px;
       border-radius: 8px;
@@ -308,59 +582,9 @@
       outline: none;
     }
 
-    input[type="number"]:focus {
+    input[type="number"]:focus, input[type="text"]:focus {
       border-color: #6366f1;
       box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-    }
-
-    /* Action Buttons */
-    .action-row {
-      display: flex;
-      gap: 6px;
-      margin-top: auto;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 10px;
-      border-radius: 12px;
-      border: none;
-      font-family: inherit;
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: 0.15s transform, 0.15s background;
-    }
-
-    .btn-undo {
-      background: #fef08a;
-      color: #a16207;
-    }
-
-    .btn-undo:hover {
-      background: #fde047;
-    }
-
-    .btn-clear {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-
-    .btn-clear:hover {
-      background: #fecaca;
-    }
-
-    .btn-export {
-      background: #dcfce7;
-      color: #16a34a;
-    }
-
-    .btn-export:hover {
-      background: #bbf7d0;
     }
 
     /* Workspace / Canvas Area */
@@ -383,7 +607,6 @@
       cursor: crosshair;
     }
 
-    /* Instruction banner */
     .help-banner {
       position: absolute;
       top: 16px;
@@ -415,6 +638,43 @@
     <p style="margin-top:20px; color:#94a3b8;">Tap to launch in Fullscreen Mode</p>
   </div>
 
+  <!-- Name Input Modal -->
+  <div class="modal-overlay" id="name-modal">
+    <div class="modal">
+      <h2>🎯 Coordinate Racer</h2>
+      <p style="color: #64748b; font-weight: 600;">Race against the clock to plot positive whole coordinates! You have 60 seconds.</p>
+      <input type="text" id="player-name-input" placeholder="Enter Player Name..." autocomplete="off">
+      <button class="modal-btn" id="start-game-btn">START RACE 🚀</button>
+      <button class="modal-btn secondary" id="cancel-game-btn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="modal-overlay" id="game-over-modal">
+    <div class="modal">
+      <h2 style="color: #4f46e5;">⏰ Time's Up!</h2>
+      <p style="color: #64748b; font-weight: 600; margin-bottom: 15px;">You scored</p>
+      <div style="font-size: 48px; font-weight: 900; color: #1e293b; margin-bottom: 20px;" id="final-score">0</div>
+      <button class="modal-btn" id="next-player-btn">Next Player 🔄</button>
+      <button class="modal-btn" id="end-game-leaderboard-btn" style="background: #f59e0b; margin-top: 10px;">🏆 End Game & View Leaderboard</button>
+      <button class="modal-btn secondary" id="exit-game-btn">Exit Game Mode</button>
+    </div>
+  </div>
+
+  <!-- Final Leaderboard Modal -->
+  <div class="modal-overlay" id="final-leaderboard-modal">
+    <div class="modal" style="max-width: 500px;">
+      <h2 style="color: #a16207; font-size: 32px;">🏆 Final Leaderboard</h2>
+      <p style="color: #64748b; font-weight: 600;">Great job, class!</p>
+      <div class="leaderboard" style="max-height: 400px; margin: 20px 0; border-width: 3px;">
+        <ul class="leaderboard-list" id="final-leaderboard-list" style="text-align: left;">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+      <button class="modal-btn" id="close-leaderboard-btn">Close & Return to Studio</button>
+    </div>
+  </div>
+
   <header>
     <div class="brand">
       <a href="../index.html" class="btn-back">⬅ Back to Hub</a>
@@ -424,16 +684,26 @@
         <span>Interactive Coordinate & Graph Studio</span>
       </div>
     </div>
-    <div class="top-stats">
-      <div class="stat-pill">📍 Points: <span id="point-count">0</span></div>
-      <div class="stat-pill">📊 Bars: <span id="bar-count">0</span></div>
-      <button class="btn-fullscreen" id="btn-fullscreen">⛶ Fullscreen</button>
+    
+    <div class="header-controls">
+      <div class="top-actions" id="studio-actions">
+        <button class="action-btn btn-coord" id="btn-coord">📌 Show Coordinates</button>
+        <button class="action-btn btn-undo" id="btn-undo">↩ Undo</button>
+        <button class="action-btn btn-clear" id="btn-clear">🗑️ Clear</button>
+        <button class="action-btn btn-export" id="btn-save">💾 Save</button>
+      </div>
+
+      <div class="top-stats">
+        <button class="action-btn btn-gamemode" id="btn-enter-gamemode">🎮 Game Mode</button>
+        <button class="btn-fullscreen" id="btn-fullscreen">⛶ Fullscreen</button>
+      </div>
     </div>
   </header>
 
   <div class="app-container">
-    <!-- Tools Panel -->
-    <aside class="toolbox">
+    
+    <!-- STANDARD TOOLBOX -->
+    <aside class="sidebar toolbox" id="standard-toolbox">
       <div>
         <div class="section-title">Select Mode</div>
         <div class="tool-grid">
@@ -468,6 +738,29 @@
         </div>
       </div>
       
+      <!-- Grid Settings -->
+      <div class="slider-group">
+        <div class="slider-header">
+          <span>Grid Size</span>
+          <span id="grid-size-val">50px</span>
+        </div>
+        <input type="range" id="grid-size-slider" min="20" max="100" value="50" step="10">
+      </div>
+
+      <!-- Exact Coordinates Input -->
+      <div class="slider-group" style="background: #eef2ff; border-color: #a5b4fc;">
+        <div class="slider-header" style="color: #4338ca;">
+          <span>Plot Exact Coordinate</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 4px;">
+          <input type="number" id="exact-x" placeholder="X Coord" step="any">
+          <input type="number" id="exact-y" placeholder="Y Coord" step="any">
+        </div>
+        <button class="tool-btn" id="btn-plot-exact" style="width: 100%; background: #ffffff; color: #4338ca; border-color: #818cf8; flex-direction: row; padding: 6px;">
+          <span class="icon" style="font-size: 16px;">🎯</span> Plot Exact Point
+        </button>
+      </div>
+
       <!-- Axis Scale / Step Controls -->
       <div class="slider-group">
         <div class="slider-header">
@@ -481,36 +774,57 @@
         </div>
         <input type="number" id="scale-y" value="1" min="0.1" step="any">
       </div>
+    </aside>
 
-      <!-- Colors -->
-      <div>
-        <div class="section-title">Theme Color</div>
-        <div class="color-palette" id="palette">
-          <div class="color-swatch active" style="background: #1e293b;" data-color="#1e293b"></div>
-          <div class="color-swatch" style="background: #ef4444;" data-color="#ef4444"></div>
-          <div class="color-swatch" style="background: #f97316;" data-color="#f97316"></div>
-          <div class="color-swatch" style="background: #10b981;" data-color="#10b981"></div>
-          <div class="color-swatch" style="background: #06b6d4;" data-color="#06b6d4"></div>
-          <div class="color-swatch" style="background: #6366f1;" data-color="#6366f1"></div>
-          <div class="color-swatch" style="background: #ec4899;" data-color="#ec4899"></div>
+    <!-- GAME MODE SIDEBAR -->
+    <aside class="sidebar game-sidebar" id="game-sidebar">
+      
+      <div class="game-stats">
+        <div class="game-stat-box">
+          <h3>Time</h3>
+          <span id="game-time">60</span><span style="font-size:14px; color:#94a3b8;">s</span>
+        </div>
+        <div class="game-stat-box">
+          <h3>Score</h3>
+          <span id="game-score" style="color: #10b981;">0</span>
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="slider-group">
-        <div class="slider-header">
-          <span>Bar Width</span>
-          <span id="bar-width-val">1 Grid</span>
+      <!-- Keypad Input Area -->
+      <div class="game-input-container" id="game-input-wrapper">
+        <div class="slider-header" style="color: #7e22ce; font-size: 15px; margin-bottom: 8px;">
+          <span>Enter Coordinate (X, Y)</span>
         </div>
-        <input type="range" id="bar-width-slider" min="1" max="4" value="1" step="1">
+        <div class="guess-row">
+          <input type="text" id="guess-x" class="guess-input active-input" placeholder="X" readonly>
+          <input type="text" id="guess-y" class="guess-input" placeholder="Y" readonly>
+        </div>
+        
+        <div class="keypad">
+          <button class="key-btn">1</button>
+          <button class="key-btn">2</button>
+          <button class="key-btn">3</button>
+          <button class="key-btn">4</button>
+          <button class="key-btn">5</button>
+          <button class="key-btn">6</button>
+          <button class="key-btn">7</button>
+          <button class="key-btn">8</button>
+          <button class="key-btn">9</button>
+          <button class="key-btn action">⌫</button>
+          <button class="key-btn">0</button>
+          <button class="key-btn action" style="background: #a855f7; color: white; border-color: #9333ea;">►</button>
+        </div>
+        
+        <button class="modal-btn" id="btn-submit-guess" style="background: #a855f7; padding: 12px; border-radius: 8px; display: none;">SUBMIT GUESS</button>
       </div>
 
-      <!-- Action Footer -->
-      <div class="action-row">
-        <button class="btn btn-undo" id="btn-undo">↩ Undo</button>
-        <button class="btn btn-clear" id="btn-clear">🗑️ Clear</button>
-        <button class="btn btn-export" id="btn-save">💾 Save</button>
+      <div class="leaderboard">
+        <div class="leaderboard-header">🏆 CLASS LEADERBOARD</div>
+        <ul class="leaderboard-list" id="sidebar-leaderboard-list">
+          <!-- Populated by JS -->
+        </ul>
       </div>
+
     </aside>
 
     <!-- Interactive Graph Paper -->
@@ -527,46 +841,134 @@
     const ctx = canvas.getContext('2d');
     const workspace = document.getElementById('workspace');
     const helpText = document.getElementById('help-text');
-    const pointCountEl = document.getElementById('point-count');
-    const barCountEl = document.getElementById('bar-count');
-    const barWidthSlider = document.getElementById('bar-width-slider');
-    const barWidthVal = document.getElementById('bar-width-val');
+    const gridSizeSlider = document.getElementById('grid-size-slider');
+    const gridSizeVal = document.getElementById('grid-size-val');
     const fullscreenBtn = document.getElementById('btn-fullscreen');
     const launcher = document.getElementById('launcher');
     
-    // Scale Inputs
+    // Core Inputs
     const scaleXInput = document.getElementById('scale-x');
     const scaleYInput = document.getElementById('scale-y');
+    const exactXInput = document.getElementById('exact-x');
+    const exactYInput = document.getElementById('exact-y');
 
-    // Graph Configuration
-    const GRID_SIZE = 50; // Main Grid square size in px
-    const MINOR_STEP = GRID_SIZE / 10; // 10x10 subdivisions (5px each) for precise decimal plotting
+    // UI Panels
+    const standardToolbox = document.getElementById('standard-toolbox');
+    const gameSidebar = document.getElementById('game-sidebar');
+    const studioActions = document.getElementById('studio-actions');
+    const btnEnterGamemode = document.getElementById('btn-enter-gamemode');
+    
+    // Modals
+    const nameModal = document.getElementById('name-modal');
+    const gameOverModal = document.getElementById('game-over-modal');
+    const finalLeaderboardModal = document.getElementById('final-leaderboard-modal');
+    const playerNameInput = document.getElementById('player-name-input');
+
+    // Graph Configuration 
+    let GRID_SIZE = 50; 
+    let MINOR_STEP = GRID_SIZE / 10; 
     
     let currentMode = 'axes';
     let currentColor = '#1e293b';
-    let barGridSpan = 1;
+    let showCoordinates = false;
 
     // Elements Data Store
-    let axesList = []; // [{ startX, startY, endX, endY, isHorizontal }]
-    let points = []; // [{ x, y, color }]
-    let lines = [];  // [{ from: {x, y}, to: {x, y}, color }]
-    let bars = [];   // [{ x, y, w, h, color }]
-    let labels = []; // [{ x, y, text, color }]
-    let doodles = []; // [{ color, points: [{x,y}, ...] }]
+    let axesList = []; 
+    let points = []; 
+    let lines = [];  
+    let bars = [];   
+    let labels = []; 
+    let doodles = []; 
+    let actionHistory = []; 
 
-    // Action History for Undo
-    let actionHistory = []; // Stores string types
-
-    // State trackers for interactions
+    // Interactions
     let isDrawing = false;
     let dragStart = null;
     let tempPoint = null; 
     let mousePos = null;
 
+    // ----- GAME STATE VARIABLES -----
+    let isGameMode = false;
+    let currentPlayer = "";
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let currentTarget = null; 
+    let leaderboard = [];
+
+    // ----- KEYPAD LOGIC (Supercharged) -----
+    let activeKeypadInput = 'x';
+    const guessXInput = document.getElementById('guess-x');
+    const guessYInput = document.getElementById('guess-y');
+
+    function setActiveKeypadInput(axis) {
+      activeKeypadInput = axis;
+      guessXInput.classList.remove('active-input');
+      guessYInput.classList.remove('active-input');
+      if (axis === 'x') guessXInput.classList.add('active-input');
+      if (axis === 'y') guessYInput.classList.add('active-input');
+    }
+
+    guessXInput.addEventListener('click', () => setActiveKeypadInput('x'));
+    guessYInput.addEventListener('click', () => setActiveKeypadInput('y'));
+
+    document.querySelectorAll('.key-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const val = e.target.textContent;
+        handleGameInput(val);
+      });
+    });
+
+    // Support for physical keyboard attached to display
+    window.addEventListener('keydown', (e) => {
+      if (isGameMode && nameModal.style.display !== 'flex' && gameOverModal.style.display !== 'flex' && finalLeaderboardModal.style.display !== 'flex') {
+        if (e.key >= '0' && e.key <= '9') {
+          handleGameInput(e.key);
+        } else if (e.key === 'Backspace') {
+          handleGameInput('⌫');
+        } else if (e.key === 'Enter' || e.key === 'ArrowRight') {
+          handleGameInput('►');
+        } else if (e.key === 'ArrowLeft') {
+          setActiveKeypadInput('x');
+        }
+      } else if (e.key === 'Escape' && !isGameMode) {
+        tempPoint = null;
+        render();
+      }
+    });
+
+    function handleGameInput(val) {
+      const targetInput = activeKeypadInput === 'x' ? guessXInput : guessYInput;
+
+      if (val === '⌫') {
+        if (activeKeypadInput === 'y' && guessYInput.value === '') {
+           setActiveKeypadInput('x');
+           guessXInput.value = '';
+        } else {
+           targetInput.value = '';
+        }
+      } else if (val === '►') {
+        if (activeKeypadInput === 'x') {
+          setActiveKeypadInput('y');
+        } else {
+          checkGuess();
+        }
+      } else {
+        // It's a number (0-9)
+        if (activeKeypadInput === 'x') {
+          guessXInput.value = val;
+          setActiveKeypadInput('y');
+        } else {
+          guessYInput.value = val;
+          checkGuess(); 
+        }
+      }
+    }
+
     const modeHints = {
       axes: '📐 Drag horizontally or vertically. Axes snap to MAIN grid lines.',
       doodle: '✏️ Draw freely anywhere on the screen.',
-      label: '🏷 Click anywhere to type your custom category label or title.',
+      label: '🏷 Tap anywhere to type your custom category label or title.',
       point: '📍 Tap to plot points. (Snaps to fine 0.1 decimal grid lines)',
       line: '📉 Tap to join points continuously. Press ESC or change tools to stop the line.',
       bar: '📊 Drag vertically from the X-axis. Bars base snaps perfectly between steps!',
@@ -584,22 +986,43 @@
         elem.msRequestFullscreen();
       }
       launcher.style.display = 'none';
-      setTimeout(resizeCanvas, 200); // Give time for full screen adjustment
+      setTimeout(resizeCanvas, 200); 
     }
 
     function resizeCanvas() {
       const rect = workspace.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      const dpr = window.devicePixelRatio || 1; 
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      ctx.scale(dpr, dpr);
+
+      // In game mode, if window resizes, regenerate positive axes
+      if (isGameMode) {
+        generateGameAxes();
+        if (currentTarget) {
+           const cw = canvas.width / dpr;
+           const ch = canvas.height / dpr;
+           const cx = snapMain(GRID_SIZE * 2); 
+           const cy = snapMain(ch - GRID_SIZE * 2); 
+           currentTarget.physX = cx + (currentTarget.logicX * GRID_SIZE);
+           currentTarget.physY = cy - (currentTarget.logicY * GRID_SIZE);
+        }
+      }
+
       render();
     }
+    
     window.addEventListener('resize', resizeCanvas);
 
-    // Fullscreen Toggle Button Functionality
     fullscreenBtn.addEventListener('click', () => {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
-          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+          console.error(`Error: ${err.message}`);
         });
       } else {
         document.exitFullscreen();
@@ -615,13 +1038,249 @@
       setTimeout(resizeCanvas, 100);
     });
 
-    // Separated Snapping Functions
+    // ----- GAME MODE LOGIC -----
+
+    btnEnterGamemode.addEventListener('click', () => {
+      nameModal.style.display = 'flex';
+      playerNameInput.value = '';
+      playerNameInput.focus();
+    });
+
+    document.getElementById('cancel-game-btn').addEventListener('click', () => {
+      nameModal.style.display = 'none';
+    });
+
+    document.getElementById('start-game-btn').addEventListener('click', () => {
+      if(playerNameInput.value.trim() === "") {
+        alert("Please enter a name!");
+        return;
+      }
+      currentPlayer = playerNameInput.value.trim();
+      nameModal.style.display = 'none';
+      startGame();
+    });
+
+    playerNameInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') document.getElementById('start-game-btn').click();
+    });
+
+    function generateGameAxes() {
+      const dpr = window.devicePixelRatio || 1;
+      const cw = canvas.width / dpr;
+      const ch = canvas.height / dpr;
+      
+      const cx = snapMain(GRID_SIZE * 2);
+      const cy = snapMain(ch - GRID_SIZE * 2);
+
+      axesList = [
+        { startX: cx, startY: cy, endX: cw, endY: cy, isHorizontal: true }, 
+        { startX: cx, startY: cy, endX: cx, endY: 0, isHorizontal: false }  
+      ];
+    }
+
+    function spawnGameTarget() {
+      const dpr = window.devicePixelRatio || 1;
+      const cw = canvas.width / dpr;
+      const ch = canvas.height / dpr;
+      
+      const cx = snapMain(GRID_SIZE * 2);
+      const cy = snapMain(ch - GRID_SIZE * 2);
+
+      const maxX = Math.min(9, Math.max(1, Math.floor((cw - cx) / GRID_SIZE) - 1));
+      const maxY = Math.min(9, Math.max(1, Math.floor(cy / GRID_SIZE) - 1));
+
+      const rx = Math.floor(Math.random() * (maxX + 1));
+      const ry = Math.floor(Math.random() * (maxY + 1));
+
+      currentTarget = {
+        logicX: rx,
+        logicY: ry,
+        physX: cx + (rx * GRID_SIZE),
+        physY: cy - (ry * GRID_SIZE)
+      };
+      
+      render();
+    }
+
+    function startGame() {
+      isGameMode = true;
+      
+      // UI Setup
+      standardToolbox.style.display = 'none';
+      studioActions.style.display = 'none';
+      btnEnterGamemode.style.display = 'none';
+      gameSidebar.style.display = 'flex';
+      helpText.textContent = `🎮 First Quadrant Mode: Guess the positive coordinates of the red point!`;
+
+      // Canvas Setup
+      points = []; lines = []; bars = []; labels = []; doodles = []; actionHistory = [];
+      scaleXInput.value = 1; scaleYInput.value = 1;
+      generateGameAxes();
+
+      // State Setup
+      score = 0;
+      timeLeft = 60;
+      document.getElementById('game-score').textContent = score;
+      document.getElementById('game-time').textContent = timeLeft;
+      
+      guessXInput.value = '';
+      guessYInput.value = '';
+      setActiveKeypadInput('x');
+
+      renderLeaderboard('sidebar-leaderboard-list', false);
+      spawnGameTarget();
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('game-time').textContent = timeLeft;
+        if(timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      clearInterval(timerInterval);
+      isGameMode = false;
+      currentTarget = null;
+      render();
+
+      leaderboard.push({ name: currentPlayer, score: score });
+      leaderboard.sort((a, b) => b.score - a.score);
+      renderLeaderboard('sidebar-leaderboard-list', false);
+
+      document.getElementById('final-score').textContent = score;
+      gameOverModal.style.display = 'flex';
+    }
+
+    // Dense Ranking Leaderboard rendering 
+    function renderLeaderboard(listElementId, showMedals = true) {
+      const list = document.getElementById(listElementId);
+      list.innerHTML = '';
+      
+      if(leaderboard.length === 0) {
+        list.innerHTML = '<li style="padding: 15px; text-align: center; color: #94a3b8; font-size:13px;">No scores yet</li>';
+        return;
+      }
+
+      let currentRank = 1;
+      for (let i = 0; i < leaderboard.length; i++) {
+        // If score is lower than previous, increase rank. If same, keep same rank.
+        if (i > 0 && leaderboard[i].score < leaderboard[i-1].score) {
+          currentRank++;
+        }
+        
+        const li = document.createElement('li');
+        li.className = 'leaderboard-item';
+        
+        let prefix = `${currentRank}.`;
+        if (showMedals) {
+          if (currentRank === 1) { prefix = "🥇 1."; li.classList.add('rank-1'); }
+          else if (currentRank === 2) { prefix = "🥈 2."; li.classList.add('rank-2'); }
+          else if (currentRank === 3) { prefix = "🥉 3."; li.classList.add('rank-3'); }
+        } else {
+          if (currentRank === 1) li.classList.add('rank-1');
+          else if (currentRank === 2) li.classList.add('rank-2');
+          else if (currentRank === 3) li.classList.add('rank-3');
+        }
+
+        li.innerHTML = `<span>${prefix} ${leaderboard[i].name}</span> <span>${leaderboard[i].score}</span>`;
+        list.appendChild(li);
+      }
+    }
+
+    document.getElementById('next-player-btn').addEventListener('click', () => {
+      gameOverModal.style.display = 'none';
+      nameModal.style.display = 'flex';
+      playerNameInput.value = '';
+      playerNameInput.focus();
+    });
+
+    document.getElementById('end-game-leaderboard-btn').addEventListener('click', () => {
+      gameOverModal.style.display = 'none';
+      finalLeaderboardModal.style.display = 'flex';
+      renderLeaderboard('final-leaderboard-list', true);
+    });
+
+    function exitGameMode() {
+      // Restore Studio
+      gameSidebar.style.display = 'none';
+      standardToolbox.style.display = 'flex';
+      studioActions.style.display = 'flex';
+      btnEnterGamemode.style.display = 'flex';
+      
+      points = []; axesList = []; leaderboard = [];
+      helpText.textContent = modeHints[currentMode];
+      render();
+    }
+
+    document.getElementById('exit-game-btn').addEventListener('click', () => {
+      gameOverModal.style.display = 'none';
+      exitGameMode();
+    });
+
+    document.getElementById('close-leaderboard-btn').addEventListener('click', () => {
+      finalLeaderboardModal.style.display = 'none';
+      exitGameMode();
+    });
+
+    function checkGuess() {
+      if(!isGameMode || !currentTarget) return;
+      
+      const gx = parseFloat(guessXInput.value);
+      const gy = parseFloat(guessYInput.value);
+
+      if (isNaN(gx) || isNaN(gy)) return; 
+
+      if (gx === currentTarget.logicX && gy === currentTarget.logicY) {
+        // Correct - Score point
+        score++;
+        document.getElementById('game-score').textContent = score;
+        
+        points.push({ x: currentTarget.physX, y: currentTarget.physY, color: '#10b981' });
+        
+        guessXInput.value = '';
+        guessYInput.value = '';
+        setActiveKeypadInput('x');
+        
+        spawnGameTarget();
+      } else {
+        // Wrong visual feedback
+        const box = document.getElementById('game-input-wrapper');
+        box.style.backgroundColor = '#fee2e2';
+        box.style.borderColor = '#ef4444';
+        
+        guessXInput.value = '';
+        guessYInput.value = '';
+        setActiveKeypadInput('x');
+
+        setTimeout(() => {
+          box.style.backgroundColor = 'white';
+          box.style.borderColor = '#a855f7';
+        }, 300);
+      }
+    }
+
+    document.getElementById('btn-submit-guess').addEventListener('click', checkGuess);
+
+    // ----- END GAME MODE LOGIC -----
+
+    document.getElementById('btn-coord').addEventListener('click', (e) => {
+      showCoordinates = !showCoordinates;
+      if (showCoordinates) {
+        e.target.classList.add('active');
+        e.target.innerHTML = '📌 Hide Coordinates';
+      } else {
+        e.target.classList.remove('active');
+        e.target.innerHTML = '📌 Show Coordinates';
+      }
+      render();
+    });
+
     function snapMain(val) {
-      return Math.round(val / GRID_SIZE) * GRID_SIZE; // Only snaps to major 50px blocks
+      return Math.round(val / GRID_SIZE) * GRID_SIZE; 
     }
 
     function snapMinor(val) {
-      return Math.round(val / MINOR_STEP) * MINOR_STEP; // Snaps to minor 5px blocks (decimal plotting)
+      return Math.round(val / MINOR_STEP) * MINOR_STEP; 
     }
 
     function getPos(e) {
@@ -638,42 +1297,77 @@
       };
     }
 
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        tempPoint = null;
-        render();
-      }
-    });
-
-    // Re-render when step sizes change
     scaleXInput.addEventListener('input', render);
     scaleYInput.addEventListener('input', render);
 
+    gridSizeSlider.addEventListener('input', (e) => {
+      const oldGrid = GRID_SIZE;
+      GRID_SIZE = parseInt(e.target.value);
+      MINOR_STEP = GRID_SIZE / 10;
+      gridSizeVal.textContent = `${GRID_SIZE}px`;
+
+      const scale = GRID_SIZE / oldGrid;
+      
+      axesList.forEach(a => { a.startX *= scale; a.startY *= scale; a.endX *= scale; a.endY *= scale; });
+      points.forEach(p => { p.x *= scale; p.y *= scale; });
+      lines.forEach(l => { 
+        l.from.x *= scale; l.from.y *= scale; 
+        l.to.x *= scale; l.to.y *= scale; 
+      });
+      bars.forEach(b => { 
+        b.x *= scale; b.y *= scale; 
+        b.w *= scale; b.h *= scale; 
+      });
+      labels.forEach(lb => { lb.x *= scale; lb.y *= scale; });
+      doodles.forEach(d => {
+        d.points.forEach(pt => { pt.x *= scale; pt.y *= scale; });
+      });
+
+      render();
+    });
+
+    document.getElementById('btn-plot-exact').addEventListener('click', () => {
+      const xVal = parseFloat(exactXInput.value);
+      const yVal = parseFloat(exactYInput.value);
+
+      if (isNaN(xVal) || isNaN(yVal)) {
+        alert("Please enter valid numbers for X and Y coordinates.");
+        return;
+      }
+
+      const scaleX = parseFloat(scaleXInput.value) || 1;
+      const scaleY = parseFloat(scaleYInput.value) || 1;
+      
+      let hAxis = axesList.find(a => a.isHorizontal);
+      let vAxis = axesList.find(a => !a.isHorizontal);
+
+      if (!hAxis || !vAxis) {
+        alert("Please draw both an X and a Y axis first to establish an origin (0,0).");
+        return;
+      }
+
+      const physicalX = vAxis.startX + (xVal / scaleX) * GRID_SIZE;
+      const physicalY = hAxis.startY - (yVal / scaleY) * GRID_SIZE;
+
+      points.push({ x: physicalX, y: physicalY, color: currentColor });
+      actionHistory.push('point');
+      
+      if (!showCoordinates) document.getElementById('btn-coord').click();
+      else render();
+    });
+
     function drawGridPaper() {
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
 
-      // 10x10 Fine Subdivisions (Minor Grid Lines)
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#f1f5f9'; // Very light gray for fine lines
-      ctx.beginPath();
-      for (let x = 0; x < canvas.width; x += MINOR_STEP) {
-        ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
-      }
-      for (let y = 0; y < canvas.height; y += MINOR_STEP) {
-        ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
-      }
-      ctx.stroke();
-
-      // Main Grid Lines
       ctx.lineWidth = 1.5;
-      ctx.strokeStyle = '#cbd5e1'; // Darker gray for main blocks
+      ctx.strokeStyle = '#cbd5e1'; 
       ctx.beginPath();
-      for (let x = 0; x < canvas.width; x += GRID_SIZE) {
-        ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+      for (let x = 0; x < canvas.width / (window.devicePixelRatio || 1); x += GRID_SIZE) {
+        ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height / (window.devicePixelRatio || 1));
       }
-      for (let y = 0; y < canvas.height; y += GRID_SIZE) {
-        ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+      for (let y = 0; y < canvas.height / (window.devicePixelRatio || 1); y += GRID_SIZE) {
+        ctx.moveTo(0, y); ctx.lineTo(canvas.width / (window.devicePixelRatio || 1), y);
       }
       ctx.stroke();
     }
@@ -701,7 +1395,6 @@
           for (let i = minX; i <= maxX; i += GRID_SIZE) {
             ctx.beginPath(); ctx.moveTo(i, axis.startY - 5); ctx.lineTo(i, axis.startY + 5); ctx.stroke();
             
-            // Labels perfectly align based on starting origin 0
             let stepCount = (i - axis.startX) / GRID_SIZE;
             let val = Number((stepCount * scaleX).toFixed(2));
             
@@ -714,6 +1407,13 @@
               ctx.fillText(val, i, axis.startY + 10);
             }
           }
+
+          ctx.fillStyle = '#1e293b';
+          ctx.font = '800 18px Fredoka, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('X', maxX + 15, axis.startY);
+          
         } else {
           const minY = Math.min(axis.startY, axis.endY);
           const maxY = Math.max(axis.startY, axis.endY);
@@ -727,11 +1427,16 @@
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'right';
             
-            // Prevents drawing origin '0' twice if intersecting
             if (val !== 0) {
               ctx.fillText(val, axis.startX - 10, j);
             }
           }
+
+          ctx.fillStyle = '#1e293b';
+          ctx.font = '800 18px Fredoka, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText('Y', axis.startX, minY - 15);
         }
       });
     }
@@ -776,6 +1481,12 @@
     }
 
     function drawPoints() {
+      const scaleX = parseFloat(scaleXInput.value) || 1;
+      const scaleY = parseFloat(scaleYInput.value) || 1;
+      
+      let hAxis = axesList.find(a => a.isHorizontal);
+      let vAxis = axesList.find(a => !a.isHorizontal);
+
       points.forEach(p => {
         ctx.fillStyle = p.color + '44';
         ctx.beginPath(); ctx.arc(p.x, p.y, 10, 0, Math.PI * 2); ctx.fill();
@@ -784,6 +1495,21 @@
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#ffffff';
         ctx.stroke();
+
+        if (showCoordinates && !isGameMode) {
+          let xVal = hAxis ? Number(((p.x - hAxis.startX) / GRID_SIZE * scaleX).toFixed(2)) : '?';
+          let yVal = vAxis ? Number((-(p.y - vAxis.startY) / GRID_SIZE * scaleY).toFixed(2)) : '?';
+          
+          ctx.fillStyle = '#1e293b';
+          ctx.font = '700 13px Fredoka, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'bottom';
+          
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#ffffff';
+          ctx.strokeText(`(${xVal}, ${yVal})`, p.x + 12, p.y - 8);
+          ctx.fillText(`(${xVal}, ${yVal})`, p.x + 12, p.y - 8);
+        }
       });
     }
 
@@ -809,10 +1535,23 @@
       drawPoints();
       drawLabels();
 
-      if (currentMode === 'axes' && isDrawing && dragStart && mousePos) {
+      // Draw game target if active
+      if (isGameMode && currentTarget) {
+        ctx.fillStyle = '#ef4444' + '44'; 
+        ctx.beginPath(); ctx.arc(currentTarget.physX, currentTarget.physY, 14, 0, Math.PI * 2); ctx.fill();
+        
+        ctx.fillStyle = '#ef4444'; 
+        ctx.beginPath(); ctx.arc(currentTarget.physX, currentTarget.physY, 8, 0, Math.PI * 2); ctx.fill();
+        
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+      }
+
+      if (currentMode === 'axes' && isDrawing && dragStart && mousePos && !isGameMode) {
         const sx = dragStart.x;
         const sy = dragStart.y;
-        const cx = snapMain(mousePos.x); // Previews snap strictly to MAIN lines
+        const cx = snapMain(mousePos.x); 
         const cy = snapMain(mousePos.y);
 
         const isHoriz = Math.abs(cx - sx) > Math.abs(cy - sy);
@@ -827,20 +1566,20 @@
         ctx.stroke();
       }
 
-      if (currentMode === 'line' && tempPoint && mousePos) {
+      if (currentMode === 'line' && tempPoint && mousePos && !isGameMode) {
         ctx.strokeStyle = currentColor + '88';
         ctx.lineWidth = 4;
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(tempPoint.x, tempPoint.y);
-        ctx.lineTo(snapMinor(mousePos.x), snapMinor(mousePos.y)); // Previews snap to MINOR lines
+        ctx.lineTo(snapMinor(mousePos.x), snapMinor(mousePos.y)); 
         ctx.stroke();
       }
 
-      if ((currentMode === 'bar' || currentMode === 'histogram') && isDrawing && dragStart && mousePos) {
+      if ((currentMode === 'bar' || currentMode === 'histogram') && isDrawing && dragStart && mousePos && !isGameMode) {
         const x = dragStart.x;
         const y1 = dragStart.y;
-        const y2 = snapMinor(mousePos.y); // Heights snap to fine decimal lines
+        const y2 = snapMinor(mousePos.y); 
         const w = (currentMode === 'histogram') ? GRID_SIZE : (barGridSpan * GRID_SIZE);
         const topY = Math.min(y1, y2);
         const h = Math.abs(y1 - y2);
@@ -851,17 +1590,14 @@
         ctx.lineWidth = 2;
         ctx.strokeRect(x, topY, w, h);
       }
-
-      pointCountEl.textContent = points.length;
-      barCountEl.textContent = bars.length;
     }
 
     function handleStart(e) {
       if (e.type.startsWith('touch')) e.preventDefault(); 
+      if (isGameMode) return; 
+      
       mousePos = getPos(e);
       
-      // CRITICAL FIX: Base and edges of Bars/Axes snap to MAIN grid lines
-      // Points and Lines snap to MINOR grid lines (for decimal precision)
       const isMainSnapMode = currentMode === 'axes' || currentMode === 'bar' || currentMode === 'histogram';
       const x = isMainSnapMode ? snapMain(mousePos.x) : snapMinor(mousePos.x);
       const y = isMainSnapMode ? snapMain(mousePos.y) : snapMinor(mousePos.y);
@@ -898,21 +1634,12 @@
         render();
         return;
       }
-
-      if (currentMode === 'label') {
-        setTimeout(() => {
-          const text = prompt('Enter your custom text or category label:');
-          if (text) {
-            labels.push({ x: mousePos.x, y: mousePos.y, text, color: currentColor });
-            actionHistory.push('label');
-            render();
-          }
-        }, 10);
-      }
     }
 
     function handleMove(e) {
       if (e.type.startsWith('touch') && isDrawing) e.preventDefault();
+      if (isGameMode) return;
+
       mousePos = getPos(e);
       
       if (currentMode === 'doodle' && isDrawing) {
@@ -924,7 +1651,7 @@
     }
 
     function handleEnd(e) {
-      if (!isDrawing) return;
+      if (!isDrawing || isGameMode) return;
       isDrawing = false;
       mousePos = getPos(e);
 
@@ -951,7 +1678,6 @@
       }
 
       if (currentMode === 'bar' || currentMode === 'histogram') {
-        // Height of the bar continues to snap to MINOR lines for exact decimal values
         const endY = snapMinor(mousePos.y); 
         const w = (currentMode === 'histogram') ? GRID_SIZE : (barGridSpan * GRID_SIZE);
         const topY = Math.min(dragStart.y, endY);
@@ -977,6 +1703,7 @@
     // Mode Switching
     document.querySelectorAll('.tool-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        if(btn.id === 'btn-plot-exact') return; 
         document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentMode = btn.dataset.mode;
@@ -993,12 +1720,6 @@
         swatch.classList.add('active');
         currentColor = swatch.dataset.color;
       });
-    });
-
-    // Bar Width Slider
-    barWidthSlider.addEventListener('input', (e) => {
-      barGridSpan = parseInt(e.target.value);
-      barWidthVal.textContent = `${barGridSpan} Grid${barGridSpan > 1 ? 's' : ''}`;
     });
 
     // Undo Functionality
@@ -1028,17 +1749,12 @@
         doodles = [];
         actionHistory = [];
         tempPoint = null;
+        
+        exactXInput.value = '';
+        exactYInput.value = '';
+        
         render();
       }
-    });
-
-    // Save as Image
-    document.getElementById('btn-save').addEventListener('click', () => {
-      const data = canvas.toDataURL();
-      const link = document.createElement('a');
-      link.download = 'graph-studio-export.png';
-      link.href = data;
-      link.click();
     });
 
     resizeCanvas();
