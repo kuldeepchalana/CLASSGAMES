@@ -747,6 +747,14 @@
         <input type="range" id="grid-size-slider" min="20" max="100" value="50" step="10">
       </div>
 
+      <!-- Custom Label Tool Input -->
+      <div class="slider-group">
+        <div class="slider-header">
+          <span>Custom Label Tool</span>
+        </div>
+        <input type="text" id="custom-label-input" placeholder="Type text, then tap canvas">
+      </div>
+
       <!-- Exact Coordinates Input -->
       <div class="slider-group" style="background: #eef2ff; border-color: #a5b4fc;">
         <div class="slider-header" style="color: #4338ca;">
@@ -774,6 +782,30 @@
         </div>
         <input type="number" id="scale-y" value="1" min="0.1" step="any">
       </div>
+
+      <!-- Colors -->
+      <div>
+        <div class="section-title">Theme Color</div>
+        <div class="color-palette" id="palette">
+          <div class="color-swatch active" style="background: #1e293b;" data-color="#1e293b"></div>
+          <div class="color-swatch" style="background: #ef4444;" data-color="#ef4444"></div>
+          <div class="color-swatch" style="background: #f97316;" data-color="#f97316"></div>
+          <div class="color-swatch" style="background: #10b981;" data-color="#10b981"></div>
+          <div class="color-swatch" style="background: #06b6d4;" data-color="#06b6d4"></div>
+          <div class="color-swatch" style="background: #6366f1;" data-color="#6366f1"></div>
+          <div class="color-swatch" style="background: #ec4899;" data-color="#ec4899"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="slider-group" style="margin-top: auto;">
+        <div class="slider-header">
+          <span>Bar Width</span>
+          <span id="bar-width-val">1 Grid</span>
+        </div>
+        <input type="range" id="bar-width-slider" min="1" max="4" value="1" step="1">
+      </div>
+
     </aside>
 
     <!-- GAME MODE SIDEBAR -->
@@ -845,6 +877,9 @@
     const gridSizeVal = document.getElementById('grid-size-val');
     const fullscreenBtn = document.getElementById('btn-fullscreen');
     const launcher = document.getElementById('launcher');
+    const barWidthSlider = document.getElementById('bar-width-slider');
+    const barWidthVal = document.getElementById('bar-width-val');
+    const customLabelInput = document.getElementById('custom-label-input');
     
     // Core Inputs
     const scaleXInput = document.getElementById('scale-x');
@@ -870,6 +905,7 @@
     
     let currentMode = 'axes';
     let currentColor = '#1e293b';
+    let barGridSpan = 1;
     let showCoordinates = false;
 
     // Elements Data Store
@@ -968,7 +1004,7 @@
     const modeHints = {
       axes: '📐 Drag horizontally or vertically. Axes snap to MAIN grid lines.',
       doodle: '✏️ Draw freely anywhere on the screen.',
-      label: '🏷 Tap anywhere to type your custom category label or title.',
+      label: '🏷 Type your text in the sidebar input box, then tap the canvas to stamp it.',
       point: '📍 Tap to plot points. (Snaps to fine 0.1 decimal grid lines)',
       line: '📉 Tap to join points continuously. Press ESC or change tools to stop the line.',
       bar: '📊 Drag vertically from the X-axis. Bars base snaps perfectly between steps!',
@@ -1110,7 +1146,9 @@
       studioActions.style.display = 'none';
       btnEnterGamemode.style.display = 'none';
       gameSidebar.style.display = 'flex';
-      helpText.textContent = `🎮 First Quadrant Mode: Guess the positive coordinates of the red point!`;
+      
+      // Hide the floating help banner so it doesn't block the points
+      helpText.style.display = 'none';
 
       // Canvas Setup
       points = []; lines = []; bars = []; labels = []; doodles = []; actionHistory = [];
@@ -1207,8 +1245,11 @@
       studioActions.style.display = 'flex';
       btnEnterGamemode.style.display = 'flex';
       
-      points = []; axesList = []; leaderboard = [];
+      // Restore the floating help banner
+      helpText.style.display = 'flex';
       helpText.textContent = modeHints[currentMode];
+      
+      points = []; axesList = []; leaderboard = [];
       render();
     }
 
@@ -1324,6 +1365,12 @@
       });
 
       render();
+    });
+
+    // Bar Width Slider
+    barWidthSlider.addEventListener('input', (e) => {
+      barGridSpan = parseInt(e.target.value);
+      barWidthVal.textContent = `${barGridSpan} Grid${barGridSpan > 1 ? 's' : ''}`;
     });
 
     document.getElementById('btn-plot-exact').addEventListener('click', () => {
@@ -1634,6 +1681,17 @@
         render();
         return;
       }
+
+      if (currentMode === 'label') {
+        const text = customLabelInput.value.trim();
+        if (text !== '') {
+          labels.push({ x: mousePos.x, y: mousePos.y, text, color: currentColor });
+          actionHistory.push('label');
+          render();
+        } else {
+          customLabelInput.focus();
+        }
+      }
     }
 
     function handleMove(e) {
@@ -1710,6 +1768,10 @@
         tempPoint = null; 
         isDrawing = false;
         helpText.textContent = modeHints[currentMode];
+
+        if(currentMode === 'label') {
+          customLabelInput.focus();
+        }
       });
     });
 
@@ -1752,6 +1814,7 @@
         
         exactXInput.value = '';
         exactYInput.value = '';
+        customLabelInput.value = '';
         
         render();
       }
