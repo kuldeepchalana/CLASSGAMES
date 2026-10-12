@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ਸਮੀਕਰਨ ਹੱਲ ਕਰੋ - Equation Flip & Solve</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts: Mukta Mahee & Fredoka -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Mukta+Mahee:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      box-sizing: border-box;
+      touch-action: manipulation;
+    }
+    body {
+      font-family: 'Mukta Mahee', 'Fredoka', sans-serif;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+    }
+    .math-font {
+      font-family: 'Fredoka', 'Mukta Mahee', sans-serif;
+    }
+    .tile-shadow {
+      box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    }
+    .pulse-glow {
+      box-shadow: 0 0 28px rgba(245, 158, 11, 0.65);
+    }
+    @keyframes flipSign {
+      0% { transform: scale(1) rotateY(0deg); }
+      50% { transform: scale(1.18) rotateY(90deg); filter: brightness(1.6); }
+      100% { transform: scale(1) rotateY(0deg); }
+    }
+    .animate-flip {
+      animation: flipSign 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes fusionPopIn {
+      0% { transform: scale(0.35); opacity: 0; filter: brightness(2); }
+      60% { transform: scale(1.22); opacity: 1; filter: brightness(1.3); }
+      100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+    }
+    .fusion-pop-in {
+      animation: fusionPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes flarePulse {
+      0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.9; }
+      50% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; filter: drop-shadow(0 0 25px #fbbf24); }
+      100% { transform: translate(-50%, -50%) scale(1.9); opacity: 0; }
+    }
+    .flare-anim {
+      animation: flarePulse 0.75s ease-out forwards;
+    }
+    .fraction-line {
+      width: 100%;
+      height: 2.5px;
+      background-color: currentColor;
+      margin: 2px 0;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar {
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="w-screen h-screen flex flex-col justify-between text-white overflow-hidden p-2.5 relative">
+
+  <!-- ================= LAUNCH SPLASH SCREEN (AUTOPLAYS IN FULLSCREEN) ================= -->
+  <div id="launchScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-xl p-6 transition-all duration-700">
+    <!-- Background Animated Glows -->
+    <div class="absolute w-96 h-96 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none -top-10 -left-10 animate-pulse"></div>
+    <div class="absolute w-96 h-96 rounded-full bg-amber-500/20 blur-3xl pointer-events-none -bottom-10 -right-10 animate-pulse" style="animation-delay: 1s;"></div>
+
+    <div class="max-w-2xl w-full bg-slate-900/90 border-2 border-indigo-500/50 rounded-3xl p-8 shadow-2xl relative text-center flex flex-col items-center">
+      
+      <!-- Top Badges -->
+      <div class="flex items-center justify-between w-full mb-4">
+        <a href="../index.html" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold px-3 py-1.5 rounded-xl border border-rose-500/30 text-xs active:scale-95 transition">
+          <i class="fa-solid fa-house-chimney"></i>
+          <span>ਹੱਬ ਵੱਲ ਵਾਪਸ</span>
+        </a>
+        <span class="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-3 py-1 rounded-full font-bold">
+          ਸਮਾਰਟ ਬੋਰਡ ਕਲਾਸਰੂਮ ਐਡੀਸ਼ਨ
+        </span>
+      </div>
+
+      <!-- Icon & Logo -->
+      <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 text-4xl shadow-xl mb-4 border-2 border-amber-300">
+        <i class="fa-solid fa-scale-balanced"></i>
+      </div>
+
+      <h1 class="text-3xl font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-emerald-300 mb-2">
+        ਸਮੀਕਰਨ ਹੱਲ ਕਰੋ (Equation Flip & Solve)
+      </h1>
+      <p class="text-sm text-slate-300 max-w-lg mb-6 leading-relaxed">
+        ਸਮੀਕਰਨਾਂ ਨੂੰ ਖੇਡ-ਖੇਡ ਵਿੱਚ ਹੱਲ ਕਰੋ! ਸੰਖਿਆਵਾਂ ਨੂੰ ਬਰਾਬਰ (<span class="font-bold text-amber-400">=</span>) ਦੇ ਆਰ-ਪਾਰ ਖਿੱਚੋ, ਨਿਸ਼ਾਨ ਉਲਟਾਓ ਅਤੇ ਚੱਲ (<span class="font-bold text-emerald-400">x</span>) ਦਾ ਮੁੱਲ ਪਤਾ ਕਰੋ।
+      </p>
+
+      <!-- Key Learning Rules Badges -->
+      <div class="grid grid-cols-3 gap-3 w-full mb-8 text-xs font-semibold">
+        <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80 flex flex-col items-center gap-1">
+          <span class="text-amber-400 text-lg">⇄</span>
+          <span class="text-slate-200">ਪਾਸਾ ਬਦਲੋ</span>
+          <span class="text-[10px] text-slate-400">+ ਬਣੇਗਾ -, - ਬਣੇਗਾ +</span>
+        </div>
+        <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80 flex flex-col items-center gap-1">
+          <span class="text-indigo-400 text-lg">⚡</span>
+          <span class="text-slate-200">ਸੰਖਿਆਵਾਂ ਮਿਲਾਓ</span>
+          <span class="text-[10px] text-slate-400">ਹੌਲੀ ਫਿਊਜ਼ਨ ਐਨੀਮੇਸ਼ਨ</span>
+        </div>
+        <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80 flex flex-col items-center gap-1">
+          <span class="text-emerald-400 text-lg">➗ / ✖</span>
+          <span class="text-slate-200">ਗੁਣਾਂਕ ਜਾਂ ਭਿੰਨ</span>
+          <span class="text-[10px] text-slate-400">ਭਾਗ ਜਾਂ ਗੁਣਾ ਕਰੋ</span>
+        </div>
+      </div>
+
+      <!-- Main Launch Button -->
+      <button onclick="launchGameFullScreen()" class="w-full max-w-md py-3.5 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-lg rounded-2xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3">
+        <i class="fa-solid fa-play text-base"></i>
+        <span>ਖੇਡ ਸ਼ੁਰੂ ਕਰੋ (ਪੂਰੀ ਸਕ੍ਰੀਨ)</span>
+        <i class="fa-solid fa-expand text-sm opacity-70"></i>
+      </button>
+
+      <p class="text-[11px] text-slate-400 mt-3">
+        * ਬਟਨ ਦਬਾਉਣ 'ਤੇ ਗੇਮ ਆਟੋਮੈਟਿਕ ਫੁੱਲ-ਸਕ੍ਰੀਨ ਵਿੱਚ ਖੁੱਲ੍ਹੇਗੀ ਅਤੇ ਆਵਾਜ਼ ਚਾਲੂ ਹੋ ਜਾਵੇਗੀ।
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ================= TOP NAVIGATION & CONTROLS ================= -->
+  <header class="w-full bg-slate-900/80 backdrop-blur-md border border-slate-700/70 rounded-2xl px-4 py-2 flex items-center justify-between shadow-xl flex-shrink-0">
+    
+    <!-- Left: Hub Link & App Title -->
+    <div class="flex items-center gap-3">
+      <!-- Back to Hub Button -->
+      <a href="../index.html" 
+         class="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold px-3.5 py-1.5 rounded-xl border border-red-400/40 shadow-lg active:scale-95 transition-all text-sm tracking-wide">
+        <i class="fa-solid fa-house-chimney text-base"></i>
+        <span>ਹੱਬ ਵੱਲ ਵਾਪਸ</span>
+      </a>
+
+      <div class="h-6 w-px bg-slate-700 mx-1"></div>
+
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600/80 flex items-center justify-center text-amber-300 font-bold text-lg border border-indigo-400/30">
+          <i class="fa-solid fa-calculator text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-emerald-300 leading-tight">
+            ਸਮੀਕਰਨ ਹੱਲ ਕਰੋ
+          </h1>
+          <p class="text-[10px] text-slate-400 font-medium">ਨਿਯਮ: ਪਾਸਾ ਬਦਲੋ ਤੇ ਨਿਸ਼ਾਨ ਉਲਟਾਓ (+ ⇋ -)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Equation Presets & Custom Input -->
+    <div class="flex items-center gap-2 bg-slate-800/80 px-2 py-1 rounded-xl border border-slate-700/60">
+      <span class="text-xs text-amber-300 font-semibold pl-1"><i class="fa-solid fa-book-open mr-1"></i>ਉਦਾਹਰਣਾਂ:</span>
+      <button onclick="loadEquation('x/5+2=10')" class="preset-btn px-2.5 py-1 bg-slate-700 hover:bg-indigo-600 text-xs font-semibold rounded-lg transition active:scale-95 math-font">x/5 + 2 = 10</button>
+      <button onclick="loadEquation('2x+5=13')" class="preset-btn px-2.5 py-1 bg-slate-700 hover:bg-indigo-600 text-xs font-semibold rounded-lg transition active:scale-95 math-font">2x + 5 = 13</button>
+      <button onclick="loadEquation('x-7=4')" class="preset-btn px-2.5 py-1 bg-slate-700 hover:bg-indigo-600 text-xs font-semibold rounded-lg transition active:scale-95 math-font">x - 7 = 4</button>
+      <button onclick="loadEquation('2x/3+4=10')" class="preset-btn px-2.5 py-1 bg-slate-700 hover:bg-indigo-600 text-xs font-semibold rounded-lg transition active:scale-95 math-font">2x/3 + 4 = 10</button>
+      <button onclick="loadEquation('3x-6=12')" class="preset-btn px-2.5 py-1 bg-slate-700 hover:bg-indigo-600 text-xs font-semibold rounded-lg transition active:scale-95 math-font">3x - 6 = 12</button>
+      
+      <button onclick="openCustomModal()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg shadow transition active:scale-95 flex items-center gap-1">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span>ਨਵੀਂ ਸਮੀਕਰਨ</span>
+      </button>
+    </div>
+
+    <!-- Right: Utility Controls (Sound, Reset, Fullscreen) -->
+    <div class="flex items-center gap-2">
+      <button onclick="resetCurrentEquation()" title="ਦੁਬਾਰਾ ਸ਼ੁਰੂ ਕਰੋ" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 active:scale-95 transition">
+        <i class="fa-solid fa-arrow-rotate-right text-xs"></i>
+      </button>
+      <button id="soundToggleBtn" onclick="toggleSound()" title="ਆਵਾਜ਼ ਆਨ/ਆਫ" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 active:scale-95 transition">
+        <i class="fa-solid fa-volume-high text-xs text-amber-300"></i>
+      </button>
+      <button onclick="toggleFullscreen()" title="ਫੁੱਲ ਸਕ੍ਰੀਨ" class="w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center border border-indigo-400/40 active:scale-95 transition">
+        <i class="fa-solid fa-expand text-xs"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN EQUATION WORKSPACE ================= -->
+  <main class="w-full flex-1 flex gap-3 my-2 min-h-0 items-stretch relative">
+
+    <!-- LEFT HAND SIDE (LHS pan) -->
+    <section class="flex-1 bg-slate-900/60 border-2 border-dashed border-sky-500/40 rounded-3xl p-3 flex flex-col justify-between relative backdrop-blur-sm shadow-inner transition-colors" id="lhsContainer">
+      <div class="flex items-center justify-between border-b border-sky-500/20 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-bold text-xs uppercase tracking-wider border border-sky-500/30">LHS</span>
+          <span class="text-sm font-semibold text-slate-300">ਖੱਬਾ ਪਾਸਾ (Left Side)</span>
+        </div>
+        <span class="text-[11px] text-sky-400/80 font-medium">ਚੱਲ ਸੰਖਿਆ (Variable) ਇੱਥੇ ਰੱਖੋ</span>
+      </div>
+
+      <!-- LHS Drop Zone -->
+      <div id="lhsDropZone" class="flex-1 flex flex-wrap items-center justify-center gap-4 p-4 content-center overflow-hidden min-h-[160px] relative">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- LHS Action Toolbar -->
+      <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+        <button id="combineLhsBtn" onclick="animateAndCombineConstants('lhs')" class="px-3 py-1.5 rounded-xl bg-sky-600/40 hover:bg-sky-600 text-sky-200 hover:text-white text-xs font-bold border border-sky-500/40 transition active:scale-95 flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none">
+          <i class="fa-solid fa-plus-minus"></i>
+          <span>ਖੱਬੇ ਪਾਸੇ ਅੰਕ ਜੋੜੋ/ਘਟਾਓ</span>
+        </button>
+        <span id="lhsCountBadge" class="text-[11px] text-slate-400 font-mono">ਪਦ: 0</span>
+      </div>
+    </section>
+
+    <!-- EQUALS TO SIGN (=) CENTRAL PILLAR -->
+    <div class="w-16 flex flex-col items-center justify-center relative flex-shrink-0 z-10">
+      <div class="h-full w-1 bg-gradient-to-b from-transparent via-amber-400 to-transparent opacity-40 absolute"></div>
+      
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 flex items-center justify-center shadow-2xl text-slate-950 font-black text-3xl math-font relative z-20 border-2 border-amber-200 pulse-glow">
+        =
+      </div>
+
+      <div class="mt-2 text-center">
+        <span class="text-[9px] font-extrabold uppercase tracking-widest text-amber-300/80 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
+          ਬਰਾਬਰ
+        </span>
+      </div>
+      <div class="mt-1 text-center">
+        <span class="text-[8px] text-slate-400 leading-none block">ਪਾਰ ਜਾਣ 'ਤੇ</span>
+        <span class="text-[8px] text-amber-400 font-bold">ਨਿਸ਼ਾਨ ਬਦਲੇਗਾ</span>
+      </div>
+    </div>
+
+    <!-- RIGHT HAND SIDE (RHS pan) -->
+    <section class="flex-1 bg-slate-900/60 border-2 border-dashed border-emerald-500/40 rounded-3xl p-3 flex flex-col justify-between relative backdrop-blur-sm shadow-inner transition-colors" id="rhsContainer">
+      <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-xs uppercase tracking-wider border border-emerald-500/30">RHS</span>
+          <span class="text-sm font-semibold text-slate-300">ਸੱਜਾ ਪਾਸਾ (Right Side)</span>
+        </div>
+        <span class="text-[11px] text-emerald-400/80 font-medium">ਅਚੱਲ ਸੰਖਿਆਵਾਂ (Numbers) ਇੱਥੇ ਰੱਖੋ</span>
+      </div>
+
+      <!-- RHS Drop Zone -->
+      <div id="rhsDropZone" class="flex-1 flex flex-wrap items-center justify-center gap-4 p-4 content-center overflow-hidden min-h-[160px] relative">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- RHS Action Toolbar -->
+      <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+        <span id="rhsCountBadge" class="text-[11px] text-slate-400 font-mono">ਪਦ: 0</span>
+        <button id="combineRhsBtn" onclick="animateAndCombineConstants('rhs')" class="px-3 py-1.5 rounded-xl bg-emerald-600/40 hover:bg-emerald-600 text-emerald-200 hover:text-white text-xs font-bold border border-emerald-500/40 transition active:scale-95 flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none">
+          <i class="fa-solid fa-plus-minus"></i>
+          <span>ਸੱਜੇ ਪਾਸੇ ਅੰਕ ਜੋੜੋ/ਘਟਾਓ</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FINAL ACTION BANNER (DIVISION OR MULTIPLICATION) ================= -->
+  <div id="finalActionBanner" class="hidden w-full bg-gradient-to-r from-amber-500/20 via-indigo-600/30 to-amber-500/20 border-2 border-amber-400/70 rounded-2xl p-2.5 mb-2 items-center justify-between shadow-2xl backdrop-blur-md animate-bounce">
+    <div class="flex items-center gap-3">
+      <div id="finalActionIcon" class="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 font-black flex items-center justify-center text-lg shadow">
+        ÷
+      </div>
+      <div>
+        <h3 id="finalActionHeading" class="text-sm font-extrabold text-amber-300">ਅੰਤਿਮ ਪੜਾਅ: ਚੱਲ ਨੂੰ ਇਕੱਲਾ ਕਰੋ</h3>
+        <p class="text-xs text-slate-200" id="finalActionDescText">ਚੱਲ <span class="font-bold text-white">x</span> ਨੂੰ ਪੂਰੀ ਤਰ੍ਹਾਂ ਇਕੱਲਾ ਕਰਨ ਲਈ ਗਣਿਤਿਕ ਕ੍ਰਿਆ ਕਰੋ।</p>
+      </div>
+    </div>
+    <button id="performFinalActionBtn" onclick="executeFinalAction()" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold px-5 py-2 rounded-xl text-sm shadow-xl active:scale-95 transition-all flex items-center gap-2">
+      <i class="fa-solid fa-bolt"></i>
+      <span id="finalActionBtnText">ਹੱਲ ਪ੍ਰਾਪਤ ਕਰੋ</span>
+    </button>
+  </div>
+
+  <!-- ================= BOTTOM WHITEBOARD & STATUS BAR ================= -->
+  <footer class="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between gap-4 flex-shrink-0 shadow-lg">
+    
+    <div class="flex-1 flex items-center gap-3 overflow-hidden">
+      <div class="flex items-center gap-1.5 text-xs font-bold text-slate-400 flex-shrink-0">
+        <i class="fa-solid fa-list-check text-indigo-400"></i>
+        <span>ਹੱਲ ਦੇ ਪੜਾਅ:</span>
+      </div>
+      
+      <div id="stepsContainer" class="flex-1 flex items-center gap-2 overflow-x-auto py-1 scroll-smooth">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+    <div id="guidanceFeedback" class="bg-indigo-950/70 border border-indigo-500/40 px-3.5 py-1.5 rounded-xl text-xs text-indigo-200 font-semibold flex items-center gap-2 flex-shrink-0">
+      <i class="fa-solid fa-lightbulb text-amber-400 animate-pulse"></i>
+      <span id="guidanceText">ਚੱਲ (x) ਨੂੰ LHS ਵੱਲ ਅਤੇ ਸੰਖਿਆਵਾਂ ਨੂੰ RHS ਵੱਲ ਖਿੱਚੋ।</span>
+    </div>
+
+  </footer>
+
+  <!-- ================= MODAL: CUSTOM EQUATION INPUT ================= -->
+  <div id="customModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border-2 border-indigo-500/60 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative">
+      <button onclick="closeCustomModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center text-xl font-bold">
+          <i class="fa-solid fa-keyboard"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-white">ਆਪਣੀ ਸਮੀਕਰਨ ਦਰਜ ਕਰੋ</h2>
+          <p class="text-xs text-slate-400">ਉਦਾਹਰਣ: x/5+2=10, 2x+5=13, 2x/3+4=10, 3x-6=12 ਆਦਿ।</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">ਸਮੀਕਰਨ (ਰੇਖਿਕ ਸਮੀਕਰਨ):</label>
+          <input type="text" id="customInput" placeholder="ਜਿਵੇਂ ਕਿ: x/5 + 2 = 10" 
+                 class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl px-4 py-2.5 text-white font-mono text-lg focus:border-amber-400 focus:outline-none tracking-wider">
+        </div>
+
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+          <p class="text-[11px] text-amber-300 font-bold mb-1"><i class="fa-solid fa-circle-info mr-1"></i>ਵਿਸ਼ੇਸ਼ਤਾ:</p>
+          <p class="text-[11px] text-slate-300">
+            ਤੁਸੀਂ ਸਧਾਰਨ ਗੁਣਾਂਕ ਵਾਲੀ (ਜਿਵੇਂ 2x) ਜਾਂ ਭਿੰਨ/ਵੰਡ ਵਾਲੀ (ਜਿਵੇਂ x/5 ਜਾਂ 2x/3) ਕੋਈ ਵੀ ਰੇਖਿਕ ਸਮੀਕਰਨ ਭਰ ਸਕਦੇ ਹੋ।
+          </p>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button onclick="closeCustomModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-semibold transition">
+            ਰੱਦ ਕਰੋ
+          </button>
+          <button onclick="applyCustomEquation()" class="px-5 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 text-slate-950 font-bold rounded-xl text-sm shadow-lg active:scale-95 transition">
+            ਸਮੀਕਰਨ ਲੋਡ ਕਰੋ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SUCCESS CELEBRATION MODAL ================= -->
+  <div id="successModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-400/80 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative">
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-400 text-slate-950 flex items-center justify-center text-4xl shadow-xl mb-4">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      
+      <h2 class="text-2xl font-black text-amber-300 mb-1">ਸ਼ਾਬਾਸ਼! ਬਹੁਤ ਵਧੀਆ!</h2>
+      <p class="text-sm text-slate-300 mb-4">ਤੁਸੀਂ ਸਮੀਕਰਨ ਸਫਲਤਾਪੂਰਵਕ ਹੱਲ ਕਰ ਲਈ ਹੈ!</p>
+
+      <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4 mb-5">
+        <span class="text-xs text-slate-400 block mb-1">ਅੰਤਿਮ ਹੱਲ (Final Answer):</span>
+        <div id="finalAnswerDisplay" class="text-3xl font-black text-emerald-400 math-font tracking-wider">
+          x = 40
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center gap-3">
+        <button onclick="closeSuccessModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+          ਦੇਖੋ
+        </button>
+        <button onclick="loadNextPreset()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-white font-extrabold rounded-xl text-xs shadow-lg active:scale-95 transition flex items-center gap-2">
+          <span>ਅਗਲੀ ਸਮੀਕਰਨ ਹੱਲ ਕਰੋ</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    /* -------------------------------------------------------------
+       STATE MANAGEMENT & VARIABLES
+    ------------------------------------------------------------- */
+    let currentEquationStr = "x/5+2=10";
+    let variableName = "x";
+    let lhsItems = [];
+    let rhsItems = [];
+    let stepsHistory = [];
+    let isSoundEnabled = true;
+    let nextId = 1;
+    let isCombiningAnimationRunning = false;
+    let currentFinalAction = null; // { type: 'divide' | 'multiply', factor: number, target: number }
+
+    const presetsList = [
+      "x/5+2=10",
+      "2x+5=13",
+      "x-7=4",
+      "2x/3+4=10",
+      "3x-6=12",
+      "4x+8=24"
+    ];
+    let presetIndex = 0;
+
+    /* -------------------------------------------------------------
+       WEB AUDIO SYNTHESIZER
+    ------------------------------------------------------------- */
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      if (!isSoundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'flip') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(780, now + 0.18);
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        } else if (type === 'glide') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(260, now);
+          osc.frequency.exponentialRampToValueAtTime(520, now + 0.7);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.7);
+          osc.start(now);
+          osc.stop(now + 0.7);
+        } else if (type === 'combine') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.22);
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'victory') {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const vOsc = ctx.createOscillator();
+            const vGain = ctx.createGain();
+            vOsc.connect(vGain);
+            vGain.connect(ctx.destination);
+            vOsc.type = 'sine';
+            vOsc.frequency.value = freq;
+            vGain.gain.setValueAtTime(0.3, now + i * 0.1);
+            vGain.gain.linearRampToValueAtTime(0.01, now + i * 0.1 + 0.35);
+            vOsc.start(now + i * 0.1);
+            vOsc.stop(now + i * 0.1 + 0.35);
+          });
+        } else if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+          osc.start(now);
+          osc.stop(now + 0.06);
+        }
+      } catch (e) {
+        console.warn('Audio error:', e);
+      }
+    }
+
+    function toggleSound() {
+      isSoundEnabled = !isSoundEnabled;
+      const btn = document.getElementById('soundToggleBtn');
+      if (isSoundEnabled) {
+        btn.innerHTML = `<i class="fa-solid fa-volume-high text-xs text-amber-300"></i>`;
+        setGuidance("ਆਵਾਜ਼ ਚਾਲੂ ਹੈ");
+      } else {
+        btn.innerHTML = `<i class="fa-solid fa-volume-xmark text-xs text-slate-500"></i>`;
+        setGuidance("ਆਵਾਜ਼ ਬੰਦ ਹੈ");
+      }
+    }
+
+    /* -------------------------------------------------------------
+       LAUNCH GAME & FULLSCREEN INITIATION
+    ------------------------------------------------------------- */
+    function launchGameFullScreen() {
+      // 1. Activate Audio Context immediately
+      getAudioContext();
+      playSound('click');
+
+      // 2. Request Fullscreen
+      const docEl = document.documentElement;
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(() => {});
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+      } else if (docEl.msRequestFullscreen) {
+        docEl.msRequestFullscreen();
+      }
+
+      // 3. Smooth fade out launch overlay
+      const splash = document.getElementById('launchScreen');
+      splash.style.opacity = '0';
+      splash.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        splash.style.display = 'none';
+      }, 700);
+
+      // Load initial equation
+      loadEquation(currentEquationStr);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    /* -------------------------------------------------------------
+       EQUATION PARSER (SUPPORTS FRACTIONS & DIVISION e.g. x/5, 2x/3)
+    ------------------------------------------------------------- */
+    function parseEquation(eqStr) {
+      const clean = eqStr.replace(/\s+/g, '');
+      const sides = clean.split('=');
+      if (sides.length !== 2) return null;
+
+      function parseSide(str) {
+        // Regex matches terms like: +2x/3, -x/5, +2x, -5, +10
+        const regex = /([+-]?(?:[0-9]*[a-zA-Z](?:\/[0-9]+)?|[0-9]+))/g;
+        const matches = str.match(regex);
+        const list = [];
+        if (!matches) return list;
+
+        matches.forEach(rawToken => {
+          let token = rawToken;
+          let sign = '+';
+          if (token.startsWith('+')) {
+            sign = '+';
+            token = token.slice(1);
+          } else if (token.startsWith('-')) {
+            sign = '-';
+            token = token.slice(1);
+          }
+
+          if (/[a-zA-Z]/.test(token)) {
+            // It is a variable term
+            let numCoeff = 1;
+            let denomCoeff = 1;
+            let charVar = 'x';
+
+            const charMatch = token.match(/[a-zA-Z]/);
+            if (charMatch) {
+              charVar = charMatch[0];
+              variableName = charVar;
+            }
+
+            if (token.includes('/')) {
+              // Divided variable e.g. x/5 or 2x/3
+              const parts = token.split('/');
+              const top = parts[0].replace(charVar, '');
+              numCoeff = (top === '' || top === '+') ? 1 : (top === '-' ? -1 : parseInt(top, 10));
+              denomCoeff = parseInt(parts[1], 10) || 1;
+            } else {
+              // Standard coefficient e.g. 2x, x
+              const top = token.replace(charVar, '');
+              numCoeff = (top === '' || top === '+') ? 1 : (top === '-' ? -1 : parseInt(top, 10));
+              denomCoeff = 1;
+            }
+
+            list.push({
+              id: nextId++,
+              type: 'var',
+              num: Math.abs(numCoeff),
+              denom: denomCoeff,
+              sign: sign,
+              char: charVar
+            });
+          } else {
+            // Constant number
+            const nVal = parseInt(token, 10);
+            list.push({
+              id: nextId++,
+              type: 'const',
+              val: Math.abs(nVal),
+              sign: sign
+            });
+          }
+        });
+        return list;
+      }
+
+      const parsedLhs = parseSide(sides[0]);
+      const parsedRhs = parseSide(sides[1]);
+      if (parsedLhs.length === 0 || parsedRhs.length === 0) return null;
+
+      return { lhs: parsedLhs, rhs: parsedRhs };
+    }
+
+    /* -------------------------------------------------------------
+       LOAD EQUATION
+    ------------------------------------------------------------- */
+    function loadEquation(eqStr) {
+      const parsed = parseEquation(eqStr);
+      if (!parsed) {
+        alert("ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੈਧ ਸਮੀਕਰਨ ਦਰਜ ਕਰੋ ਜਿਵੇਂ: x/5 + 2 = 10 ਜਾਂ 2x + 5 = 13");
+        return;
+      }
+      currentEquationStr = eqStr;
+      lhsItems = parsed.lhs;
+      rhsItems = parsed.rhs;
+      stepsHistory = [];
+      document.getElementById('stepsContainer').innerHTML = '';
+
+      addStep(formatCurrentEquationString(), "ਅਸਲ ਸਮੀਕਰਨ ਲੋਡ ਕੀਤੀ ਗਈ");
+      renderBoard();
+      setGuidance(`ਸਮੀਕਰਨ ਲੋਡ ਹੋਈ: ${eqStr}। ਸੰਖਿਆਵਾਂ ਨੂੰ ਪਾਸਾ ਬਦਲਣ ਲਈ ਖਿੱਚੋ ਜਾਂ ਤੀਰ (⇄) ਦਬਾਓ।`);
+    }
+
+    function resetCurrentEquation() {
+      loadEquation(currentEquationStr);
+    }
+
+    function loadNextPreset() {
+      closeSuccessModal();
+      presetIndex = (presetIndex + 1) % presetsList.length;
+      loadEquation(presetsList[presetIndex]);
+    }
+
+    /* -------------------------------------------------------------
+       RENDER WORKSPACE TILES
+    ------------------------------------------------------------- */
+    function renderBoard() {
+      const lhsZone = document.getElementById('lhsDropZone');
+      const rhsZone = document.getElementById('rhsDropZone');
+      lhsZone.innerHTML = '';
+      rhsZone.innerHTML = '';
+
+      lhsItems.forEach((item, index) => {
+        lhsZone.appendChild(createTileElement(item, 'lhs', index));
+      });
+
+      rhsItems.forEach((item, index) => {
+        rhsZone.appendChild(createTileElement(item, 'rhs', index));
+      });
+
+      document.getElementById('lhsCountBadge').innerText = `ਪਦ: ${lhsItems.length}`;
+      document.getElementById('rhsCountBadge').innerText = `ਪਦ: ${rhsItems.length}`;
+
+      const lhsConstCount = lhsItems.filter(i => i.type === 'const').length;
+      const rhsConstCount = rhsItems.filter(i => i.type === 'const').length;
+      document.getElementById('combineLhsBtn').disabled = lhsConstCount < 2 || isCombiningAnimationRunning;
+      document.getElementById('combineRhsBtn').disabled = rhsConstCount < 2 || isCombiningAnimationRunning;
+
+      checkEquationProgress();
+    }
+
+    /* -------------------------------------------------------------
+       CREATE TILE COMPONENT
+    ------------------------------------------------------------- */
+    function createTileElement(item, side, index) {
+      const el = document.createElement('div');
+      el.dataset.id = item.id;
+      el.dataset.side = side;
+
+      const isVar = item.type === 'var';
+      const isPositive = item.sign === '+';
+
+      let bgGrad = isVar 
+        ? 'from-indigo-600 via-indigo-700 to-indigo-800 border-indigo-400 text-white' 
+        : (isPositive 
+            ? 'from-emerald-600 via-emerald-700 to-teal-800 border-emerald-400 text-white' 
+            : 'from-rose-600 via-rose-700 to-red-800 border-rose-400 text-white');
+
+      el.className = `equation-tile group relative cursor-grab active:cursor-grabbing select-none p-3 rounded-2xl bg-gradient-to-br ${bgGrad} border-2 tile-shadow flex items-center gap-2 font-bold transition-all duration-300 touch-none`;
+
+      // Build Inner Math HTML (Formatted for regular coefficient or fraction)
+      let mathContent = '';
+      if (isVar) {
+        if (item.denom > 1) {
+          // Fraction display: (num)x / denom
+          const topLabel = (item.num === 1) ? item.char : (item.num + item.char);
+          mathContent = `
+            <div class="inline-flex flex-col items-center justify-center leading-none px-1">
+              <span class="text-xl font-black">${topLabel}</span>
+              <div class="fraction-line"></div>
+              <span class="text-base font-bold">${item.denom}</span>
+            </div>
+          `;
+        } else {
+          // Normal display: 2x or x
+          const valLabel = (item.num === 1) ? item.char : (item.num + item.char);
+          mathContent = `<span class="text-2xl font-black tracking-wide">${valLabel}</span>`;
+        }
+      } else {
+        mathContent = `<span class="text-2xl font-black tracking-wide">${item.val}</span>`;
+      }
+
+      el.innerHTML = `
+        <button onclick="event.stopPropagation(); transferTile(${item.id})" title="${side === 'lhs' ? 'ਸੱਜੇ ਪਾਸੇ (RHS) ਭੇਜੋ' : 'ਖੱਬੇ ਪਾਸੇ (LHS) ਭੇਜੋ'}" class="w-7 h-7 rounded-lg bg-black/30 hover:bg-black/50 text-amber-300 flex items-center justify-center text-xs active:scale-90 transition">
+          <i class="fa-solid ${side === 'lhs' ? 'fa-arrow-right' : 'fa-arrow-left'}"></i>
+        </button>
+
+        <span class="text-amber-300 text-2xl font-black math-font mr-0.5">${item.sign}</span>
+        
+        <div class="math-font">${mathContent}</div>
+
+        <div class="text-white/40 group-hover:text-white/80 text-xs ml-1">
+          <i class="fa-solid fa-grip-vertical"></i>
+        </div>
+      `;
+
+      attachPointerDrag(el, item, side);
+      return el;
+    }
+
+    /* -------------------------------------------------------------
+       TRANSFER TILE & FLIP SIGN (CORE ALGEBRAIC TRANSPOSITION)
+    ------------------------------------------------------------- */
+    function transferTile(itemId) {
+      if (isCombiningAnimationRunning) return;
+
+      let fromSide = 'lhs';
+      let itemIndex = lhsItems.findIndex(i => i.id === itemId);
+
+      if (itemIndex === -1) {
+        fromSide = 'rhs';
+        itemIndex = rhsItems.findIndex(i => i.id === itemId);
+      }
+      if (itemIndex === -1) return;
+
+      const toSide = fromSide === 'lhs' ? 'rhs' : 'lhs';
+      const item = fromSide === 'lhs' ? lhsItems.splice(itemIndex, 1)[0] : rhsItems.splice(itemIndex, 1)[0];
+
+      // Sign Inversion
+      const oldSign = item.sign;
+      item.sign = (item.sign === '+') ? '-' : '+';
+
+      if (toSide === 'lhs') lhsItems.push(item);
+      else rhsItems.push(item);
+
+      playSound('flip');
+
+      let termDesc = item.type === 'var' 
+        ? (item.denom > 1 ? `${item.num === 1 ? '' : item.num}${item.char}/${item.denom}` : `${item.num === 1 ? '' : item.num}${item.char}`)
+        : item.val;
+
+      setGuidance(`ਨਿਯਮ ਲਾਗੂ ਹੋਇਆ: ਜਦੋਂ ਸੰਖਿਆ ਬਰਾਬਰ (=) ਦੇ ਪਾਰ ਗਈ, ਉਸਦਾ ਨਿਸ਼ਾਨ ਉਲਟ ਗਿਆ (${oldSign} ਤੋਂ ${item.sign})!`);
+      addStep(formatCurrentEquationString(), `${termDesc} ਨੂੰ ${toSide.toUpperCase()} ਵੱਲ ਤਬਦੀਲ ਕੀਤਾ (${oldSign} ➔ ${item.sign})`);
+
+      renderBoard();
+
+      setTimeout(() => {
+        const placed = document.querySelector(`[data-id="${item.id}"]`);
+        if (placed) placed.classList.add('animate-flip');
+      }, 50);
+    }
+
+    /* -------------------------------------------------------------
+       TOUCH & POINTER DRAG HANDLING
+    ------------------------------------------------------------- */
+    function attachPointerDrag(element, item, currentSide) {
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let originalTransform = '';
+
+      element.onpointerdown = function (e) {
+        if (isCombiningAnimationRunning) return;
+        if (e.target.closest('button')) return;
+
+        isDragging = true;
+        element.setPointerCapture(e.pointerId);
+        startX = e.clientX;
+        startY = e.clientY;
+        originalTransform = element.style.transform;
+        element.style.zIndex = '1000';
+        element.classList.add('scale-105', 'opacity-90');
+      };
+
+      element.onpointermove = function (e) {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        element.style.transform = `translate3d(${dx}px, ${dy}px, 0px) scale(1.08)`;
+
+        const screenMid = window.innerWidth / 2;
+        const lhsBox = document.getElementById('lhsContainer');
+        const rhsBox = document.getElementById('rhsContainer');
+
+        if (e.clientX > screenMid) {
+          rhsBox.classList.add('bg-emerald-950/40', 'border-emerald-400');
+          lhsBox.classList.remove('bg-sky-950/40', 'border-sky-400');
+        } else {
+          lhsBox.classList.add('bg-sky-950/40', 'border-sky-400');
+          rhsBox.classList.remove('bg-emerald-950/40', 'border-emerald-400');
+        }
+      };
+
+      element.onpointerup = function (e) {
+        if (!isDragging) return;
+        isDragging = false;
+        element.releasePointerCapture(e.pointerId);
+
+        document.getElementById('lhsContainer').classList.remove('bg-sky-950/40', 'border-sky-400');
+        document.getElementById('rhsContainer').classList.remove('bg-emerald-950/40', 'border-emerald-400');
+
+        element.style.zIndex = '';
+        element.style.transform = originalTransform;
+        element.classList.remove('scale-105', 'opacity-90');
+
+        const screenMid = window.innerWidth / 2;
+        const droppedX = e.clientX;
+
+        if (currentSide === 'lhs' && droppedX > screenMid + 30) {
+          transferTile(item.id);
+        } else if (currentSide === 'rhs' && droppedX < screenMid - 30) {
+          transferTile(item.id);
+        }
+      };
+
+      element.onpointercancel = function () {
+        isDragging = false;
+        element.style.zIndex = '';
+        element.style.transform = originalTransform;
+      };
+    }
+
+    /* -------------------------------------------------------------
+       SLOW SMOOTH MERGING COLLISION & PARTICLE ANIMATION
+    ------------------------------------------------------------- */
+    function animateAndCombineConstants(side) {
+      if (isCombiningAnimationRunning) return;
+
+      const zone = document.getElementById(side === 'lhs' ? 'lhsDropZone' : 'rhsDropZone');
+      const itemsList = (side === 'lhs') ? lhsItems : rhsItems;
+      const constItems = itemsList.filter(it => it.type === 'const');
+
+      if (constItems.length < 2) return;
+
+      isCombiningAnimationRunning = true;
+      document.getElementById('combineLhsBtn').disabled = true;
+      document.getElementById('combineRhsBtn').disabled = true;
+
+      // Calculate Net Sum
+      let totalVal = 0;
+      constItems.forEach(it => {
+        totalVal += (it.sign === '+' ? it.val : -it.val);
+      });
+
+      // Get DOM bounding rects
+      const constElements = constItems.map(it => zone.querySelector(`[data-id="${it.id}"]`)).filter(Boolean);
+      const zoneRect = zone.getBoundingClientRect();
+
+      // Find average focal point
+      let sumX = 0, sumY = 0;
+      const rects = constElements.map(el => {
+        const r = el.getBoundingClientRect();
+        sumX += (r.left + r.width / 2);
+        sumY += (r.top + r.height / 2);
+        return r;
+      });
+
+      const targetX = sumX / constElements.length;
+      const targetY = sumY / constElements.length;
+
+      // Audio glide effect
+      playSound('glide');
+      setGuidance(`ਸੰਖਿਆਵਾਂ ਆਪਸ ਵਿੱਚ ਮਿਲ ਰਹੀਆਂ ਹਨ: ${constItems.map(i => i.sign + i.val).join(' ')} = ${totalVal >= 0 ? '+' : ''}${totalVal}`);
+
+      // 1. Smooth convergence towards focal collision point
+      constElements.forEach((el, idx) => {
+        const r = rects[idx];
+        const currentCenterX = r.left + r.width / 2;
+        const currentCenterY = r.top + r.height / 2;
+        const dx = targetX - currentCenterX;
+        const dy = targetY - currentCenterY;
+
+        el.style.transition = 'transform 0.85s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.85s ease-in, filter 0.85s ease-in';
+        el.style.transform = `translate3d(${dx}px, ${dy}px, 0px) scale(0.65)`;
+        el.style.opacity = '0.4';
+        el.style.filter = 'brightness(1.5)';
+      });
+
+      // 2. Collision Impact, Flare, and Fusion Pop
+      setTimeout(() => {
+        // Spawn glowing flare
+        const flare = document.createElement('div');
+        flare.className = 'flare-anim absolute w-24 h-24 rounded-full bg-gradient-to-r from-amber-300 via-orange-400 to-yellow-200 pointer-events-none z-30';
+        flare.style.left = `${targetX - zoneRect.left}px`;
+        flare.style.top = `${targetY - zoneRect.top}px`;
+        zone.appendChild(flare);
+
+        // Spawn confetti / sparkles at focal point
+        try {
+          confetti({
+            particleCount: 35,
+            spread: 60,
+            origin: {
+              x: targetX / window.innerWidth,
+              y: targetY / window.innerHeight
+            },
+            colors: ['#fbbf24', '#f59e0b', '#34d399', '#60a5fa']
+          });
+        } catch (e) {}
+
+        playSound('combine');
+
+        // Update state array
+        const newConst = {
+          id: nextId++,
+          type: 'const',
+          val: Math.abs(totalVal),
+          sign: totalVal >= 0 ? '+' : '-'
+        };
+
+        if (side === 'lhs') {
+          lhsItems = lhsItems.filter(it => it.type !== 'const');
+          lhsItems.push(newConst);
+        } else {
+          rhsItems = rhsItems.filter(it => it.type !== 'const');
+          rhsItems.push(newConst);
+        }
+
+        addStep(formatCurrentEquationString(), `${side.toUpperCase()} ਦੇ ਅੰਕ ਇਕੱਠੇ ਕਰਕੇ ਸਰਲ ਕੀਤੇ (${totalVal >= 0 ? '+' : ''}${totalVal})`);
+        
+        // Render with fusion pop animation
+        renderBoard();
+        
+        setTimeout(() => {
+          const newEl = zone.querySelector(`[data-id="${newConst.id}"]`);
+          if (newEl) newEl.classList.add('fusion-pop-in');
+          if (flare.parentNode) flare.remove();
+          isCombiningAnimationRunning = false;
+        }, 100);
+
+      }, 850);
+    }
+
+    /* -------------------------------------------------------------
+       CHECK PROGRESS & DETERMINE DIVISION / MULTIPLICATION
+    ------------------------------------------------------------- */
+    function checkEquationProgress() {
+      const banner = document.getElementById('finalActionBanner');
+
+      const lhsVarCount = lhsItems.filter(i => i.type === 'var').length;
+      const lhsConstCount = lhsItems.filter(i => i.type === 'const').length;
+      const rhsVarCount = rhsItems.filter(i => i.type === 'var').length;
+      const rhsConstCount = rhsItems.filter(i => i.type === 'const').length;
+
+      // When LHS has isolated variable and RHS has single constant
+      if (lhsVarCount === 1 && lhsConstCount === 0 && rhsVarCount === 0 && rhsConstCount === 1) {
+        const varItem = lhsItems.find(i => i.type === 'var');
+        const constItem = rhsItems.find(i => i.type === 'const');
+
+        const effectiveNum = (varItem.sign === '+' ? varItem.num : -varItem.num);
+        const denom = varItem.denom;
+        const rhsVal = (constItem.sign === '+' ? constItem.val : -constItem.val);
+
+        if (effectiveNum === 1 && denom === 1) {
+          // Completely solved! x = value
+          banner.classList.add('hidden');
+          triggerVictory(variableName, rhsVal);
+          return;
+        }
+
+        // Case A: Denominator > 1 e.g. x/5 = 8 -> Multiply by Denominator
+        if (denom > 1 && effectiveNum === 1) {
+          currentFinalAction = { type: 'multiply', factor: denom, currentRhs: rhsVal };
+          banner.classList.remove('hidden');
+          document.getElementById('finalActionIcon').innerText = '✖';
+          document.getElementById('finalActionHeading').innerText = 'ਅੰਤਿਮ ਪੜਾਅ: ਹਰ (Denominator) ਨਾਲ ਗੁਣਾ ਕਰੋ';
+          document.getElementById('finalActionDescText').innerHTML = 
+            `ਸਮੀਕਰਨ <span class="font-bold text-amber-300">${varItem.char}/${denom} = ${rhsVal}</span> ਬਣ ਚੁੱਕੀ ਹੈ। ਚੱਲ ਨੂੰ ਇਕੱਲਾ ਕਰਨ ਲਈ ਦੋਹਾਂ ਪਾਸਿਆਂ ਨੂੰ <span class="font-bold text-white">${denom}</span> ਨਾਲ ਗੁਣਾ ਕਰੋ।`;
+          document.getElementById('finalActionBtnText').innerText = `${denom} ਨਾਲ ਗੁਣਾ ਕਰੋ`;
+          setGuidance(`ਚੱਲ ਵੰਡਿਆ ਹੋਇਆ ਹੈ (${denom} ਨਾਲ)! ਦੋਹਾਂ ਪਾਸਿਆਂ ਨੂੰ ${denom} ਨਾਲ ਗੁਣਾ ਕਰੋ।`);
+        } 
+        // Case B: Numerator > 1 e.g. 2x = 8 -> Divide by Coefficient
+        else if (effectiveNum !== 1 && denom === 1) {
+          currentFinalAction = { type: 'divide', factor: effectiveNum, currentRhs: rhsVal };
+          banner.classList.remove('hidden');
+          document.getElementById('finalActionIcon').innerText = '÷';
+          document.getElementById('finalActionHeading').innerText = 'ਅੰਤਿਮ ਪੜਾਅ: ਗੁਣਾਂਕ ਨਾਲ ਭਾਗ ਕਰੋ';
+          document.getElementById('finalActionDescText').innerHTML = 
+            `ਸਮੀਕਰਨ <span class="font-bold text-amber-300">${effectiveNum}${varItem.char} = ${rhsVal}</span> ਬਣ ਚੁੱਕੀ ਹੈ। ਚੱਲ ਨੂੰ ਇਕੱਲਾ ਕਰਨ ਲਈ ਦੋਹਾਂ ਪਾਸਿਆਂ ਨੂੰ <span class="font-bold text-white">${effectiveNum}</span> ਨਾਲ ਭਾਗ ਕਰੋ।`;
+          document.getElementById('finalActionBtnText').innerText = `${effectiveNum} ਨਾਲ ਭਾਗ ਕਰੋ`;
+          setGuidance(`ਗੁਣਾਂਕ (${effectiveNum}) ਨਾਲ ਦੋਹਾਂ ਪਾਸਿਆਂ ਨੂੰ ਭਾਗ ਕਰੋ।`);
+        }
+        // Case C: Fraction with both numerator and denominator e.g. 2x/3 = 10
+        else {
+          currentFinalAction = { type: 'multiply_then_divide', num: effectiveNum, denom: denom, currentRhs: rhsVal };
+          banner.classList.remove('hidden');
+          document.getElementById('finalActionIcon').innerText = '⚡';
+          document.getElementById('finalActionHeading').innerText = 'ਅੰਤਿਮ ਪੜਾਅ: ਗੁਣਾ ਅਤੇ ਭਾਗ ਕਰੋ';
+          document.getElementById('finalActionDescText').innerHTML = 
+            `ਸਮੀਕਰਨ <span class="font-bold text-amber-300">${effectiveNum}${varItem.char}/${denom} = ${rhsVal}</span> ਬਣ ਚੁੱਕੀ ਹੈ। ${denom} ਨਾਲ ਗੁਣਾ ਅਤੇ ${effectiveNum} ਨਾਲ ਭਾਗ ਕਰੋ।`;
+          document.getElementById('finalActionBtnText').innerText = `ਹੱਲ ਪ੍ਰਾਪਤ ਕਰੋ`;
+          setGuidance(`ਸਮੀਕਰਨ ਨੂੰ ਪੂਰੀ ਤਰ੍ਹਾਂ ਸਰਲ ਕਰੋ।`);
+        }
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function executeFinalAction() {
+      if (!currentFinalAction) return;
+
+      const varItem = lhsItems.find(i => i.type === 'var');
+      const constItem = rhsItems.find(i => i.type === 'const');
+      if (!varItem || !constItem) return;
+
+      let finalResult = 0;
+
+      if (currentFinalAction.type === 'multiply') {
+        finalResult = currentFinalAction.currentRhs * currentFinalAction.factor;
+        varItem.denom = 1;
+        varItem.num = 1;
+        varItem.sign = '+';
+        constItem.val = Math.abs(finalResult);
+        constItem.sign = finalResult >= 0 ? '+' : '-';
+        addStep(`${varItem.char} = ${finalResult}`, `ਦੋਹਾਂ ਪਾਸਿਆਂ ਨੂੰ ${currentFinalAction.factor} ਨਾਲ ਗੁਣਾ ਕੀਤਾ`);
+      } else if (currentFinalAction.type === 'divide') {
+        finalResult = currentFinalAction.currentRhs / currentFinalAction.factor;
+        varItem.num = 1;
+        varItem.denom = 1;
+        varItem.sign = '+';
+        constItem.val = Math.abs(finalResult);
+        constItem.sign = finalResult >= 0 ? '+' : '-';
+        addStep(`${varItem.char} = ${finalResult}`, `ਦੋਹਾਂ ਪਾਸਿਆਂ ਨੂੰ ${currentFinalAction.factor} ਨਾਲ ਭਾਗ ਕੀਤਾ`);
+      } else {
+        finalResult = (currentFinalAction.currentRhs * currentFinalAction.denom) / currentFinalAction.num;
+        varItem.num = 1;
+        varItem.denom = 1;
+        varItem.sign = '+';
+        constItem.val = Math.abs(finalResult);
+        constItem.sign = finalResult >= 0 ? '+' : '-';
+        addStep(`${varItem.char} = ${finalResult}`, `ਸਰਲ ਕਰਕੇ ਅੰਤਿਮ ਉੱਤਰ ਪ੍ਰਾਪਤ ਕੀਤਾ`);
+      }
+
+      playSound('combine');
+      renderBoard();
+      triggerVictory(variableName, finalResult);
+    }
+
+    /* -------------------------------------------------------------
+       VICTORY CELEBRATION
+    ------------------------------------------------------------- */
+    function triggerVictory(varName, answerVal) {
+      playSound('victory');
+      try {
+        confetti({
+          particleCount: 130,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 80,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 }
+          });
+          confetti({
+            particleCount: 80,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 }
+          });
+        }, 300);
+      } catch (e) {}
+
+      document.getElementById('finalAnswerDisplay').innerText = `${varName} = ${answerVal}`;
+      document.getElementById('successModal').classList.remove('hidden');
+      document.getElementById('successModal').classList.add('flex');
+      setGuidance(`ਸ਼ਾਨਦਾਰ! ਸਮੀਕਰਨ ਦਾ ਹੱਲ ਨਿਕਲ ਗਿਆ: ${varName} = ${answerVal}`);
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('successModal').classList.add('hidden');
+      document.getElementById('successModal').classList.remove('flex');
+    }
+
+    /* -------------------------------------------------------------
+       EQUATION FORMATTING & STEP HISTORY TRACKER
+    ------------------------------------------------------------- */
+    function formatCurrentEquationString() {
+      function sideString(items) {
+        if (items.length === 0) return '0';
+        return items.map((it, idx) => {
+          const signPart = (idx === 0 && it.sign === '+') ? '' : (it.sign === '+' ? ' + ' : ' - ');
+          let valPart = '';
+          if (it.type === 'var') {
+            if (it.denom > 1) {
+              valPart = `${it.num === 1 ? '' : it.num}${it.char}/${it.denom}`;
+            } else {
+              valPart = `${it.num === 1 ? '' : it.num}${it.char}`;
+            }
+          } else {
+            valPart = it.val;
+          }
+          return `${signPart}${valPart}`;
+        }).join('');
+      }
+
+      return `${sideString(lhsItems)} = ${sideString(rhsItems)}`;
+    }
+
+    function addStep(eqText, description) {
+      stepsHistory.push({ eq: eqText, desc: description });
+      const container = document.getElementById('stepsContainer');
+
+      const chip = document.createElement('div');
+      chip.className = 'flex items-center gap-1.5 bg-slate-800 border border-slate-700/80 px-3 py-1 rounded-xl text-xs flex-shrink-0 animate-fadeIn';
+      chip.innerHTML = `
+        <span class="w-4 h-4 rounded-full bg-indigo-600 text-[10px] font-bold flex items-center justify-center text-white">${stepsHistory.length}</span>
+        <span class="font-black text-amber-300 math-font">${eqText}</span>
+        <span class="text-[10px] text-slate-400 border-l border-slate-700 pl-1.5 ml-0.5">${description}</span>
+      `;
+
+      container.appendChild(chip);
+      container.scrollLeft = container.scrollWidth;
+    }
+
+    function setGuidance(text) {
+      document.getElementById('guidanceText').innerText = text;
+    }
+
+    /* -------------------------------------------------------------
+       CUSTOM EQUATION MODAL HANDLERS
+    ------------------------------------------------------------- */
+    function openCustomModal() {
+      document.getElementById('customInput').value = currentEquationStr;
+      document.getElementById('customModal').classList.remove('hidden');
+      document.getElementById('customModal').classList.add('flex');
+    }
+
+    function closeCustomModal() {
+      document.getElementById('customModal').classList.add('hidden');
+      document.getElementById('customModal').classList.remove('flex');
+    }
+
+    function applyCustomEquation() {
+      const val = document.getElementById('customInput').value.trim();
+      if (!val) return;
+      closeCustomModal();
+      loadEquation(val);
+    }
+  </script>
+</body>
+</html>
