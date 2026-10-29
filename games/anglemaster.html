@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AngleMaster - ਕੋਣ ਮਾਸਟਰ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Mukta+Mahee:wght@500;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    html, body {
+      height: 100vh;
+      width: 100vw;
+      max-width: 100vw;
+      max-height: 100vh;
+      overflow: hidden !important;
+      font-family: 'Fredoka', 'Nunito', 'Mukta Mahee', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .punjabi-font {
+      font-family: 'Mukta Mahee', sans-serif;
+    }
+    .light-theme {
+      background: linear-gradient(135deg, #eff6ff 0%, #fdfbf7 45%, #f5f3ff 100%);
+    }
+    .card-light {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.07);
+    }
+    .tab-active {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px -1px rgba(79, 70, 229, 0.35);
+      border-color: transparent !important;
+    }
+    .btn-press {
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .btn-press:active {
+      transform: scale(0.96);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulseSoft {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .pulse-hint {
+      animation: pulseSoft 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="light-theme text-slate-800 flex flex-col h-screen w-screen p-2 md:p-3 overflow-hidden select-none">
+
+  <!-- ================= TOP COMPACT HEADER ================= -->
+  <header class="flex-none flex items-center justify-between card-light rounded-2xl px-2.5 sm:px-3.5 py-1.5 mb-2 gap-2 border border-slate-200/90 shadow-sm w-full min-w-0 overflow-hidden">
+    <!-- Brand & Back Button -->
+    <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      <a href="../index.html" title="Back to Games Hub / ਵਾਪਸ ਹੱਬ ਵੱਲ" class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-800 border border-slate-200 transition btn-press text-xs font-bold">
+        <span>🔙</span>
+        <span class="hidden sm:inline">Hub</span>
+        <span class="text-[10px] opacity-80 punjabi-font hidden md:inline">ਹੱਬ</span>
+      </a>
+
+      <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-600 flex items-center justify-center text-white shadow font-black text-base sm:text-lg">
+        ∠
+      </div>
+      <div class="leading-tight">
+        <div class="flex items-center gap-1.5">
+          <h1 class="text-xs sm:text-sm font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 via-rose-600 to-amber-600">
+            AngleMaster
+          </h1>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-50 text-indigo-700 font-extrabold border border-indigo-200 punjabi-font hidden xs:inline">
+            ਕੋਣ ਮਾਸਟਰ
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode Tabs -->
+    <nav class="flex items-center gap-1 overflow-x-hidden no-scrollbar flex-shrink min-w-0">
+      <button onclick="switchTab('explorer')" id="tab-explorer" class="tab-btn tab-active text-xs font-black px-2.5 sm:px-3 py-1.5 rounded-xl border border-transparent flex items-center gap-1 transition btn-press whitespace-nowrap">
+        <span>📐</span>
+        <span class="hidden sm:inline">Explorer</span>
+        <span class="text-[11px] opacity-90 punjabi-font">ਖੋਜ</span>
+      </button>
+
+      <button onclick="switchTab('complementary')" id="tab-complementary" class="tab-btn text-xs font-black text-slate-700 bg-slate-100 hover:bg-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1 transition btn-press whitespace-nowrap">
+        <span>➕</span>
+        <span class="hidden sm:inline">Angle Pairs</span>
+        <span class="text-[11px] opacity-90 punjabi-font">ਜੋੜੇ/ਰੇਖੀ ਜੋੜਾ</span>
+      </button>
+
+      <button onclick="switchTab('transversal')" id="tab-transversal" class="tab-btn text-xs font-black text-slate-700 bg-slate-100 hover:bg-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1 transition btn-press whitespace-nowrap">
+        <span>⏸️</span>
+        <span class="hidden sm:inline">Transversal</span>
+        <span class="text-[11px] opacity-90 punjabi-font">ਕਾਟਵੀਂ ਰੇਖਾ</span>
+      </button>
+
+      <button onclick="switchTab('game')" id="tab-game" class="tab-btn text-xs font-black text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-xl border border-emerald-300 flex items-center gap-1 transition btn-press pulse-hint whitespace-nowrap">
+        <span>🎮</span>
+        <span>Quiz</span>
+        <span class="text-[11px] opacity-90 punjabi-font">ਖੇਡ</span>
+      </button>
+    </nav>
+
+    <!-- Language & Fullscreen -->
+    <div class="flex items-center gap-1 flex-shrink-0">
+      <button onclick="toggleLang()" class="px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-[11px] font-bold text-indigo-700 flex items-center gap-1">
+        🌐 <span id="langBtnText">Dual</span>
+      </button>
+      <button onclick="toggleFullScreen()" id="fsBtn" title="Toggle Fullscreen / ਪੂਰੀ ਸਕ੍ਰੀਨ" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-indigo-700 border border-slate-200 text-xs flex items-center justify-center">
+        ⛶
+      </button>
+      <button onclick="playChime()" title="Sound" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-amber-600 border border-slate-200 text-xs">
+        🔔
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN VIEWPORT CONTAINER ================= -->
+  <main class="flex-1 min-h-0 w-full relative overflow-hidden">
+
+    <!-- ============================================== -->
+    <!-- TAB 1: ANGLE EXPLORER -->
+    <!-- ============================================== -->
+    <div id="view-explorer" class="tab-view h-full w-full grid grid-cols-1 lg:grid-cols-12 gap-2 overflow-hidden">
+      <!-- Left: Interactive Canvas -->
+      <div class="lg:col-span-7 h-full card-light rounded-2xl p-2 sm:p-3 flex flex-col justify-between items-center relative border-2 border-indigo-100 overflow-hidden">
+        <div class="w-full flex items-center justify-between px-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wide">Interactive Protractor Dial</span>
+            <span class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200 punjabi-font hidden sm:inline">ਡਾਇਲ ਘੁਮਾਓ ਜਾਂ ਕੋਣ ਚੁਣੋ</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs text-slate-500 font-bold">Angle:</span>
+            <span id="expDegreesLabel" class="text-base sm:text-lg font-black text-indigo-700 font-mono">60°</span>
+          </div>
+        </div>
+
+        <div class="flex-1 w-full min-h-0 flex items-center justify-center p-1 relative overflow-hidden">
+          <canvas id="explorerCanvas" class="max-h-full max-w-full aspect-square cursor-grab active:cursor-grabbing rounded-2xl"></canvas>
+        </div>
+
+        <!-- Slider Bar & Touch Controls -->
+        <div class="w-full flex items-center gap-2 px-2 py-1 bg-slate-50 rounded-xl border border-slate-200">
+          <span class="text-xs font-bold text-slate-500">0°</span>
+          <input type="range" id="expSlider" min="0" max="360" value="60" oninput="setAngleFromSlider(this.value)" class="flex-1 accent-indigo-600 cursor-pointer h-2">
+          <span class="text-xs font-bold text-slate-500">360°</span>
+        </div>
+      </div>
+
+      <!-- Right: Classification & Quick Jump Buttons -->
+      <div class="lg:col-span-5 h-full flex flex-col justify-between gap-1.5 overflow-hidden">
+        <!-- Angle Type Info Card -->
+        <div class="card-light rounded-2xl p-3 border border-slate-200 flex-1 flex flex-col justify-between overflow-hidden">
+          <div>
+            <div class="flex items-center justify-between">
+              <span id="expAngleCategoryBadge" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300">
+                Acute Angle • ਨਿਊਨ ਕੋਣ
+              </span>
+              <span id="expRadiansLabel" class="text-xs font-bold text-slate-400 font-mono">1.05 rad</span>
+            </div>
+
+            <div class="mt-2">
+              <h2 id="expAngleTypeNameEn" class="text-base sm:text-lg font-black text-slate-800 leading-tight">Acute Angle</h2>
+              <p id="expAngleTypeNamePa" class="text-sm font-bold text-indigo-700 punjabi-font">ਨਿਊਨ ਕੋਣ (&gt; 0° ਅਤੇ &lt; 90°)</p>
+            </div>
+
+            <div class="mt-2 p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-200 text-xs text-slate-700">
+              <p id="expDetailEn" class="leading-relaxed">An angle measuring greater than 0° and less than 90°. Examples: slice of pizza, open scissors, sharp beak of a bird.</p>
+              <p id="expDetailPa" class="font-bold text-indigo-900 mt-1 punjabi-font leading-relaxed">ਇਹ ਕੋਣ 0° ਤੋਂ ਵੱਡਾ ਅਤੇ 90° ਤੋਂ ਛੋਟਾ ਹੁੰਦਾ ਹੈ। ਉਦਾਹਰਨ: ਪੀਜ਼ਾ ਦੀ ਫਾੜੀ, ਖੁੱਲ੍ਹੀ ਕੈਂਚੀ।</p>
+            </div>
+          </div>
+
+          <!-- Quick Jump Buttons -->
+          <div class="mt-2 pt-2 border-t border-slate-100">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Standard Angle Presets • ਮੁੱਖ ਕੋਣ ਚੁਣੋ</span>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="setAngle(45)" class="p-1.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 font-bold text-xs text-indigo-700 btn-press">45° (Acute)</button>
+              <button onclick="setAngle(90)" class="p-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm btn-press">90° (Right)</button>
+              <button onclick="setAngle(120)" class="p-1.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 font-bold text-xs text-indigo-700 btn-press">120° (Obtuse)</button>
+              <button onclick="setAngle(180)" class="p-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm btn-press">180° (Straight)</button>
+              <button onclick="setAngle(270)" class="p-1.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 font-bold text-xs text-indigo-700 btn-press">270° (Reflex)</button>
+              <button onclick="setAngle(360)" class="p-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm btn-press">360° (Full)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: COMPLEMENTARY, SUPPLEMENTARY & LINEAR PAIR -->
+    <!-- ============================================== -->
+    <div id="view-complementary" class="tab-view hidden h-full w-full grid grid-cols-1 lg:grid-cols-12 gap-2 overflow-hidden">
+      <!-- Left: Interactive Canvas -->
+      <div class="lg:col-span-7 h-full card-light rounded-2xl p-2 sm:p-3 flex flex-col justify-between items-center relative border-2 border-indigo-100 overflow-hidden">
+        <div class="w-full flex items-center justify-between gap-1 sm:gap-2 px-1">
+          <div class="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 overflow-x-hidden no-scrollbar">
+            <button id="csBtnComp" onclick="setCompSuppMode('complementary')" class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm transition btn-press whitespace-nowrap">
+              Comp (90°) / ਪੂਰਕ
+            </button>
+            <button id="csBtnSupp" onclick="setCompSuppMode('supplementary')" class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black text-slate-600 hover:text-slate-900 transition btn-press whitespace-nowrap">
+              Supp (180°) / ਸੰਪੂਰਕ
+            </button>
+            <button id="csBtnLinear" onclick="setCompSuppMode('linear-pair')" class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black text-slate-600 hover:text-slate-900 transition btn-press whitespace-nowrap">
+              Linear Pair / ਰੇਖੀ ਜੋੜਾ 📏
+            </button>
+          </div>
+          <span class="text-[10px] text-pink-600 font-bold hidden md:inline">👆 Drag pink ray</span>
+        </div>
+
+        <div class="flex-1 w-full min-h-0 flex items-center justify-center p-1 relative overflow-hidden">
+          <canvas id="compSuppCanvas" class="max-h-full max-w-full aspect-square cursor-grab active:cursor-grabbing rounded-2xl"></canvas>
+        </div>
+
+        <div class="w-full py-1 px-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-around text-center shadow-inner">
+          <div>
+            <span class="text-[10px] text-indigo-600 font-extrabold uppercase block">∠1 (ਕੋਣ ੧)</span>
+            <span id="csA1Label" class="text-lg sm:text-xl font-black text-indigo-700 font-mono">35°</span>
+          </div>
+          <span class="text-xl font-black text-slate-400">+</span>
+          <div>
+            <span class="text-[10px] text-emerald-600 font-extrabold uppercase block">∠2 (ਕੋਣ ੨)</span>
+            <span id="csA2Label" class="text-lg sm:text-xl font-black text-emerald-700 font-mono">55°</span>
+          </div>
+          <span class="text-xl font-black text-slate-400">=</span>
+          <div>
+            <span id="csSumHeaderLabel" class="text-[10px] text-amber-600 font-extrabold uppercase block">Total Sum (ਕੁੱਲ)</span>
+            <span id="csSumLabel" class="text-lg sm:text-xl font-black text-amber-700 font-mono">90°</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Rule & Calculator -->
+      <div class="lg:col-span-5 h-full flex flex-col justify-between gap-1.5 overflow-hidden">
+        <div class="card-light rounded-2xl p-3 border border-slate-200 flex flex-col justify-between flex-1">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-xl" id="csIcon">📐</span>
+              <div>
+                <h3 id="csHeadingEn" class="text-sm sm:text-base font-black text-slate-800 leading-tight">Complementary Angles</h3>
+                <p id="csHeadingPa" class="text-xs font-bold text-indigo-700 punjabi-font">ਪੂਰਕ ਕੋਣ (ਜੋੜ = 90°)</p>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 mt-1.5 text-xs">
+              <div class="p-2.5 rounded-xl bg-indigo-50/60 border border-indigo-200 text-slate-800">
+                <p id="csRuleEn" class="font-medium">Two angles are complementary when they add up to <b>90 degrees</b> (form a right angle).</p>
+                <p id="csRulePa" class="font-bold text-indigo-900 mt-1 punjabi-font">ਜਦੋਂ ਦੋ ਕੋਣਾਂ ਦਾ ਜੋੜ 90° (ਸਮਕੋਣ) ਹੁੰਦਾ ਹੈ, ਤਾਂ ਉਹ ਆਪਸ ਵਿੱਚ ਪੂਰਕ ਹੁੰਦੇ ਹਨ।</p>
+              </div>
+
+              <div id="csSubTipCard" class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-200 text-slate-800">
+                <span id="csTipTitle" class="text-amber-800 font-black block">💡 Golden Rule to Remember / ਯਾਦ ਰੱਖਣ ਦਾ ਨੁਕਤਾ:</span>
+                <p id="csTipEn" class="mt-0.5"><b>C</b> comes before <b>S</b>; <b>90°</b> comes before <b>180°</b>!</p>
+                <p id="csTipPa" class="punjabi-font text-amber-900 mt-0.5">C = 90° (ਪੂਰਕ) ਅਤੇ S = 180° (ਸੰਪੂਰਕ)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instant Angle Solver Tool -->
+          <div class="mt-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[11px] font-bold text-indigo-700 uppercase block mb-1">Instant Solver • ਅਗਿਆਤ ਕੋਣ ਕੱਢੋ</span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-600 font-bold">Angle:</span>
+              <input type="number" id="quickSolveInput" min="1" max="179" value="40" oninput="solveAngles(this.value)" class="w-16 px-2 py-1 rounded-lg bg-white border border-indigo-300 font-black text-center text-sm text-indigo-700 focus:outline-none">
+              <div class="flex-1 grid grid-cols-2 gap-1 text-[11px]">
+                <div class="bg-white p-1 rounded-lg border border-indigo-100 text-center shadow-xs">
+                  <span class="text-slate-400 block text-[9px]">Comp (90-x)</span>
+                  <b id="solveCompRes" class="text-indigo-700 text-xs font-mono">50°</b>
+                </div>
+                <div class="bg-white p-1 rounded-lg border border-amber-100 text-center shadow-xs">
+                  <span class="text-slate-400 block text-[9px]">Supp / Linear (180-x)</span>
+                  <b id="solveSuppRes" class="text-amber-700 text-xs font-mono">140°</b>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 3: PARALLEL LINES & TRANSVERSAL -->
+    <!-- ============================================== -->
+    <div id="view-transversal" class="tab-view hidden h-full w-full grid grid-cols-1 lg:grid-cols-12 gap-2 overflow-hidden">
+      <!-- Left: Interactive Canvas -->
+      <div class="lg:col-span-7 h-full card-light rounded-2xl p-2 sm:p-3 flex flex-col justify-between items-center relative border-2 border-rose-100 overflow-hidden">
+        <div class="w-full flex items-center justify-between px-2">
+          <div>
+            <h2 class="text-sm sm:text-base font-black text-slate-800">Parallel Lines &amp; Transversal</h2>
+            <p class="text-[11px] text-rose-700 font-bold punjabi-font">ਸਮਾਂਤਰ ਰੇਖਾਵਾਂ ਅਤੇ ਕਾਟਵੀਂ ਰੇਖਾ</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs text-slate-500 font-bold">Angle:</span>
+            <span id="transTiltLabel" class="text-sm font-black text-rose-600 font-mono">60°</span>
+          </div>
+        </div>
+
+        <div class="flex-1 w-full min-h-0 flex items-center justify-center p-1 relative overflow-hidden">
+          <canvas id="transversalCanvas" class="max-h-full max-w-full aspect-square cursor-grab active:cursor-grabbing rounded-2xl"></canvas>
+        </div>
+
+        <div class="w-full flex items-center gap-2 px-2 py-1 bg-slate-50 rounded-xl border border-slate-200">
+          <span class="text-[11px] font-bold text-slate-500">Tilt:</span>
+          <input type="range" id="transSlider" min="25" max="80" value="60" oninput="setTransversalAngle(this.value)" class="flex-1 accent-rose-600 cursor-pointer">
+          <span class="text-[11px] font-mono font-bold text-rose-600">Drag Tilt</span>
+        </div>
+      </div>
+
+      <!-- Right: Pair Selection & 8-Angle Table -->
+      <div class="lg:col-span-5 h-full flex flex-col justify-between gap-1.5 overflow-hidden">
+        <div class="card-light rounded-2xl p-2.5 border border-slate-200 flex-1 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-wider text-rose-700 block mb-1">
+              Select Angle Pair to Highlight • ਜੋੜਾ ਚੁਣੋ
+            </span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              <button onclick="setPairHighlight('corresponding')" id="btn-pair-corresponding" class="p-1.5 rounded-xl border border-emerald-400 bg-emerald-50 text-left transition btn-press">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-black text-emerald-800">Corresponding</span>
+                  <span class="text-[9px] font-bold bg-emerald-600 text-white px-1 rounded">Equal =</span>
+                </div>
+                <p class="text-[10px] font-bold text-emerald-700 punjabi-font">ਸੰਗਤ ਕੋਣ (∠1=∠5)</p>
+              </button>
+
+              <button onclick="setPairHighlight('alt-interior')" id="btn-pair-alt-interior" class="p-1.5 rounded-xl border border-slate-200 bg-white text-left transition btn-press">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-black text-indigo-700">Alternate Interior</span>
+                  <span class="text-[9px] font-bold bg-indigo-600 text-white px-1 rounded">Equal =</span>
+                </div>
+                <p class="text-[10px] font-bold text-indigo-600 punjabi-font">ਅੰਦਰਲੇ ਇਕਾਂਤਰ (∠3=∠6)</p>
+              </button>
+
+              <button onclick="setPairHighlight('alt-exterior')" id="btn-pair-alt-exterior" class="p-1.5 rounded-xl border border-slate-200 bg-white text-left transition btn-press">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-black text-fuchsia-700">Alternate Exterior</span>
+                  <span class="text-[9px] font-bold bg-fuchsia-600 text-white px-1 rounded">Equal =</span>
+                </div>
+                <p class="text-[10px] font-bold text-fuchsia-600 punjabi-font">ਬਾਹਰਲੇ ਇਕਾਂਤਰ (∠1=∠8)</p>
+              </button>
+
+              <button onclick="setPairHighlight('vert-opposite')" id="btn-pair-vert-opposite" class="p-1.5 rounded-xl border border-slate-200 bg-white text-left transition btn-press">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-black text-amber-700">Vertically Opposite</span>
+                  <span class="text-[9px] font-bold bg-amber-500 text-white px-1 rounded">Equal =</span>
+                </div>
+                <p class="text-[10px] font-bold text-amber-600 punjabi-font">ਸਿਖਰ ਸਨਮੁੱਖ (∠1=∠4, ∠2=∠3)</p>
+              </button>
+
+              <button onclick="setPairHighlight('consec-interior')" id="btn-pair-consec-interior" class="col-span-1 sm:col-span-2 p-1.5 rounded-xl border border-slate-200 bg-white text-left transition btn-press">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-black text-violet-700">Consecutive Interior (Co-Interior)</span>
+                  <span class="text-[9px] font-bold bg-violet-600 text-white px-1.5 rounded">Sum = 180°</span>
+                </div>
+                <p class="text-[10px] font-bold text-violet-600 punjabi-font">ਇੱਕੋ ਪਾਸੇ ਦੇ ਅੰਦਰਲੇ ਕੋਣ (∠3 + ∠5 = 180°)</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- All 8 Angle Values Grid -->
+          <div class="mt-2 pt-1.5 border-t border-slate-100">
+            <span class="text-[10px] font-bold text-slate-500 block mb-1 text-center">Live Angle Values (ਸਾਰੇ ੮ ਕੋਣ):</span>
+            <div class="grid grid-cols-4 gap-1 font-mono text-center text-xs">
+              <div class="bg-white p-1 rounded-lg border border-indigo-200"><span class="text-indigo-600 font-bold">∠1:</span> <span id="vA1">60°</span></div>
+              <div class="bg-white p-1 rounded-lg border border-amber-200"><span class="text-amber-600 font-bold">∠2:</span> <span id="vA2">120°</span></div>
+              <div class="bg-white p-1 rounded-lg border border-amber-200"><span class="text-amber-600 font-bold">∠3:</span> <span id="vA3">120°</span></div>
+              <div class="bg-white p-1 rounded-lg border border-indigo-200"><span class="text-indigo-600 font-bold">∠4:</span> <span id="vA4">60°</span></div>
+              <div class="bg-white p-1 rounded-lg border border-indigo-200"><span class="text-indigo-600 font-bold">∠5:</span> <span id="vA5">60°</span></div>
+              <div class="bg-white p-1 rounded-lg border border-amber-200"><span class="text-amber-600 font-bold">∠6:</span> <span id="vA6">120°</span></div>
+              <div class="bg-white p-1 rounded-lg border border-amber-200"><span class="text-amber-600 font-bold">∠7:</span> <span id="vA7">120°</span></div>
+              <div class="bg-white p-1 rounded-lg border border-indigo-200"><span class="text-indigo-600 font-bold">∠8:</span> <span id="vA8">60°</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 4: CHALLENGE GAME -->
+    <!-- ============================================== -->
+    <div id="view-game" class="tab-view hidden h-full w-full card-light rounded-2xl p-2 sm:p-4 flex flex-col justify-between border-2 border-emerald-200 relative overflow-hidden">
+      <!-- HUD -->
+      <div class="flex-none flex items-center justify-between bg-slate-50 rounded-xl px-3 py-1 border border-slate-200">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 border border-amber-300 flex items-center justify-center font-black text-sm">
+            ⭐
+          </div>
+          <div>
+            <span class="text-[9px] font-bold text-slate-500 uppercase block leading-none">Score / ਅੰਕ</span>
+            <span id="quizScore" class="text-base sm:text-lg font-black text-amber-600 font-mono">0</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 px-3 py-0.5 rounded-lg bg-orange-50 border border-orange-200">
+          <span class="text-sm">🔥</span>
+          <span id="quizStreak" class="text-xs sm:text-sm font-black text-orange-600 font-mono">Streak: 0</span>
+        </div>
+
+        <div class="text-right">
+          <span class="text-[9px] font-bold text-slate-500 uppercase block leading-none">Question / ਸਵਾਲ</span>
+          <span id="quizCounter" class="text-xs sm:text-sm font-black text-indigo-700 font-mono">1 / 10</span>
+        </div>
+      </div>
+
+      <!-- Prompt Area -->
+      <div class="flex-1 min-h-0 flex flex-col justify-center items-center text-center px-2 py-1 relative">
+        <span id="quizCategoryBadge" class="text-[10px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 mb-1">
+          Angle Identification • ਕੋਣ ਪਛਾਣੋ
+        </span>
+        
+        <h2 id="quizPromptEn" class="text-base sm:text-lg font-black text-slate-800 max-w-xl leading-snug">
+          What type of angle measures 130°?
+        </h2>
+        <p id="quizPromptPa" class="text-xs sm:text-sm font-bold text-amber-700 punjabi-font mt-0.5">
+          130° ਦੇ ਕੋਣ ਨੂੰ ਕਿਹੜਾ ਕੋਣ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?
+        </p>
+
+        <!-- Aiming Canvas -->
+        <div id="quizAimCanvasContainer" class="hidden my-1 flex flex-col items-center">
+          <canvas id="quizAimCanvas" width="160" height="100" class="rounded-xl border border-slate-200 bg-white shadow-sm"></canvas>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-xs text-slate-500 font-bold">Your Aim:</span>
+            <span id="quizAimDisplay" class="text-sm font-black text-indigo-700 font-mono">45°</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Answers Area -->
+      <div id="quizInteractiveArea" class="flex-none w-full">
+        <div id="quizOptionsGrid" class="grid grid-cols-2 gap-2 w-full max-w-2xl mx-auto"></div>
+
+        <div id="quizAimSliderArea" class="hidden w-full max-w-md mx-auto flex flex-col gap-1.5 items-center">
+          <input type="range" id="quizAimSlider" min="5" max="355" value="45" oninput="onQuizAimSlider(this.value)" class="w-full accent-indigo-600 cursor-pointer h-2">
+          <button onclick="submitAimAnswer()" class="w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs sm:text-sm shadow-md transition btn-press">
+            Submit Guess ✓ (ਕੋਣ ਜਾਂਚੋ)
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div id="quizFeedbackBanner" class="hidden flex-none mt-2 p-2 rounded-xl bg-white border flex items-center justify-between gap-2 max-w-2xl mx-auto w-full transition-all shadow-md">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="feedbackIcon" class="text-2xl flex-none">🎉</span>
+          <div class="truncate">
+            <p id="feedbackEn" class="text-xs sm:text-sm font-black text-slate-800 truncate">Superb! Correct Answer!</p>
+            <p id="feedbackPa" class="text-[11px] font-bold text-amber-700 punjabi-font truncate">ਬਿਲਕੁਲ ਸਹੀ ਜਵਾਬ!</p>
+          </div>
+        </div>
+        <button onclick="nextQuizQuestion()" class="flex-none px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 font-black text-xs shadow hover:brightness-105 btn-press">
+          Next ➔ (ਅਗਲਾ)
+        </button>
+      </div>
+
+      <!-- Game Over Modal -->
+      <div id="quizGameOverModal" class="hidden absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center z-30">
+        <div class="w-16 h-16 rounded-2xl bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-3xl mb-2 animate-bounce shadow">
+          🏆
+        </div>
+        <h3 class="text-xl sm:text-2xl font-black text-slate-800">Quiz Completed! ਖੇਡ ਪੂਰੀ ਹੋਈ!</h3>
+        <p id="quizFinalScoreMsg" class="text-sm font-bold text-indigo-700 mt-1 font-mono">You scored 80 points!</p>
+        <p class="text-xs text-slate-600 mt-0.5 punjabi-font">ਤੁਸੀਂ ਕੋਣਾਂ ਦੇ ਸੰਕਲਪ ਬਹੁਤ ਚੰਗੀ ਤਰ੍ਹਾਂ ਸਿੱਖ ਲਏ ਹਨ।</p>
+        <button onclick="restartQuiz()" class="mt-4 px-6 py-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 text-white font-black text-sm shadow-md hover:scale-105 transition btn-press">
+          Play Again 🔄 (ਦੁਬਾਰਾ ਖੇਡੋ)
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= EMBEDDED SOUND SYNTHESIZER ================= -->
+  <script>
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    function playTone(freq, type, duration, vol = 0.12) {
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playChime() {
+      playTone(523.25, 'sine', 0.18);
+      setTimeout(() => playTone(659.25, 'sine', 0.25), 100);
+    }
+    function playCorrectSound() {
+      playTone(523.25, 'triangle', 0.12);
+      setTimeout(() => playTone(659.25, 'triangle', 0.12), 80);
+      setTimeout(() => playTone(783.99, 'triangle', 0.25), 160);
+    }
+    function playWrongSound() {
+      playTone(200, 'sawtooth', 0.2, 0.15);
+    }
+  </script>
+
+  <!-- ================= APPLICATION SCRIPTS ================= -->
+  <script>
+    // Robust DPR Scaling Helper with safe fallback dimensions
+    function fitCanvasDPR(canvas) {
+      const parent = canvas.parentElement;
+      const rect = parent ? parent.getBoundingClientRect() : null;
+      let width = rect && rect.width > 0 ? rect.width : 340;
+      let height = rect && rect.height > 0 ? rect.height : 340;
+      const size = Math.floor(Math.min(width, height));
+      const dpr = window.devicePixelRatio || 1;
+
+      if (canvas.width !== size * dpr || canvas.height !== size * dpr) {
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        canvas.style.width = `${size}px`;
+        canvas.style.height = `${size}px`;
+      }
+      return { size, dpr };
+    }
+
+    function drawArrow(ctx, toX, toY, angleRad, len, color) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.translate(toX, toY);
+      ctx.rotate(angleRad);
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-len, -len * 0.45);
+      ctx.lineTo(-len * 0.7, 0);
+      ctx.lineTo(-len, len * 0.45);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Fullscreen Toggle
+    function toggleFullScreen() {
+      const fsBtn = document.getElementById('fsBtn');
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+        }
+        if (fsBtn) fsBtn.innerText = '✕';
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+        if (fsBtn) fsBtn.innerText = '⛶';
+      }
+    }
+    document.addEventListener('fullscreenchange', () => {
+      const fsBtn = document.getElementById('fsBtn');
+      if (fsBtn) fsBtn.innerText = document.fullscreenElement ? '✕' : '⛶';
+    });
+
+    // Language Toggle
+    let currentLang = 'dual';
+    function toggleLang() {
+      const btn = document.getElementById('langBtnText');
+      if (currentLang === 'dual') {
+        currentLang = 'pa';
+        btn.innerText = 'ਪੰਜਾਬੀ';
+      } else if (currentLang === 'pa') {
+        currentLang = 'en';
+        btn.innerText = 'English';
+      } else {
+        currentLang = 'dual';
+        btn.innerText = 'Dual';
+      }
+      updateLangVisibility();
+    }
+
+    function updateLangVisibility() {
+      const showEn = currentLang === 'dual' || currentLang === 'en';
+      const showPa = currentLang === 'dual' || currentLang === 'pa';
+
+      document.querySelectorAll('#expAngleTypeNameEn, #expDetailEn, #csHeadingEn, #csRuleEn, #quizPromptEn').forEach(el => {
+        el.style.display = showEn ? 'block' : 'none';
+      });
+      document.querySelectorAll('#expAngleTypeNamePa, #expDetailPa, #csHeadingPa, #csRulePa, #quizPromptPa').forEach(el => {
+        el.style.display = showPa ? 'block' : 'none';
+      });
+    }
+
+    // Tab Switching
+    let activeTab = 'explorer';
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+
+      const targetView = document.getElementById(`view-${tabId}`);
+      const targetBtn = document.getElementById(`tab-${tabId}`);
+      if (targetView) targetView.classList.remove('hidden');
+      if (targetBtn) targetBtn.classList.add('tab-active');
+
+      if (tabId === 'explorer') renderExplorer();
+      if (tabId === 'complementary') renderCompSupp();
+      if (tabId === 'transversal') renderTransversal();
+      if (tabId === 'game' && quizQuestions.length > 0 && currentQIdx === 0 && !isQuizAnswered) {
+        loadQuizQuestion();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // MODULE 1: ANGLE EXPLORER
+    // -------------------------------------------------------------
+    let explorerAngle = 60;
+    let isDraggingExplorer = false;
+    const expCanvas = document.getElementById('explorerCanvas');
+    const expCtx = expCanvas.getContext('2d');
+
+    const angleCategories = [
+      { max: 0, en: "Zero Angle", pa: "ਸਿਫ਼ਰ ਕੋਣ", badge: "0° Exactly", enDesc: "An angle measuring exactly 0 degrees where arms overlap.", paDesc: "ਜਦੋਂ ਦੋਵੇਂ ਭੁਜਾਵਾਂ ਇੱਕ ਦੂਜੀ ਦੇ ਉੱਪਰ ਹੁੰਦੀਆਂ ਹਨ (0°)।" },
+      { max: 89, en: "Acute Angle", pa: "ਨਿਊਨ ਕੋਣ", badge: "0° to 90°", enDesc: "An angle measuring greater than 0° and less than 90°. Examples: slice of pizza, open scissors.", paDesc: "ਇਹ ਕੋਣ 0° ਤੋਂ ਵੱਡਾ ਅਤੇ 90° ਤੋਂ ਛੋਟਾ ਹੁੰਦਾ ਹੈ। ਉਦਾਹਰਨ: ਪੀਜ਼ਾ ਦੀ ਫਾੜੀ।" },
+      { max: 90, en: "Right Angle", pa: "ਸਮਕੋਣ", badge: "Exact 90°", enDesc: "An angle measuring exactly 90°. Examples: corner of a book, table corner, letter 'L'.", paDesc: "ਇਹ ਕੋਣ ਬਿਲਕੁਲ 90° ਹੁੰਦਾ ਹੈ। ਉਦਾਹਰਨ: ਕਿਤਾਬ ਦਾ ਕੋਨਾ, ਅੱਖਰ 'L'।" },
+      { max: 179, en: "Obtuse Angle", pa: "ਅਧਿਕ ਕੋਣ", badge: "90° to 180°", enDesc: "An angle greater than 90° and less than 180°. Examples: open laptop screen, fan blades.", paDesc: "ਇਹ ਕੋਣ 90° ਤੋਂ ਵੱਡਾ ਅਤੇ 180° ਤੋਂ ਛੋਟਾ ਹੁੰਦਾ ਹੈ। ਉਦਾਹਰਨ: ਖੁੱਲ੍ਹਾ ਲੈਪਟਾਪ।" },
+      { max: 180, en: "Straight Angle", pa: "ਸਰਲ ਕੋਣ", badge: "Exact 180°", enDesc: "An angle measuring exactly 180°, forming a straight line. Examples: straight ruler, horizon.", paDesc: "ਇਹ ਕੋਣ ਪੂਰਾ 180° ਹੁੰਦਾ ਹੈ ਅਤੇ ਸਿੱਧੀ ਲਾਈਨ ਬਣਾਉਂਦਾ ਹੈ।" },
+      { max: 359, en: "Reflex Angle", pa: "ਰਿਫਲੈਕਸ ਕੋਣ", badge: "180° to 360°", enDesc: "An angle greater than 180° and less than 360°. Examples: outer angle of an open door.", paDesc: "ਇਹ ਕੋਣ 180° ਤੋਂ ਵੱਡਾ ਅਤੇ 360° ਤੋਂ ਛੋਟਾ ਹੁੰਦਾ ਹੈ।" },
+      { max: 360, en: "Complete Angle", pa: "ਸੰਪੂਰਨ ਕੋਣ", badge: "Exact 360°", enDesc: "A complete rotation of 360° around a point. Examples: full circle, clock hands completing an hour.", paDesc: "ਇੱਕ ਪੂਰਾ ਚੱਕਰ (360°)। ਉਦਾਹਰਨ: ਘੜੀ ਦੀ ਸੂਈ ਦਾ ਪੂਰਾ ਗੇੜਾ।" }
+    ];
+
+    function setAngle(deg) {
+      explorerAngle = Math.max(0, Math.min(360, Math.round(deg)));
+      document.getElementById('expSlider').value = explorerAngle;
+      updateExplorerUI();
+      renderExplorer();
+      playTone(350 + explorerAngle * 1.2, 'sine', 0.08);
+    }
+
+    function setAngleFromSlider(val) {
+      explorerAngle = parseInt(val);
+      updateExplorerUI();
+      renderExplorer();
+    }
+
+    function updateExplorerUI() {
+      document.getElementById('expDegreesLabel').innerText = `${explorerAngle}°`;
+      document.getElementById('expRadiansLabel').innerText = `${((explorerAngle * Math.PI) / 180).toFixed(2)} rad`;
+
+      let category = angleCategories[angleCategories.length - 1];
+      for (let i = 0; i < angleCategories.length; i++) {
+        if (explorerAngle <= angleCategories[i].max) {
+          category = angleCategories[i];
+          break;
+        }
+      }
+
+      document.getElementById('expAngleCategoryBadge').innerText = `${category.en} • ${category.pa}`;
+      document.getElementById('expAngleTypeNameEn').innerText = category.en;
+      document.getElementById('expAngleTypeNamePa').innerText = `${category.pa} (${category.badge})`;
+      document.getElementById('expDetailEn').innerText = category.enDesc;
+      document.getElementById('expDetailPa').innerText = category.paDesc;
+    }
+
+    function renderExplorer() {
+      const { size, dpr } = fitCanvasDPR(expCanvas);
+      if (!size) return;
+      const ctx = expCtx;
+      const w = size;
+      const h = size;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w * 0.5;
+      const cy = h * 0.52;
+      const r = w * 0.40;
+      const rad = (explorerAngle * Math.PI) / 180;
+
+      // Outer protractor circle
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(248, 250, 252, 0.85)';
+      ctx.fill();
+      ctx.lineWidth = 2 * dpr;
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.stroke();
+
+      // Tick marks every 10 and 30 degrees
+      for (let d = 0; d < 360; d += 10) {
+        const tr = (d * Math.PI) / 180;
+        const isMajor = d % 30 === 0;
+        const isRight = d % 90 === 0;
+        const tickLen = isRight ? 13 * dpr : (isMajor ? 9 * dpr : 5 * dpr);
+        const x1 = cx + r * Math.cos(tr);
+        const y1 = cy - r * Math.sin(tr);
+        const x2 = cx + (r - tickLen) * Math.cos(tr);
+        const y2 = cy - (r - tickLen) * Math.sin(tr);
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineWidth = isRight ? 2.5 * dpr : (isMajor ? 1.8 * dpr : 1 * dpr);
+        ctx.strokeStyle = isRight ? '#e11d48' : (isMajor ? '#475569' : '#94a3b8');
+        ctx.stroke();
+      }
+
+      // Shaded angle sector
+      if (explorerAngle > 0) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r * 0.85, 0, -rad, true);
+        ctx.closePath();
+        const grad = ctx.createRadialGradient(cx, cy, 5 * dpr, cx, cy, r * 0.85);
+        grad.addColorStop(0, 'rgba(99, 102, 241, 0.40)');
+        grad.addColorStop(1, 'rgba(129, 140, 248, 0.15)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.45, 0, -rad, true);
+        ctx.lineWidth = 3 * dpr;
+        ctx.strokeStyle = '#4f46e5';
+        ctx.stroke();
+      }
+
+      // Base ray (Horizontal to the right)
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + r, cy);
+      ctx.lineWidth = 4 * dpr;
+      ctx.strokeStyle = '#334155';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      drawArrow(ctx, cx + r, cy, 0, 10 * dpr, '#334155');
+
+      // Moving Ray
+      const armX = cx + r * Math.cos(-rad);
+      const armY = cy + r * Math.sin(-rad);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(armX, armY);
+      ctx.lineWidth = 4 * dpr;
+      ctx.strokeStyle = '#e11d48';
+      ctx.stroke();
+      drawArrow(ctx, armX, armY, -rad, 12 * dpr, '#e11d48');
+
+      // Draggable handle knob
+      ctx.beginPath();
+      ctx.arc(armX, armY, 12 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 3.5 * dpr;
+      ctx.strokeStyle = '#e11d48';
+      ctx.stroke();
+
+      // Central Vertex Pin
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = '#1e293b';
+      ctx.fill();
+
+      // Degree label on canvas
+      ctx.fillStyle = '#312e81';
+      ctx.font = `bold ${Math.round(15 * dpr)}px 'Nunito', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const midRad = -rad / 2;
+      const badgeR = explorerAngle > 180 ? r * 0.28 : r * 0.60;
+      ctx.fillText(`${explorerAngle}°`, cx + badgeR * Math.cos(midRad), cy + badgeR * Math.sin(midRad));
+    }
+
+    function handleExplorerPointer(e) {
+      const rect = expCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      const cx = rect.width * 0.5;
+      const cy = rect.height * 0.52;
+      const dx = x - cx;
+      const dy = cy - y;
+
+      let rad = Math.atan2(dy, dx);
+      if (rad < 0) rad += Math.PI * 2;
+      let deg = Math.round((rad * 180) / Math.PI);
+      if (deg === 360) deg = 0;
+
+      // Smart snaps
+      [0, 45, 90, 120, 135, 180, 270, 360].forEach(snap => {
+        if (Math.abs(deg - snap) <= 3) deg = snap;
+      });
+
+      setAngle(deg);
+    }
+
+    ['mousedown', 'touchstart'].forEach(evt => {
+      expCanvas.addEventListener(evt, e => {
+        isDraggingExplorer = true;
+        handleExplorerPointer(e);
+        e.preventDefault();
+      }, { passive: false });
+    });
+
+    ['mousemove', 'touchmove'].forEach(evt => {
+      window.addEventListener(evt, e => {
+        if (!isDraggingExplorer) return;
+        handleExplorerPointer(e);
+        e.preventDefault();
+      }, { passive: false });
+    });
+
+    ['mouseup', 'touchend', 'touchcancel'].forEach(evt => {
+      window.addEventListener(evt, () => { isDraggingExplorer = false; });
+    });
+
+    // -------------------------------------------------------------
+    // MODULE 2: COMPLEMENTARY, SUPPLEMENTARY & LINEAR PAIR
+    // -------------------------------------------------------------
+    let csMode = 'complementary';
+    let csSplit = 35;
+    let isDraggingCS = false;
+    const csCanvas = document.getElementById('compSuppCanvas');
+    const csCtx = csCanvas.getContext('2d');
+
+    function setCompSuppMode(mode) {
+      csMode = mode;
+      const btnC = document.getElementById('csBtnComp');
+      const btnS = document.getElementById('csBtnSupp');
+      const btnL = document.getElementById('csBtnLinear');
+
+      [btnC, btnS, btnL].forEach(b => {
+        b.className = "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black text-slate-600 hover:text-slate-900 transition btn-press whitespace-nowrap";
+      });
+
+      const activeClass = "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm transition btn-press whitespace-nowrap";
+
+      if (mode === 'complementary') {
+        btnC.className = activeClass;
+        if (csSplit >= 85) csSplit = 40;
+        document.getElementById('csIcon').innerText = "📐";
+        document.getElementById('csHeadingEn').innerText = "Complementary Angles";
+        document.getElementById('csHeadingPa').innerText = "ਪੂਰਕ ਕੋਣ (ਜੋੜ = 90°)";
+        document.getElementById('csRuleEn').innerHTML = "Two angles are complementary when their sum is <b>90°</b> (Right angle).";
+        document.getElementById('csRulePa').innerHTML = "ਜਦੋਂ ਦੋ ਕੋਣਾਂ ਦਾ ਜੋੜ 90° (ਸਮਕੋਣ) ਹੁੰਦਾ ਹੈ, ਤਾਂ ਉਹ ਆਪਸ ਵਿੱਚ ਪੂਰਕ ਹੁੰਦੇ ਹਨ।";
+        document.getElementById('csSumLabel').innerText = "90°";
+        document.getElementById('csTipTitle').innerText = "💡 Golden Rule / ਯਾਦ ਰੱਖਣ ਦਾ ਨੁਕਤਾ:";
+        document.getElementById('csTipEn').innerHTML = "<b>C</b> comes before <b>S</b>; <b>90°</b> comes before <b>180°</b>!";
+        document.getElementById('csTipPa').innerHTML = "C = 90° (ਪੂਰਕ) ਅਤੇ S = 180° (ਸੰਪੂਰਕ)";
+      } else if (mode === 'supplementary') {
+        btnS.className = activeClass;
+        if (csSplit < 20 || csSplit > 160) csSplit = 65;
+        document.getElementById('csIcon').innerText = "📏";
+        document.getElementById('csHeadingEn').innerText = "Supplementary Angles";
+        document.getElementById('csHeadingPa').innerText = "ਸੰਪੂਰਕ ਕੋਣ (ਜੋੜ = 180°)";
+        document.getElementById('csRuleEn').innerHTML = "Two angles are supplementary when their sum is <b>180°</b> (Straight angle). They do not have to be adjacent.";
+        document.getElementById('csRulePa').innerHTML = "ਜਦੋਂ ਦੋ ਕੋਣਾਂ ਦਾ ਜੋੜ 180° (ਸਰਲ ਕੋਣ) ਹੁੰਦਾ ਹੈ, ਤਾਂ ਉਹ ਸੰਪੂਰਕ ਹੁੰਦੇ ਹਨ (ਲਾਗਵੇਂ ਹੋਣਾ ਜ਼ਰੂਰੀ ਨਹੀਂ)।";
+        document.getElementById('csSumLabel').innerText = "180°";
+        document.getElementById('csTipTitle').innerText = "💡 Key Property / ਮੁੱਖ ਗੁਣ:";
+        document.getElementById('csTipEn').innerHTML = "Supplementary angles can be adjacent or completely separate!";
+        document.getElementById('csTipPa').innerHTML = "ਸੰਪੂਰਕ ਕੋਣ ਇਕੱਠੇ ਜਾਂ ਵੱਖ-ਵੱਖ ਵੀ ਹੋ ਸਕਦੇ ਹਨ।";
+      } else if (mode === 'linear-pair') {
+        btnL.className = activeClass;
+        if (csSplit < 20 || csSplit > 160) csSplit = 65;
+        document.getElementById('csIcon').innerText = "➖";
+        document.getElementById('csHeadingEn').innerText = "Linear Pair of Angles";
+        document.getElementById('csHeadingPa').innerText = "ਰੇਖੀ ਜੋੜਾ (ਲਾਗਵੇਂ ਕੋਣ + 180°)";
+        document.getElementById('csRuleEn').innerHTML = "A <b>Linear Pair</b> is formed by two <i>adjacent angles</i> standing on a single straight line whose non-common arms form opposite rays (Sum = 180°).";
+        document.getElementById('csRulePa').innerHTML = "ਇੱਕ ਸਿੱਧੀ ਰੇਖਾ 'ਤੇ ਬਣੇ ਦੋ ਲਾਗਵੇਂ ਕੋਣ ਜਿਨ੍ਹਾਂ ਦੀ ਸਾਂਝੀ ਭੁਜਾ ਹੁੰਦੀ ਹੈ ਅਤੇ ਜੋੜ 180° ਹੁੰਦਾ ਹੈ, ਉਸਨੂੰ <b>ਰੇਖੀ ਜੋੜਾ</b> ਕਹਿੰਦੇ ਹਨ।";
+        document.getElementById('csSumLabel').innerText = "180°";
+        document.getElementById('csTipTitle').innerText = "🌟 Linear Pair Axiom / ਰੇਖੀ ਜੋੜਾ ਸਵੈ-ਸਿੱਧ ਅਸੂਲ:";
+        document.getElementById('csTipEn').innerHTML = "Adjacent angles on a straight line ALWAYS sum to 180°: ∠1 + ∠2 = 180°!";
+        document.getElementById('csTipPa').innerHTML = "ਸਿੱਧੀ ਰੇਖਾ 'ਤੇ ਲਾਗਵੇਂ ਕੋਣਾਂ ਦਾ ਜੋੜ ਹਮੇਸ਼ਾ 180° ਹੁੰਦਾ ਹੈ: ∠1 + ∠2 = 180°!";
+      }
+      renderCompSupp();
+    }
+
+    function renderCompSupp() {
+      const { size, dpr } = fitCanvasDPR(csCanvas);
+      if (!size) return;
+      const ctx = csCtx;
+      const w = size;
+      const h = size;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const targetSum = csMode === 'complementary' ? 90 : 180;
+      csSplit = Math.max(5, Math.min(targetSum - 5, csSplit));
+      const a2 = targetSum - csSplit;
+
+      document.getElementById('csA1Label').innerText = `${csSplit}°`;
+      document.getElementById('csA2Label').innerText = `${a2}°`;
+
+      const cx = csMode === 'complementary' ? w * 0.25 : w * 0.5;
+      const cy = h * 0.78;
+      const r = w * 0.60;
+
+      const rad1 = (csSplit * Math.PI) / 180;
+      const radTotal = (targetSum * Math.PI) / 180;
+
+      // Arc for Angle 1 (Indigo)
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r * 0.55, 0, -rad1, true);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(79, 70, 229, 0.15)';
+      ctx.fill();
+      ctx.lineWidth = 2.5 * dpr;
+      ctx.strokeStyle = '#4f46e5';
+      ctx.stroke();
+
+      // Arc for Angle 2 (Emerald)
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r * 0.42, -rad1, -radTotal, true);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(5, 150, 105, 0.15)';
+      ctx.fill();
+      ctx.lineWidth = 2.5 * dpr;
+      ctx.strokeStyle = '#059669';
+      ctx.stroke();
+
+      // Baseline
+      if (csMode === 'linear-pair') {
+        ctx.beginPath();
+        ctx.moveTo(cx - r * 0.95, cy);
+        ctx.lineTo(cx + r * 0.95, cy);
+        ctx.lineWidth = 5 * dpr;
+        ctx.strokeStyle = '#0f172a';
+        ctx.stroke();
+        drawArrow(ctx, cx + r * 0.95, cy, 0, 10 * dpr, '#0f172a');
+        drawArrow(ctx, cx - r * 0.95, cy, Math.PI, 10 * dpr, '#0f172a');
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = `bold ${Math.round(9 * dpr)}px 'Nunito', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText("Straight Line 180° (ਸਿੱਧੀ ਰੇਖਾ)", cx, cy + 18 * dpr);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + r, cy);
+        ctx.lineWidth = 3.5 * dpr;
+        ctx.strokeStyle = '#334155';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        drawArrow(ctx, cx + r, cy, 0, 10 * dpr, '#334155');
+
+        const endOX = cx + r * Math.cos(-radTotal);
+        const endOY = cy + r * Math.sin(-radTotal);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(endOX, endOY);
+        ctx.lineWidth = 3.5 * dpr;
+        ctx.strokeStyle = '#334155';
+        ctx.stroke();
+        drawArrow(ctx, endOX, endOY, -radTotal, 10 * dpr, '#334155');
+      }
+
+      // Moving common ray (Rose/Pink)
+      const midX = cx + r * Math.cos(-rad1);
+      const midY = cy + r * Math.sin(-rad1);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(midX, midY);
+      ctx.lineWidth = 4 * dpr;
+      ctx.strokeStyle = '#e11d48';
+      ctx.stroke();
+      drawArrow(ctx, midX, midY, -rad1, 12 * dpr, '#e11d48');
+
+      // Knob
+      ctx.beginPath();
+      ctx.arc(midX, midY, 13 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 3.5 * dpr;
+      ctx.strokeStyle = '#e11d48';
+      ctx.stroke();
+
+      // Numbers
+      ctx.font = `bold ${Math.round(13 * dpr)}px 'Nunito', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const a1Mid = -rad1 / 2;
+      ctx.fillStyle = '#4338ca';
+      ctx.fillText(`${csSplit}°`, cx + (r * 0.35) * Math.cos(a1Mid), cy + (r * 0.35) * Math.sin(a1Mid));
+
+      const a2Mid = -(rad1 + (radTotal - rad1) / 2);
+      ctx.fillStyle = '#065f46';
+      ctx.fillText(`${a2}°`, cx + (r * 0.30) * Math.cos(a2Mid), cy + (r * 0.30) * Math.sin(a2Mid));
+    }
+
+    function handleCSPointer(e) {
+      const rect = csCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      const cx = csMode === 'complementary' ? rect.width * 0.25 : rect.width * 0.5;
+      const cy = rect.height * 0.78;
+      const dx = x - cx;
+      const dy = cy - y;
+
+      let rad = Math.atan2(dy, dx);
+      let deg = Math.round((rad * 180) / Math.PI);
+      const limit = csMode === 'complementary' ? 90 : 180;
+
+      if (deg > 3 && deg < limit - 3) {
+        csSplit = deg;
+        renderCompSupp();
+      }
+    }
+
+    ['mousedown', 'touchstart'].forEach(evt => {
+      csCanvas.addEventListener(evt, e => {
+        isDraggingCS = true;
+        handleCSPointer(e);
+        e.preventDefault();
+      }, { passive: false });
+    });
+
+    ['mousemove', 'touchmove'].forEach(evt => {
+      window.addEventListener(evt, e => {
+        if (!isDraggingCS) return;
+        handleCSPointer(e);
+        e.preventDefault();
+      }, { passive: false });
+    });
+
+    ['mouseup', 'touchend', 'touchcancel'].forEach(evt => {
+      window.addEventListener(evt, () => { isDraggingCS = false; });
+    });
+
+    function solveAngles(val) {
+      const v = parseInt(val) || 0;
+      const comp = 90 - v;
+      const supp = 180 - v;
+      document.getElementById('solveCompRes').innerText = comp >= 0 ? `${comp}°` : '--';
+      document.getElementById('solveSuppRes').innerText = supp >= 0 ? `${supp}°` : '--';
+    }
+
+    // -------------------------------------------------------------
+    // MODULE 3: PARALLEL LINES & TRANSVERSAL
+    // -------------------------------------------------------------
+    let transversalTilt = 60;
+    let pairMode = 'corresponding';
+    const transCanvas = document.getElementById('transversalCanvas');
+    const transCtx = transCanvas.getContext('2d');
+
+    function setTransversalAngle(deg) {
+      transversalTilt = parseInt(deg);
+      document.getElementById('transTiltLabel').innerText = `${transversalTilt}°`;
+      renderTransversal();
+    }
+
+    function setPairHighlight(mode) {
+      pairMode = mode;
+      document.querySelectorAll('#btn-pair-corresponding, #btn-pair-alt-interior, #btn-pair-alt-exterior, #btn-pair-vert-opposite, #btn-pair-consec-interior').forEach(btn => {
+        btn.classList.remove('border-emerald-400', 'bg-emerald-50');
+        btn.classList.add('border-slate-200', 'bg-white');
+      });
+      const activeBtn = document.getElementById(`btn-pair-${mode}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-slate-200', 'bg-white');
+        activeBtn.classList.add('border-emerald-400', 'bg-emerald-50');
+      }
+      renderTransversal();
+      playTone(450, 'triangle', 0.08);
+    }
+
+    function renderTransversal() {
+      const { size, dpr } = fitCanvasDPR(transCanvas);
+      if (!size) return;
+      const ctx = transCtx;
+      const w = size;
+      const h = size;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const y1 = h * 0.35;
+      const y2 = h * 0.65;
+      const margin = 20 * dpr;
+
+      ctx.lineWidth = 3.5 * dpr;
+      ctx.strokeStyle = '#475569';
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(margin, y1);
+      ctx.lineTo(w - margin, y1);
+      ctx.stroke();
+      drawArrow(ctx, w - margin, y1, 0, 8 * dpr, '#475569');
+      drawArrow(ctx, margin, y1, Math.PI, 8 * dpr, '#475569');
+
+      ctx.beginPath();
+      ctx.moveTo(margin, y2);
+      ctx.lineTo(w - margin, y2);
+      ctx.stroke();
+      drawArrow(ctx, w - margin, y2, 0, 8 * dpr, '#475569');
+      drawArrow(ctx, margin, y2, Math.PI, 8 * dpr, '#475569');
+
+      const cx1 = w * 0.46;
+      const radTilt = (transversalTilt * Math.PI) / 180;
+      const dy = y2 - y1;
+      const dx = dy / Math.tan(radTilt);
+      const cx2 = cx1 - dx;
+
+      const ext = 45 * dpr;
+      const tx1 = cx1 + ext * Math.cos(radTilt);
+      const ty1 = y1 - ext * Math.sin(radTilt);
+      const tx2 = cx2 - ext * Math.cos(radTilt);
+      const ty2 = y2 + ext * Math.sin(radTilt);
+
+      ctx.beginPath();
+      ctx.moveTo(tx1, ty1);
+      ctx.lineTo(tx2, ty2);
+      ctx.lineWidth = 4 * dpr;
+      ctx.strokeStyle = '#e11d48';
+      ctx.stroke();
+      drawArrow(ctx, tx1, ty1, Math.atan2(ty1 - ty2, tx1 - tx2), 9 * dpr, '#e11d48');
+      drawArrow(ctx, tx2, ty2, Math.atan2(ty2 - ty1, tx2 - tx1), 9 * dpr, '#e11d48');
+
+      const acuteA = transversalTilt;
+      const obtuseA = 180 - transversalTilt;
+      document.getElementById('vA1').innerText = `${obtuseA}°`;
+      document.getElementById('vA2').innerText = `${acuteA}°`;
+      document.getElementById('vA3').innerText = `${acuteA}°`;
+      document.getElementById('vA4').innerText = `${obtuseA}°`;
+      document.getElementById('vA5').innerText = `${obtuseA}°`;
+      document.getElementById('vA6').innerText = `${acuteA}°`;
+      document.getElementById('vA7').innerText = `${acuteA}°`;
+      document.getElementById('vA8').innerText = `${obtuseA}°`;
+
+      const getColor = (idx) => {
+        if (pairMode === 'corresponding') {
+          if ([1, 5].includes(idx)) return '#059669';
+          if ([2, 6].includes(idx)) return '#4f46e5';
+          if ([3, 7].includes(idx)) return '#d97706';
+          if ([4, 8].includes(idx)) return '#db2777';
+        } else if (pairMode === 'alt-interior') {
+          if ([3, 6].includes(idx)) return '#4f46e5';
+          if ([4, 5].includes(idx)) return '#7c3aed';
+          return 'rgba(203, 213, 225, 0.4)';
+        } else if (pairMode === 'alt-exterior') {
+          if ([1, 8].includes(idx)) return '#059669';
+          if ([2, 7].includes(idx)) return '#ea580c';
+          return 'rgba(203, 213, 225, 0.4)';
+        } else if (pairMode === 'vert-opposite') {
+          // Top pair (1 & 4) and (2 & 3); Bottom pair (5 & 8) and (6 & 7)
+          if ([1, 4].includes(idx)) return '#059669';
+          if ([2, 3].includes(idx)) return '#4f46e5';
+          if ([5, 8].includes(idx)) return '#d97706';
+          if ([6, 7].includes(idx)) return '#db2777';
+        } else if (pairMode === 'consec-interior') {
+          if ([3, 5].includes(idx)) return '#2563eb';
+          if ([4, 6].includes(idx)) return '#db2777';
+          return 'rgba(203, 213, 225, 0.4)';
+        }
+        return [2, 3, 6, 7].includes(idx) ? '#4f46e5' : '#d97706';
+      };
+
+      const arcR = 22 * dpr;
+      // Top Intersection:
+      // ∠1 (Top-Left): between -PI and -radTilt
+      // ∠2 (Top-Right): between -radTilt and 0
+      // ∠3 (Bottom-Left): between -PI and -(PI + radTilt)
+      // ∠4 (Bottom-Right): between -(PI + radTilt) and 0
+      drawSector(ctx, cx1, y1, arcR, -radTilt, -Math.PI, true, getColor(1), "1", cx1 - 16 * dpr, y1 - 12 * dpr);
+      drawSector(ctx, cx1, y1, arcR, 0, -radTilt, true, getColor(2), "2", cx1 + 18 * dpr, y1 - 10 * dpr);
+      drawSector(ctx, cx1, y1, arcR, -Math.PI, -(Math.PI + radTilt), true, getColor(3), "3", cx1 - 18 * dpr, y1 + 12 * dpr);
+      drawSector(ctx, cx1, y1, arcR, -(Math.PI + radTilt), 0, true, getColor(4), "4", cx1 + 16 * dpr, y1 + 12 * dpr);
+
+      // Bottom Intersection:
+      // ∠5 (Top-Left), ∠6 (Top-Right), ∠7 (Bottom-Left), ∠8 (Bottom-Right)
+      drawSector(ctx, cx2, y2, arcR, -radTilt, -Math.PI, true, getColor(5), "5", cx2 - 16 * dpr, y2 - 12 * dpr);
+      drawSector(ctx, cx2, y2, arcR, 0, -radTilt, true, getColor(6), "6", cx2 + 18 * dpr, y2 - 10 * dpr);
+      drawSector(ctx, cx2, y2, arcR, -Math.PI, -(Math.PI + radTilt), true, getColor(7), "7", cx2 - 18 * dpr, y2 + 12 * dpr);
+      drawSector(ctx, cx2, y2, arcR, -(Math.PI + radTilt), 0, true, getColor(8), "8", cx2 + 16 * dpr, y2 + 12 * dpr);
+    }
+
+    function drawSector(ctx, cx, cy, r, startA, endA, ccw, color, num, lx, ly) {
+      const dpr = window.devicePixelRatio || 1;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, startA, endA, ccw);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.35;
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+      ctx.lineWidth = 1.5 * dpr;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(lx, ly, 8.5 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 1.5 * dpr;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      ctx.font = `900 ${Math.round(9 * dpr)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`∠${num}`, lx, ly);
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // MODULE 4: CHALLENGE GAME
+    // -------------------------------------------------------------
+    let quizScore = 0;
+    let quizStreak = 0;
+    let currentQIdx = 0;
+    let isQuizAnswered = false;
+
+    const quizQuestions = [
+      {
+        category: "Linear Pair • ਰੇਖੀ ਜੋੜਾ",
+        type: "mcq",
+        promptEn: "Two adjacent angles form a Linear Pair on a straight line. If one angle is 65°, what is the other angle?",
+        promptPa: "ਇੱਕ ਸਿੱਧੀ ਰੇਖਾ 'ਤੇ ਰੇਖੀ ਜੋੜਾ ਬਣਦਾ ਹੈ। ਜੇਕਰ ਇੱਕ ਕੋਣ 65° ਹੈ, ਤਾਂ ਦੂਜਾ ਕੋਣ ਕੀ ਹੋਵੇਗਾ?",
+        options: [
+          { en: "115° (Sum = 180°)", pa: "115° (ਜੋੜ = 180°)", correct: true, color: "from-indigo-600 to-purple-600" },
+          { en: "25° (Complementary)", pa: "25° (ਪੂਰਕ)", correct: false, color: "from-amber-500 to-orange-600" },
+          { en: "125°", pa: "125°", correct: false, color: "from-cyan-500 to-blue-600" },
+          { en: "65° (Equal)", pa: "65° (ਬਰਾਬਰ)", correct: false, color: "from-rose-500 to-pink-600" }
+        ],
+        hintEn: "The sum of angles in a linear pair is always 180°. (180 - 65 = 115)",
+        hintPa: "ਰੇਖੀ ਜੋੜੇ ਦੇ ਕੋਣਾਂ ਦਾ ਜੋੜ ਹਮੇਸ਼ਾ 180° ਹੁੰਦਾ ਹੈ। (180 - 65 = 115)"
+      },
+      {
+        category: "Angle Type • ਕਿਸਮ ਪਛਾਣੋ",
+        type: "mcq",
+        promptEn: "What type of angle measures 135°?",
+        promptPa: "135° ਦੇ ਕੋਣ ਨੂੰ ਕਿਹੜਾ ਕੋਣ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?",
+        options: [
+          { en: "Obtuse Angle", pa: "ਅਧਿਕ ਕੋਣ", correct: true, color: "from-rose-500 to-pink-600" },
+          { en: "Acute Angle", pa: "ਨਿਊਨ ਕੋਣ", correct: false, color: "from-emerald-500 to-teal-600" },
+          { en: "Right Angle", pa: "ਸਮਕੋਣ", correct: false, color: "from-amber-500 to-yellow-600" },
+          { en: "Straight Angle", pa: "ਸਰਲ ਕੋਣ", correct: false, color: "from-blue-500 to-indigo-600" }
+        ],
+        hintEn: "It is between 90° and 180°.",
+        hintPa: "ਇਹ 90° ਤੋਂ ਵੱਡਾ ਅਤੇ 180° ਤੋਂ ਛੋਟਾ ਹੈ।"
+      },
+      {
+        category: "Complementary • ਪੂਰਕ ਕੋਣ",
+        type: "mcq",
+        promptEn: "Two angles are Complementary. If Angle 1 is 40°, what is Angle 2?",
+        promptPa: "ਦੋ ਕੋਣ ਪੂਰਕ ਹਨ। ਜੇਕਰ ਕੋਣ ੧ 40° ਹੈ, ਤਾਂ ਕੋਣ ੨ ਕਿੰਨਾ ਹੋਵੇਗਾ?",
+        options: [
+          { en: "50° (Sum = 90°)", pa: "50° (ਜੋੜ = 90°)", correct: true, color: "from-cyan-500 to-blue-600" },
+          { en: "140°", pa: "140°", correct: false, color: "from-purple-500 to-fuchsia-600" },
+          { en: "60°", pa: "60°", correct: false, color: "from-emerald-500 to-teal-600" },
+          { en: "90°", pa: "90°", correct: false, color: "from-amber-500 to-orange-600" }
+        ],
+        hintEn: "Complementary angles add up to 90°. (90 - 40 = 50)",
+        hintPa: "ਪੂਰਕ ਕੋਣਾਂ ਦਾ ਜੋੜ 90° ਹੁੰਦਾ ਹੈ। (90 - 40 = 50)"
+      },
+      {
+        category: "Linear Pair • ਰੇਖੀ ਜੋੜਾ",
+        type: "mcq",
+        promptEn: "What is the defining condition of a Linear Pair?",
+        promptPa: "ਰੇਖੀ ਜੋੜੇ ਦੀ ਮੁੱਖ ਸ਼ਰਤ ਕੀ ਹੁੰਦੀ ਹੈ?",
+        options: [
+          { en: "Adjacent angles on a straight line (Sum = 180°)", pa: "ਸਿੱਧੀ ਰੇਖਾ 'ਤੇ ਲਾਗਵੇਂ ਕੋਣ (ਜੋੜ = 180°)", correct: true, color: "from-emerald-500 to-teal-600" },
+          { en: "Opposite angles measuring 90° each", pa: "ਸਾਹਮਣੇ ਵਾਲੇ 90° ਦੇ ਕੋਣ", correct: false, color: "from-amber-500 to-orange-600" },
+          { en: "Non-adjacent angles adding to 90°", pa: "ਗੈਰ-ਲਾਗਵੇਂ ਕੋਣ ਜਿਨ੍ਹਾਂ ਦਾ ਜੋੜ 90° ਹੈ", correct: false, color: "from-rose-500 to-pink-600" },
+          { en: "Angles forming a full circle (360°)", pa: "ਪੂਰਾ ਚੱਕਰ ਬਣਾਉਣ ਵਾਲੇ ਕੋਣ (360°)", correct: false, color: "from-blue-500 to-indigo-600" }
+        ],
+        hintEn: "A linear pair consists of adjacent angles on a straight line whose sum is 180°.",
+        hintPa: "ਸਿੱਧੀ ਰੇਖਾ 'ਤੇ ਬਣੇ ਦੋ ਲਾਗਵੇਂ ਕੋਣ ਜਿਨ੍ਹਾਂ ਦਾ ਜੋੜ 180° ਹੁੰਦਾ ਹੈ।"
+      },
+      {
+        category: "Aim The Angle • ਕੋਣ ਬਣਾਓ",
+        type: "aim",
+        targetAngle: 90,
+        tolerance: 6,
+        promptEn: "Use the slider below to aim and set a Right Angle (90°)",
+        promptPa: "ਸਲਾਈਡਰ ਨਾਲ ਇੱਕ ਸਮਕੋਣ (90°) ਸੈੱਟ ਕਰੋ।",
+        hintEn: "Right angle is exactly 90 degrees.",
+        hintPa: "ਸਮਕੋਣ ਪੂਰਾ 90 ਡਿਗਰੀ ਹੁੰਦਾ ਹੈ।"
+      },
+      {
+        category: "Supplementary • ਸੰਪੂਰਕ ਕੋਣ",
+        type: "mcq",
+        promptEn: "What is the Supplementary angle of 110°?",
+        promptPa: "110° ਦਾ ਸੰਪੂਰਕ ਕੋਣ ਕੀ ਹੋਵੇਗਾ?",
+        options: [
+          { en: "70°", pa: "70°", correct: true, color: "from-emerald-500 to-teal-600" },
+          { en: "80°", pa: "80°", correct: false, color: "from-amber-500 to-orange-600" },
+          { en: "90°", pa: "90°", correct: false, color: "from-cyan-500 to-blue-600" },
+          { en: "20°", pa: "20°", correct: false, color: "from-rose-500 to-pink-600" }
+        ],
+        hintEn: "Supplementary angles add up to 180°. (180 - 110 = 70)",
+        hintPa: "ਸੰਪੂਰਕ ਕੋਣਾਂ ਦਾ ਜੋੜ 180° ਹੁੰਦਾ ਹੈ। (180 - 110 = 70)"
+      },
+      {
+        category: "Transversal Lines • ਕਾਟਵੀਂ ਰੇਖਾ",
+        type: "mcq",
+        promptEn: "Alternate interior angles formed by parallel lines are always:",
+        promptPa: "ਸਮਾਂਤਰ ਰੇਖਾਵਾਂ ਵਿੱਚ ਅੰਦਰਲੇ ਇਕਾਂਤਰ ਕੋਣ ਹਮੇਸ਼ਾ ਹੁੰਦੇ ਹਨ:",
+        options: [
+          { en: "Equal to each other", pa: "ਆਪਸ ਵਿੱਚ ਬਰਾਬਰ (=)", correct: true, color: "from-emerald-500 to-teal-600" },
+          { en: "Complementary (90°)", pa: "ਪੂਰਕ (90°)", correct: false, color: "from-cyan-500 to-blue-600" },
+          { en: "Supplementary (180°)", pa: "ਸੰਪੂਰਕ (180°)", correct: false, color: "from-purple-500 to-violet-600" },
+          { en: "Unequal", pa: "ਅਸਮਾਨ", correct: false, color: "from-rose-500 to-pink-600" }
+        ],
+        hintEn: "They form a Z-shape and are equal!",
+        hintPa: "ਇਹ Z ਆਕਾਰ ਬਣਾਉਂਦੇ ਹਨ ਅਤੇ ਬਰਾਬਰ ਹੁੰਦੇ ਹਨ!"
+      },
+      {
+        category: "Reflex Angle • ਰਿਫਲੈਕਸ ਕੋਣ",
+        type: "mcq",
+        promptEn: "An angle measuring 240° is called a:",
+        promptPa: "240° ਦੇ ਕੋਣ ਨੂੰ ਕੀ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?",
+        options: [
+          { en: "Reflex Angle", pa: "ਰਿਫਲੈਕਸ (ਪਰਿਵਰਤੀ) ਕੋਣ", correct: true, color: "from-purple-500 to-violet-600" },
+          { en: "Obtuse Angle", pa: "ਅਧਿਕ ਕੋਣ", correct: false, color: "from-rose-500 to-pink-600" },
+          { en: "Straight Angle", pa: "ਸਰਲ ਕੋਣ", correct: false, color: "from-blue-500 to-indigo-600" },
+          { en: "Acute Angle", pa: "ਨਿਊਨ ਕੋਣ", correct: false, color: "from-emerald-500 to-teal-600" }
+        ],
+        hintEn: "It is greater than 180° and less than 360°.",
+        hintPa: "ਇਹ 180° ਤੋਂ ਵੱਡਾ ਅਤੇ 360° ਤੋਂ ਛੋਟਾ ਹੁੰਦਾ ਹੈ।"
+      },
+      {
+        category: "Aim The Angle • ਕੋਣ ਬਣਾਓ",
+        type: "aim",
+        targetAngle: 45,
+        tolerance: 6,
+        promptEn: "Aim the dial to set an Acute Angle of 45°",
+        promptPa: "ਸਲਾਈਡਰ ਨਾਲ 45° ਦਾ ਨਿਊਨ ਕੋਣ ਬਣਾਓ।",
+        hintEn: "Halfway to a right angle (90 / 2 = 45).",
+        hintPa: "ਸਮਕੋਣ ਦਾ ਅੱਧਾ (45°)।"
+      },
+      {
+        category: "Lines & Vertices • ਸਿਖਰ ਸਨਮੁੱਖ",
+        type: "mcq",
+        promptEn: "When two straight lines cross, vertically opposite angles are:",
+        promptPa: "ਜਦੋਂ ਦੋ ਰੇਖਾਵਾਂ ਕੱਟਦੀਆਂ ਹਨ, ਤਾਂ ਸਿਖਰ ਸਨਮੁੱਖ ਕੋਣ ਹੁੰਦੇ ਹਨ:",
+        options: [
+          { en: "Always Equal", pa: "ਹਮੇਸ਼ਾ ਬਰਾਬਰ (=)", correct: true, color: "from-amber-500 to-orange-600" },
+          { en: "Always 90°", pa: "ਹਮੇਸ਼ਾ 90°", correct: false, color: "from-cyan-500 to-blue-600" },
+          { en: "Sum to 360°", pa: "ਜੋੜ 360°", correct: false, color: "from-purple-500 to-violet-600" },
+          { en: "Linear Pair", pa: "ਰੇਖੀ ਜੋੜਾ", correct: false, color: "from-rose-500 to-pink-600" }
+        ],
+        hintEn: "Opposite angles across the X vertex are always identical.",
+        hintPa: "ਕਾਟਵੇਂ ਬਿੰਦੂ ਦੇ ਸਾਹਮਣੇ ਵਾਲੇ ਕੋਣ ਬਰਾਬਰ ਹੁੰਦੇ ਹਨ।"
+      }
+    ];
+
+    function loadQuizQuestion() {
+      isQuizAnswered = false;
+      document.getElementById('quizFeedbackBanner').classList.add('hidden');
+
+      if (currentQIdx >= quizQuestions.length) {
+        showQuizGameOver();
+        return;
+      }
+
+      const q = quizQuestions[currentQIdx];
+      document.getElementById('quizCounter').innerText = `${currentQIdx + 1} / ${quizQuestions.length}`;
+      document.getElementById('quizCategoryBadge').innerText = q.category;
+      document.getElementById('quizPromptEn').innerText = q.promptEn;
+      document.getElementById('quizPromptPa').innerText = q.promptPa;
+
+      const optsGrid = document.getElementById('quizOptionsGrid');
+      const aimArea = document.getElementById('quizAimSliderArea');
+      const aimCanvasCont = document.getElementById('quizAimCanvasContainer');
+
+      optsGrid.innerHTML = '';
+
+      if (q.type === 'aim') {
+        optsGrid.classList.add('hidden');
+        aimArea.classList.remove('hidden');
+        aimCanvasCont.classList.remove('hidden');
+        document.getElementById('quizAimSlider').value = 45;
+        document.getElementById('quizAimDisplay').innerText = '45°';
+        drawQuizAim(45);
+      } else {
+        optsGrid.classList.remove('hidden');
+        aimArea.classList.add('hidden');
+        aimCanvasCont.classList.add('hidden');
+
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          btn.className = `p-2.5 sm:p-3 rounded-xl bg-gradient-to-r ${opt.color} hover:brightness-105 text-white font-black text-left shadow-sm transition btn-press border border-white/30 flex flex-col justify-between`;
+          btn.onclick = () => selectQuizAnswer(idx, btn);
+          btn.innerHTML = `
+            <span class="text-xs sm:text-sm leading-tight">${opt.en}</span>
+            <span class="text-[11px] font-bold text-amber-100 punjabi-font mt-0.5">${opt.pa}</span>
+          `;
+          optsGrid.appendChild(btn);
+        });
+      }
+
+      updateLangVisibility();
+    }
+
+    function onQuizAimSlider(val) {
+      document.getElementById('quizAimDisplay').innerText = `${val}°`;
+      drawQuizAim(parseInt(val));
+    }
+
+    function drawQuizAim(deg) {
+      const cv = document.getElementById('quizAimCanvas');
+      const ctx = cv.getContext('2d');
+      const w = cv.width;
+      const h = cv.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w * 0.5;
+      const cy = h * 0.82;
+      const r = 50;
+      const rad = (deg * Math.PI) / 180;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r * 0.5, 0, -rad, true);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.3)';
+      ctx.fill();
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + r, cy);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + r * Math.cos(-rad), cy + r * Math.sin(-rad));
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#1e293b';
+      ctx.fill();
+    }
+
+    function submitAimAnswer() {
+      if (isQuizAnswered) return;
+      isQuizAnswered = true;
+      const q = quizQuestions[currentQIdx];
+      const userDeg = parseInt(document.getElementById('quizAimSlider').value);
+      const diff = Math.abs(userDeg - q.targetAngle);
+
+      if (diff <= q.tolerance) {
+        onQuizSuccess();
+      } else {
+        onQuizFailure(`Target was ${q.targetAngle}°, you set ${userDeg}°.`, `ਨਿਸ਼ਾਨਾ ${q.targetAngle}° ਸੀ, ਤੁਸੀਂ ${userDeg}° ਬਣਾਇਆ।`);
+      }
+    }
+
+    function selectQuizAnswer(idx, btnEl) {
+      if (isQuizAnswered) return;
+      isQuizAnswered = true;
+      const q = quizQuestions[currentQIdx];
+      const opt = q.options[idx];
+
+      if (opt.correct) {
+        btnEl.classList.add('ring-4', 'ring-emerald-400', 'scale-[1.02]');
+        onQuizSuccess();
+      } else {
+        btnEl.classList.add('ring-4', 'ring-rose-500', 'opacity-60');
+        onQuizFailure(q.hintEn, q.hintPa);
+      }
+    }
+
+    function onQuizSuccess() {
+      quizScore += 10 + (quizStreak * 2);
+      quizStreak += 1;
+      document.getElementById('quizScore').innerText = quizScore;
+      document.getElementById('quizStreak').innerText = `Streak: ${quizStreak} 🔥`;
+
+      playCorrectSound();
+
+      const banner = document.getElementById('quizFeedbackBanner');
+      banner.className = "flex-none mt-2 p-2 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-2 max-w-2xl mx-auto w-full transition-all shadow-sm";
+      document.getElementById('feedbackIcon').innerText = "🎉";
+      document.getElementById('feedbackEn').innerText = "Correct! Well Done!";
+      document.getElementById('feedbackPa').innerText = "ਬਿਲਕੁਲ ਸਹੀ! ਬਹੁਤ ਵਧੀਆ!";
+      banner.classList.remove('hidden');
+
+      if (quizStreak >= 2 && window.confetti) {
+        window.confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 } });
+      }
+    }
+
+    function onQuizFailure(hintEn, hintPa) {
+      quizStreak = 0;
+      document.getElementById('quizStreak').innerText = `Streak: 0`;
+      playWrongSound();
+
+      const banner = document.getElementById('quizFeedbackBanner');
+      banner.className = "flex-none mt-2 p-2 rounded-xl bg-rose-50 border border-rose-300 flex items-center justify-between gap-2 max-w-2xl mx-auto w-full transition-all shadow-sm";
+      document.getElementById('feedbackIcon').innerText = "💡";
+      document.getElementById('feedbackEn').innerText = `Hint: ${hintEn}`;
+      document.getElementById('feedbackPa').innerText = `ਸੰਕੇਤ: ${hintPa}`;
+      banner.classList.remove('hidden');
+    }
+
+    function nextQuizQuestion() {
+      currentQIdx++;
+      loadQuizQuestion();
+    }
+
+    function showQuizGameOver() {
+      const modal = document.getElementById('quizGameOverModal');
+      document.getElementById('quizFinalScoreMsg').innerText = `Final Score: ${quizScore} Points!`;
+      modal.classList.remove('hidden');
+      if (window.confetti) window.confetti({ particleCount: 120, spread: 80 });
+      playChime();
+    }
+
+    function restartQuiz() {
+      quizScore = 0;
+      quizStreak = 0;
+      currentQIdx = 0;
+      document.getElementById('quizScore').innerText = "0";
+      document.getElementById('quizStreak').innerText = "Streak: 0";
+      document.getElementById('quizGameOverModal').classList.add('hidden');
+      loadQuizQuestion();
+    }
+
+    // -------------------------------------------------------------
+    // INITIALIZATION & RESIZE HANDLERS
+    // -------------------------------------------------------------
+    function renderCurrentTab() {
+      if (activeTab === 'explorer') renderExplorer();
+      else if (activeTab === 'complementary') renderCompSupp();
+      else if (activeTab === 'transversal') renderTransversal();
+    }
+
+    window.addEventListener('resize', () => {
+      window.requestAnimationFrame(renderCurrentTab);
+    });
+
+    // Suppress non-breaking ResizeObserver loop warning in browser console
+    window.addEventListener('error', e => {
+      if (e.message && (
+        e.message.includes('ResizeObserver loop completed with undelivered notifications') ||
+        e.message.includes('ResizeObserver loop limit exceeded')
+      )) {
+        e.stopImmediatePropagation();
+      }
+    });
+
+    // ResizeObserver debounced via requestAnimationFrame to avoid loop notification errors
+    if (window.ResizeObserver) {
+      let rAF = null;
+      let lastSizes = new WeakMap();
+
+      const ro = new ResizeObserver(entries => {
+        let hasChanged = false;
+        for (const entry of entries) {
+          const width = Math.round(entry.contentRect.width);
+          const height = Math.round(entry.contentRect.height);
+          const prev = lastSizes.get(entry.target);
+          if (!prev || prev.w !== width || prev.h !== height) {
+            lastSizes.set(entry.target, { w: width, h: height });
+            hasChanged = true;
+          }
+        }
+
+        if (hasChanged) {
+          if (rAF) cancelAnimationFrame(rAF);
+          rAF = requestAnimationFrame(() => {
+            renderCurrentTab();
+          });
+        }
+      });
+
+      const c1 = document.getElementById('explorerCanvas');
+      const c2 = document.getElementById('compSuppCanvas');
+      const c3 = document.getElementById('transversalCanvas');
+      if (c1 && c1.parentElement) ro.observe(c1.parentElement);
+      if (c2 && c2.parentElement) ro.observe(c2.parentElement);
+      if (c3 && c3.parentElement) ro.observe(c3.parentElement);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateExplorerUI();
+      renderExplorer();
+      setPairHighlight('corresponding');
+      loadQuizQuestion();
+    });
+
+    window.onload = function() {
+      updateExplorerUI();
+      renderExplorer();
+      renderCompSupp();
+      renderTransversal();
+    };
+  </script>
+</body>
+</html>
