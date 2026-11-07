@@ -68,7 +68,7 @@
         <!-- Dynamic Instruction Banner -->
         <div id="instructionBanner" class="bg-indigo-700/80 px-4 py-1.5 rounded-full text-xs md:text-sm font-medium border border-indigo-400/40 flex items-center gap-2 shadow-inner">
             <i class="fa-solid fa-lightbulb text-yellow-300 text-base animate-pulse"></i>
-            <span id="instructionText">Click on grid intersections to start drawing a polygon!</span>
+            <span id="instructionText">Click or touch to start drawing a polygon!</span>
         </div>
 
         <!-- Action Quick Buttons -->
@@ -109,9 +109,7 @@
             <!-- Color Palette Selector -->
             <div>
                 <label class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block">Color Palette</label>
-                <div class="flex items-center gap-2 flex-wrap" id="colorPalette">
-                    <!-- Color swatches dynamically injected -->
-                </div>
+                <div class="flex items-center gap-2 flex-wrap" id="colorPalette"></div>
             </div>
 
             <!-- Grid Settings -->
@@ -152,7 +150,7 @@
 
                 <div id="inspectorEmptyState" class="text-center py-6 text-slate-400 text-xs flex flex-col items-center justify-center gap-2">
                     <i class="fa-solid fa-draw-polygon text-3xl opacity-40"></i>
-                    <span id="inspectorEmptyMsg">Switch to <strong>Select / Move</strong> mode and click a shape to inspect or delete it.</span>
+                    <span id="inspectorEmptyMsg">Switch to <strong>Select / Move</strong> mode and tap a shape to inspect or delete it.</span>
                 </div>
 
                 <div id="inspectorContent" class="hidden flex-col gap-2 text-xs">
@@ -182,7 +180,6 @@
                         <span id="valRegular" class="text-xs font-semibold text-slate-600">Irregular Polygon</span>
                     </div>
 
-                    <!-- Strictly visible delete button ONLY when shape is selected in Select Mode -->
                     <div id="inspectorDeleteArea" class="mt-2 pt-2 border-t border-indigo-100 hidden">
                         <button id="btnDeleteSelected" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-trash-can"></i> Delete Selected Shape
@@ -201,7 +198,7 @@
             <div class="notebook-container w-full h-full relative flex items-center justify-center border border-slate-300" id="canvasWrapper">
                 <canvas id="gridCanvas" class="w-full h-full block cursor-crosshair"></canvas>
 
-                <!-- Floating Canvas Overlay Delete Button (STRICTLY shows ONLY in Select Mode when shape selected) -->
+                <!-- Floating Canvas Overlay Delete Button -->
                 <button id="floatingDeleteBtn" class="absolute hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg border-2 border-white transition-transform transform -translate-x-1/2 -translate-y-1/2 hover:scale-105 items-center gap-1.5 z-20">
                     <i class="fa-solid fa-trash-can"></i> Delete
                 </button>
@@ -239,10 +236,12 @@
             mousePos: { x: 0, y: 0 },
             isDragging: false,
             dragStartPos: { x: 0, y: 0 },
-            dragInitialPoints: []
+            dragInitialPoints: [],
+            // Touch state tracking
+            isTouchActive: false,
+            touchCurrentNode: null
         };
 
-        // Translations mapping
         const punjabiMap = {
             "Triangle": "ਤਿਕੋਣ",
             "Equilateral Triangle": "ਸਮਭੁਜੀ ਤਿਕੋਣ",
@@ -267,7 +266,6 @@
             "Polygon": "ਬਹੁਭੁਜ"
         };
 
-        // Launch Game Function
         function launchGame() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
@@ -282,7 +280,6 @@
 
         function getBilingualName(name) {
             if (!name) return "Polygon / ਬਹੁਭੁਜ";
-            // Check for N-gon format
             if (name.endsWith("-gon")) {
                 const n = name.split("-")[0];
                 return `${name} / ${n}-ਭੁਜ`;
@@ -349,6 +346,15 @@
         }
 
         function getSnappedGridNode(canvasX, canvasY) {
+            // Proximity snap radius specifically targeting the starting node to make closing quadrilaterals easy
+            if (state.mode === 'draw' && state.currentPoints.length >= 3) {
+                const first = state.currentPoints[0];
+                const d = Math.hypot(canvasX - first.x, canvasY - first.y);
+                if (d < state.gridSize * 0.8) {
+                    return { gx: first.gx, gy: first.gy, x: first.x, y: first.y };
+                }
+            }
+
             const gx = Math.round(canvasX / state.gridSize);
             const gy = Math.round(canvasY / state.gridSize);
             return {
@@ -544,7 +550,6 @@
 
         function drawPolygons() {
             state.polygons.forEach((poly, index) => {
-                // Selection highlight ONLY applies in 'select' mode
                 const isSelected = (state.mode === 'select' && index === state.selectedPolygonIndex);
 
                 ctx.save();
@@ -555,12 +560,10 @@
                 });
                 ctx.closePath();
 
-                // Fill & Stroke
                 ctx.fillStyle = poly.color.fill;
                 ctx.fill();
 
                 if (isSelected) {
-                    // Outer glow when selected in select mode
                     ctx.shadowColor = 'rgba(99, 102, 241, 0.6)';
                     ctx.shadowBlur = 12;
                     ctx.strokeStyle = '#4f46e5';
@@ -572,11 +575,8 @@
                     ctx.setLineDash([]);
                 }
                 ctx.stroke();
-
-                // Reset shadow
                 ctx.shadowBlur = 0;
 
-                // Draw Vertices
                 poly.points.forEach(pt => {
                     ctx.beginPath();
                     ctx.arc(pt.x, pt.y, isSelected ? 5.5 : 4, 0, Math.PI * 2);
@@ -593,9 +593,7 @@
                     }
                 });
 
-                // Conditionally render shape name label badges above top vertex
                 if (state.showLabels) {
-                    // Find highest point (minimum Y) of the polygon
                     let topVertex = poly.points[0];
                     poly.points.forEach(pt => {
                         if (pt.y < topVertex.y) {
@@ -603,7 +601,6 @@
                         }
                     });
 
-                    // Calculate label positioning
                     const rawName = poly.classification.subType || poly.classification.name;
                     const labelText = getBilingualName(rawName);
                     
@@ -611,9 +608,8 @@
                     const textMetrics = ctx.measureText(labelText);
                     const badgeWidth = textMetrics.width + 16;
                     const badgeHeight = 22;
-                    const offsetY = 28; // Distance above topmost vertex
+                    const offsetY = 28;
 
-                    // Bound check top position to prevent canvas overflow
                     let labelY = topVertex.y - offsetY;
                     if (labelY < badgeHeight / 2 + 6) {
                         labelY = badgeHeight / 2 + 6;
@@ -623,7 +619,6 @@
                     const maxX = canvas.width - (badgeWidth / 2 + 6);
                     labelX = Math.max(minX, Math.min(maxX, labelX));
 
-                    // Draw leader line pointing down to top vertex
                     ctx.beginPath();
                     ctx.moveTo(labelX, labelY + badgeHeight / 2);
                     ctx.lineTo(topVertex.x, topVertex.y);
@@ -633,7 +628,6 @@
                     ctx.stroke();
                     ctx.setLineDash([]);
 
-                    // Draw label badge background
                     ctx.beginPath();
                     ctx.roundRect(
                         labelX - badgeWidth / 2,
@@ -655,7 +649,6 @@
                     ctx.shadowBlur = 0;
                     ctx.shadowOffsetY = 0;
 
-                    // Draw bilingual text inside badge
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = '#1e293b';
@@ -669,6 +662,8 @@
         function drawActiveDrawing() {
             if (state.currentPoints.length === 0) return;
 
+            const targetNode = state.isTouchActive ? state.touchCurrentNode : state.hoverGridNode;
+
             ctx.save();
             ctx.beginPath();
             state.currentPoints.forEach((pt, i) => {
@@ -676,8 +671,8 @@
                 else ctx.lineTo(pt.x, pt.y);
             });
 
-            if (state.hoverGridNode) {
-                ctx.lineTo(state.hoverGridNode.x, state.hoverGridNode.y);
+            if (targetNode) {
+                ctx.lineTo(targetNode.x, targetNode.y);
             }
 
             const activeColor = state.colors[state.activeColorIndex];
@@ -688,7 +683,7 @@
 
             state.currentPoints.forEach((pt, i) => {
                 ctx.beginPath();
-                ctx.arc(pt.x, pt.y, i === 0 ? 6 : 4.5, 0, Math.PI * 2);
+                ctx.arc(pt.x, pt.y, i === 0 ? 6.5 : 4.5, 0, Math.PI * 2);
                 ctx.fillStyle = i === 0 ? '#10b981' : activeColor.stroke;
                 ctx.fill();
                 ctx.strokeStyle = '#ffffff';
@@ -706,30 +701,69 @@
         }
 
         function drawHoverIndicator() {
-            if (!state.hoverGridNode || state.mode !== 'draw') return;
+            if (state.mode !== 'draw') return;
 
-            const node = state.hoverGridNode;
+            const node = state.isTouchActive ? state.touchCurrentNode : state.hoverGridNode;
+            if (!node) return;
+
             const isStartNode = state.currentPoints.length > 2 && 
                 state.currentPoints[0].gx === node.gx && 
                 state.currentPoints[0].gy === node.gy;
 
             ctx.save();
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, isStartNode ? 9 : 6, 0, Math.PI * 2);
-            ctx.fillStyle = isStartNode ? 'rgba(16, 185, 129, 0.4)' : 'rgba(99, 102, 241, 0.3)';
-            ctx.fill();
 
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, isStartNode ? 7 : 4, 0, Math.PI * 2);
-            ctx.fillStyle = isStartNode ? '#10b981' : '#6366f1';
-            ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            if (state.isTouchActive) {
+                // High-visibility touch reticle centered over target node
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, isStartNode ? 22 : 16, 0, Math.PI * 2);
+                ctx.fillStyle = isStartNode ? 'rgba(16, 185, 129, 0.25)' : 'rgba(99, 102, 241, 0.25)';
+                ctx.fill();
+                ctx.strokeStyle = isStartNode ? '#10b981' : '#6366f1';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
 
-            ctx.font = 'bold 11px Quicksand';
-            ctx.fillStyle = '#334155';
-            ctx.fillText(`(${node.gx}, ${node.gy})`, node.x + 10, node.y - 10);
+                ctx.beginPath();
+                ctx.moveTo(node.x - 12, node.y);
+                ctx.lineTo(node.x + 12, node.y);
+                ctx.moveTo(node.x, node.y - 12);
+                ctx.lineTo(node.x, node.y + 12);
+                ctx.strokeStyle = isStartNode ? '#059669' : '#4f46e5';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Elevation callout positioned above finger view
+                const calloutY = Math.max(30, node.y - 42);
+                const tag = isStartNode ? "Release to Close Shape!" : `(${node.gx}, ${node.gy})`;
+                ctx.font = 'bold 12px Quicksand, sans-serif';
+                const metrics = ctx.measureText(tag);
+
+                ctx.fillStyle = '#1e293b';
+                ctx.beginPath();
+                ctx.roundRect(node.x - (metrics.width + 16) / 2, calloutY - 12, metrics.width + 16, 24, 6);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(tag, node.x, calloutY);
+            } else {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, isStartNode ? 9 : 6, 0, Math.PI * 2);
+                ctx.fillStyle = isStartNode ? 'rgba(16, 185, 129, 0.4)' : 'rgba(99, 102, 241, 0.3)';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, isStartNode ? 7 : 4, 0, Math.PI * 2);
+                ctx.fillStyle = isStartNode ? '#10b981' : '#6366f1';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.font = 'bold 11px Quicksand';
+                ctx.fillStyle = '#334155';
+                ctx.fillText(`(${node.gx}, ${node.gy})`, node.x + 10, node.y - 10);
+            }
 
             ctx.restore();
         }
@@ -821,8 +855,6 @@
 
             state.polygons.push(newPoly);
             state.currentPoints = [];
-
-            // Do not select auto-created shape unless in select mode
             state.selectedPolygonIndex = -1;
 
             const nameDisplay = getBilingualName(classification.subType || classification.name);
@@ -839,14 +871,14 @@
                 if (state.selectedPolygonIndex !== -1) {
                     bannerText.textContent = "Shape selected! Drag to move, or click Delete to remove it.";
                 } else {
-                    bannerText.textContent = "Click on any polygon to select and inspect it.";
+                    bannerText.textContent = "Click or tap inside any polygon to inspect or drag it.";
                 }
             } else if (state.currentPoints.length === 0) {
-                bannerText.textContent = "Click on grid intersections to place vertices!";
+                bannerText.textContent = "Touch & drag to preview grid node, lift to place vertex!";
             } else if (state.currentPoints.length < 3) {
-                bannerText.textContent = `Placed ${state.currentPoints.length} point(s). Keep clicking nodes to add sides.`;
+                bannerText.textContent = `Placed ${state.currentPoints.length} point(s). Continue placing vertices.`;
             } else {
-                bannerText.textContent = "Click the starting point (green node) or 'Close Shape' to complete your polygon!";
+                bannerText.textContent = "Release on green starting node or tap 'Close Shape' to finish!";
             }
 
             const emptyState = document.getElementById('inspectorEmptyState');
@@ -854,7 +886,6 @@
             const inspectBadge = document.getElementById('inspectBadge');
             const inspectorDeleteArea = document.getElementById('inspectorDeleteArea');
 
-            // Delete buttons MUST strictly show ONLY when mode is 'select' AND a polygon is selected
             const hasActiveSelection = (state.mode === 'select' && state.selectedPolygonIndex !== -1 && state.polygons[state.selectedPolygonIndex]);
 
             if (hasActiveSelection) {
@@ -874,10 +905,8 @@
                 document.getElementById('valConvex').textContent = poly.isConvex ? "Convex / ਉੱਤਲ" : "Concave / ਅਵਤਲ";
                 document.getElementById('valRegular').textContent = poly.isRegular ? "Regular / ਨਿਯਮਿਤ" : "Irregular Polygon / ਅਨਿਯਮਿਤ ਬਹੁਭੁਜ";
 
-                // Show delete button in sidebar inspector
                 inspectorDeleteArea.classList.remove('hidden');
 
-                // Position floating delete button above selected shape center on canvas
                 const center = getPolygonCentroid(poly.points);
                 floatingDeleteBtn.style.left = `${center.x}px`;
                 floatingDeleteBtn.style.top = `${Math.max(20, center.y - 35)}px`;
@@ -891,30 +920,32 @@
                 inspectBadge.textContent = "None";
                 inspectBadge.className = "text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-slate-200 text-slate-600";
 
-                // Hide delete controls when not selected or in Draw mode
                 inspectorDeleteArea.classList.add('hidden');
                 floatingDeleteBtn.classList.add('hidden');
                 floatingDeleteBtn.classList.remove('flex');
             }
         }
 
-        function getPointerPos(e) {
+        function getCoordsFromEvent(e) {
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
             return {
                 x: clientX - rect.left,
                 y: clientY - rect.top
             };
         }
 
-        function handlePointerDown(e) {
-            const pos = getPointerPos(e);
+        // ================= TOUCH HANDLING (PANELS & TABLETS) =================
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const pos = getCoordsFromEvent(e);
             state.mousePos = pos;
+            state.isTouchActive = true;
 
             if (state.mode === 'draw') {
-                const node = getSnappedGridNode(pos.x, pos.y);
-                tryAddVertex(node);
+                state.touchCurrentNode = getSnappedGridNode(pos.x, pos.y);
+                draw();
             } else if (state.mode === 'select') {
                 let foundIndex = -1;
                 for (let i = state.polygons.length - 1; i >= 0; i--) {
@@ -923,24 +954,71 @@
                         break;
                     }
                 }
-
-                // Strictly select shape ONLY if clicked inside
                 state.selectedPolygonIndex = foundIndex;
-
                 if (foundIndex !== -1) {
-                    // Start dragging selected polygon
                     state.isDragging = true;
                     state.dragStartPos = getSnappedGridNode(pos.x, pos.y);
                     state.dragInitialPoints = state.polygons[foundIndex].points.map(p => ({ ...p }));
-                    canvas.style.cursor = "grabbing";
                 }
-
                 draw();
             }
-        }
+        }, { passive: false });
 
-        function handlePointerMove(e) {
-            const pos = getPointerPos(e);
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!state.isTouchActive) return;
+            const pos = getCoordsFromEvent(e);
+            state.mousePos = pos;
+
+            if (state.mode === 'draw') {
+                state.touchCurrentNode = getSnappedGridNode(pos.x, pos.y);
+                draw();
+            } else if (state.mode === 'select' && state.isDragging && state.selectedPolygonIndex !== -1) {
+                const currentGridNode = getSnappedGridNode(pos.x, pos.y);
+                const deltaGx = currentGridNode.gx - state.dragStartPos.gx;
+                const deltaGy = currentGridNode.gy - state.dragStartPos.gy;
+
+                const poly = state.polygons[state.selectedPolygonIndex];
+                poly.points = state.dragInitialPoints.map(p => {
+                    const newGx = p.gx + deltaGx;
+                    const newGy = p.gy + deltaGy;
+                    return {
+                        gx: newGx,
+                        gy: newGy,
+                        x: newGx * state.gridSize,
+                        y: newGy * state.gridSize
+                    };
+                });
+                draw();
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', (e) => {
+            if (!state.isTouchActive) return;
+
+            if (state.mode === 'draw') {
+                if (state.touchCurrentNode) {
+                    tryAddVertex(state.touchCurrentNode);
+                }
+                state.touchCurrentNode = null;
+            } else if (state.mode === 'select' && state.isDragging) {
+                state.isDragging = false;
+                if (state.selectedPolygonIndex !== -1) {
+                    const poly = state.polygons[state.selectedPolygonIndex];
+                    poly.area = calculatePolygonArea(poly.points);
+                    poly.perimeter = calculatePolygonPerimeter(poly.points);
+                    showToast("Polygon repositioned on grid.", "info");
+                }
+            }
+
+            state.isTouchActive = false;
+            draw();
+        });
+
+        // ================= MOUSE HANDLING (DESKTOP) =================
+        canvas.addEventListener('mousemove', (e) => {
+            if (state.isTouchActive) return;
+            const pos = getCoordsFromEvent(e);
             state.mousePos = pos;
 
             if (state.mode === 'draw') {
@@ -963,10 +1041,8 @@
                             y: newGy * state.gridSize
                         };
                     });
-
                     draw();
                 } else {
-                    // Update hover cursor over shapes
                     let isOverShape = false;
                     for (let i = state.polygons.length - 1; i >= 0; i--) {
                         if (isPointInPolygon(pos, state.polygons[i].points)) {
@@ -977,14 +1053,40 @@
                     canvas.style.cursor = isOverShape ? "grab" : "default";
                 }
             }
-        }
+        });
 
-        function handlePointerUp() {
+        canvas.addEventListener('mousedown', (e) => {
+            if (state.isTouchActive) return;
+            const pos = getCoordsFromEvent(e);
+
+            if (state.mode === 'draw') {
+                const node = getSnappedGridNode(pos.x, pos.y);
+                tryAddVertex(node);
+            } else if (state.mode === 'select') {
+                let foundIndex = -1;
+                for (let i = state.polygons.length - 1; i >= 0; i--) {
+                    if (isPointInPolygon(pos, state.polygons[i].points)) {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+                state.selectedPolygonIndex = foundIndex;
+
+                if (foundIndex !== -1) {
+                    state.isDragging = true;
+                    state.dragStartPos = getSnappedGridNode(pos.x, pos.y);
+                    state.dragInitialPoints = state.polygons[foundIndex].points.map(p => ({ ...p }));
+                    canvas.style.cursor = "grabbing";
+                }
+                draw();
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
             if (state.isDragging && state.selectedPolygonIndex !== -1) {
                 state.isDragging = false;
                 canvas.style.cursor = "grab";
                 
-                // Recalculate area and perimeter after move
                 const poly = state.polygons[state.selectedPolygonIndex];
                 poly.area = calculatePolygonArea(poly.points);
                 poly.perimeter = calculatePolygonPerimeter(poly.points);
@@ -992,22 +1094,6 @@
                 showToast("Polygon repositioned on grid.", "info");
                 draw();
             }
-        }
-
-        canvas.addEventListener('mousemove', handlePointerMove);
-        canvas.addEventListener('mousedown', handlePointerDown);
-        window.addEventListener('mouseup', handlePointerUp);
-
-        canvas.addEventListener('touchmove', (e) => {
-            handlePointerMove(e);
-        }, { passive: true });
-
-        canvas.addEventListener('touchstart', (e) => {
-            handlePointerDown(e);
-        }, { passive: true });
-
-        window.addEventListener('touchend', () => {
-            handlePointerUp();
         });
 
         // Delete buttons event handlers
@@ -1031,7 +1117,7 @@
         // Mode Switching Controls
         document.getElementById('modeDraw').addEventListener('click', () => {
             state.mode = 'draw';
-            state.selectedPolygonIndex = -1; // Deselect immediately when leaving select mode
+            state.selectedPolygonIndex = -1;
             document.getElementById('modeDraw').className = "py-2 px-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center justify-center gap-2 transition";
             document.getElementById('modeSelect').className = "py-2 px-3 rounded-xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-xs flex items-center justify-center gap-2 hover:border-slate-300 transition";
             canvas.style.cursor = "crosshair";
