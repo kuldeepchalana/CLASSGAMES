@@ -321,7 +321,7 @@
     <div class="player-bar">
       <div class="player-input-group">
         <label for="playerNameInput">👤 ਖਿਡਾਰੀ ਦਾ ਨਾਮ:</label>
-        <input type="text" id="playerNameInput" maxlength="25" placeholder="ਆਪਣਾ ਨਾਮ ਲਿਖੋ..." oninput="savePlayerName()">
+        <input type="text" id="playerNameInput" maxlength="25" placeholder="ਆਪਣਾ ਨਾਮ ਲਿਖੋ..." autocomplete="off" oninput="onNameInput()">
         <span class="name-warn" id="nameWarn">⚠️ ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਆਪਣਾ ਨਾਮ ਲਿਖੋ!</span>
       </div>
       <div class="timer-note">⏱️ ਹਰ ਪ੍ਰਸ਼ਨ ਲਈ 15 ਸਕਿੰਟ • 🔀 ਸ਼ਫ਼ਲ ਮੋਡ</div>
@@ -391,6 +391,18 @@
 </div>
 
 <script>
+// --- Fullscreen Helper ---
+function enterFullscreen() {
+  const elem = document.documentElement;
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    try {
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } catch (e) {}
+  }
+}
+
 // --- Web Audio API Sound Effects ---
 let soundOn = true;
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -799,17 +811,21 @@ let currentQIdx = 0;
 let score = 0;
 let streak = 0;
 let answered = false;
-let playerName = localStorage.getItem('pseb8_sci_player') || '';
+let playerName = '';
 let timerInterval = null;
 let timeLeft = TIME_LIMIT;
 let totalTimeUsed = 0;
 let lastRunId = null;
 
-document.getElementById('playerNameInput').value = playerName;
+function resetNameField() {
+  playerName = '';
+  const input = document.getElementById('playerNameInput');
+  input.value = '';
+  document.getElementById('nameWarn').style.display = 'none';
+}
 
-function savePlayerName() {
+function onNameInput() {
   playerName = document.getElementById('playerNameInput').value.trim();
-  localStorage.setItem('pseb8_sci_player', playerName);
   if (playerName) document.getElementById('nameWarn').style.display = 'none';
 }
 
@@ -945,13 +961,14 @@ function prepareShuffledQuestions(ch) {
 }
 
 function startChapter(idx) {
-  savePlayerName();
+  playerName = document.getElementById('playerNameInput').value.trim() || playerName;
   if (!playerName) {
     playSound('wrong');
     document.getElementById('nameWarn').style.display = 'inline';
     document.getElementById('playerNameInput').focus();
     return;
   }
+  enterFullscreen();
   playSound('click');
   currentChIdx = idx;
   activeQuestions = prepareShuffledQuestions(CHAPTERS[idx]);
@@ -1093,12 +1110,14 @@ function restartChapter() {
 function goHome() {
   stopTimer();
   playSound('click');
+  resetNameField();
   document.getElementById('quizScreen').classList.add('hidden');
   document.getElementById('resultScreen').classList.add('hidden');
   document.getElementById('homeScreen').classList.remove('hidden');
   renderHome();
 }
 
+resetNameField();
 renderHome();
 </script>
 </body>
