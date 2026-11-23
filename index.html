@@ -56,11 +56,46 @@
         
         h1 { margin: 0; font-size: 48px; letter-spacing: 2px; }
         .subtitle { font-size: 22px; margin-top: 10px; color: #b2dfdb; }
+
+        /* Category Filter Bar */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin: 35px auto 0 auto;
+            width: 95%;
+            max-width: 1200px;
+        }
+
+        .filter-btn {
+            padding: 14px 28px;
+            font-size: 20px;
+            font-weight: bold;
+            border: 3px solid #006064;
+            border-radius: 50px;
+            background: white;
+            color: #006064;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-3px);
+            background: #b2ebf2;
+        }
+
+        .filter-btn.active {
+            background: #006064;
+            color: white;
+            box-shadow: 0 6px 14px rgba(0,96,100,0.3);
+        }
         
         .container {
             max-width: 1200px;
             width: 95%;
-            margin: 50px auto;
+            margin: 35px auto 50px auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
@@ -87,12 +122,25 @@
             transform: translateY(-10px);
             box-shadow: 0 15px 30px rgba(0,0,0,0.15);
         }
+
+        .cat-badge {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #e0f2f1;
+            color: #006064;
+        }
         
         .icon { font-size: 70px; margin-bottom: 20px; }
         h2 { margin: 0 0 15px 0; font-size: 28px; color: #263238; }
         p { margin: 0; color: #607d8b; font-size: 18px; line-height: 1.4; }
         
         /* Card Colors */
+        .card-science7 { border-bottom-color: #14b8a6 !important; } /* 7th Science Quiz Color */
         .card-science8 { border-bottom-color: #0284c7 !important; } /* 8th Science Quiz Color */
         .card-science { border-bottom-color: #10b981 !important; } /* 6th Science Quiz Color */
         .card-angle { border-bottom-color: #4f46e5 !important; } /* Angle Master Color */
@@ -131,144 +179,182 @@
         <div class="subtitle">Interactive Classroom Activities</div>
     </header>
 
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterGames('All', this)">🌟 All Games</button>
+        <button class="filter-btn" onclick="filterGames('Maths', this)">📐 Maths</button>
+        <button class="filter-btn" onclick="filterGames('Science', this)">🔬 Science</button>
+        <button class="filter-btn" onclick="filterGames('English', this)">📖 English</button>
+        <button class="filter-btn" onclick="filterGames('Mindfulness', this)">🧘🏽‍♀️ Mindfulness</button>
+    </div>
+
     <div class="container" id="game-container">
 
+        <!-- NEW GAME: 7TH SCIENCE QUIZ -->
+        <a href="games/7thquiz.html" class="game-card card-science7" data-category="Science">
+            <span class="cat-badge">Science</span>
+            <div class="icon">🌿</div>
+            <h2>7th Science Quiz</h2>
+            <p>ਸੱਤਵੀਂ ਜਮਾਤ ਵਿਗਿਆਨ ਕੁਇਜ਼! All 13 chapters with 20 shuffled MCQs each, 15-second timers, and an all-time leaderboard.</p>
+        </a>
+
         <!-- NEW GAME: 8TH SCIENCE QUIZ -->
-        <a href="games/8thquiz.html" class="game-card card-science8">
+        <a href="games/8thquiz.html" class="game-card card-science8" data-category="Science">
+            <span class="cat-badge">Science</span>
             <div class="icon">🧪</div>
             <h2>8th Science Quiz</h2>
             <p>ਅੱਠਵੀਂ ਜਮਾਤ ਵਿਗਿਆਨ ਕੁਇਜ਼! All 13 chapters with 20 shuffled MCQs each, 15-second timers, and an all-time leaderboard.</p>
         </a>
 
         <!-- NEW GAME: 6TH SCIENCE QUIZ -->
-        <a href="games/6thquiz.html" class="game-card card-science">
+        <a href="games/6thquiz.html" class="game-card card-science" data-category="Science">
+            <span class="cat-badge">Science</span>
             <div class="icon">🔬</div>
             <h2>6th Science Quiz</h2>
             <p>ਛੇਵੀਂ ਜਮਾਤ ਵਿਗਿਆਨ ਕੁਇਜ਼! Chapter-wise MCQ quiz with 15-second timers and an all-time leaderboard.</p>
         </a>
         
         <!-- NEW GAME: ANGLE MASTER -->
-        <a href="games/anglemaster.html" class="game-card card-angle">
+        <a href="games/anglemaster.html" class="game-card card-angle" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">📐</div>
             <h2>Angle Master</h2>
             <p>ਕੋਣ ਮਾਸਟਰ! Interactive Protractor, Linear Pair, Complementary &amp; Supplementary angles, and Transversals with quiz.</p>
         </a>
 
         <!-- NEW GAME: SIMPLE EQUATIONS -->
-        <a href="games/simpleequations.html" class="game-card card-equations">
+        <a href="games/simpleequations.html" class="game-card card-equations" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">⚖️</div>
             <h2>Simple Equations</h2>
             <p>ਸਮੀਕਰਨ ਹੱਲ ਕਰੋ! Drag numbers across the equals sign, flip signs, and isolate the variable.</p>
         </a>
 
         <!-- GAME: GRAPH STUDIO -->
-        <a href="games/graphstudio.html" class="game-card card-graph">
+        <a href="games/graphstudio.html" class="game-card card-graph" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">📈</div>
             <h2>Graph Studio</h2>
             <p>Create, explore, and analyze mathematical graphs interactively!</p>
         </a>
 
         <!-- GAME: GEO SCRIBBLE -->
-        <a href="games/geoscribble.html" class="game-card card-geo">
+        <a href="games/geoscribble.html" class="game-card card-geo" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">🗺️</div>
             <h2>Geo Scribble</h2>
             <p>Draw and have fun with polygons.</p>
         </a>
         
         <!-- GAME: MINDFULNESS PROGRAMME -->
-        <a href="games/mindfulness.html" class="game-card card-mindfulness">
+        <a href="games/mindfulness.html" class="game-card card-mindfulness" data-category="Mindfulness">
+            <span class="cat-badge">Mindfulness</span>
             <div class="icon">🧘🏽‍♀️</div>
             <h2>Mindfulness Programme</h2>
             <p>Take a deep breath and relax. Guided exercises for calm and mental focus.</p>
         </a>
 
         <!-- GAME: WORD WAR 3 -->
-        <a href="games/wordwar3.html" class="game-card card-wordwar3">
+        <a href="games/wordwar3.html" class="game-card card-wordwar3" data-category="English">
+            <span class="cat-badge">English</span>
             <div class="icon">🎖️🎖️🎖️</div>
             <h2>Word War 3</h2>
             <p>The Grid Battle! Find adjacent letters to unlock dictionary meanings and Punjabi translations. Race to 40!</p>
         </a>
 
         <!-- GAME: MONEY MATH 2 -->
-        <a href="games/moneymath2.html" class="game-card card-money2">
+        <a href="games/moneymath2.html" class="game-card card-money2" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">💵</div>
             <h2>Money Math 2</h2>
             <p>Master Class! Build precise complex amounts using all denominations from ₹1 to ₹2000.</p>
         </a>
 
-        <a href="games/money_math.html" class="game-card card-money">
+        <a href="games/money_math.html" class="game-card card-money" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">💰</div>
             <h2>Money Math</h2>
             <p>Rupee Duel! Practice counting currency in Single or 2-Player modes.</p>
         </a>
 
-        <a href="games/word_war_1.html" class="game-card card-wordwar">
+        <a href="games/word_war_1.html" class="game-card card-wordwar" data-category="English">
+            <span class="cat-badge">English</span>
             <div class="icon">🎖️</div>
             <h2>Word War 1</h2>
             <p>2-Player Battle! Jumbled words and 8-bit music. Drag 3 letters to win!</p>
         </a>
 
-        <a href="games/word_war_2.html" class="game-card card-wordwar2">
+        <a href="games/word_war_2.html" class="game-card card-wordwar2" data-category="English">
+            <span class="cat-badge">English</span>
             <div class="icon">🎖️🎖️</div>
             <h2>Word War 2</h2>
             <p>The Siege! Master 100 common 4-letter words in this intense 2-player duel.</p>
         </a>
 
-        <a href="games/grammar_gladiator.html" class="game-card card-gladiator">
+        <a href="games/grammar_gladiator.html" class="game-card card-gladiator" data-category="English">
+            <span class="cat-badge">English</span>
             <div class="icon">🤺</div>
             <h2>Grammar Gladiator</h2>
             <p>ਵਿਆਕਰਣ ਦੇ ਯੋਧੇ: 90s English Duel with Punjabi translations!</p>
         </a>
 
-        <a href="games/factor_ninja.html" class="game-card card-ninja">
+        <a href="games/factor_ninja.html" class="game-card card-ninja" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">⚔</div>
             <h2>Factor Ninja</h2>
             <p>3D Duel! Be the fastest Ninja to tap the factors of the target number.</p>
         </a>
 
-        <a href="games/magic_square.html" class="game-card card-magic">
+        <a href="games/magic_square.html" class="game-card card-magic" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">🔮</div>
             <h2>Magic Square Duel</h2>
             <p>Split-Screen Challenge! Be the fastest to complete the 3x3 Magic Square.</p>
         </a>
 
-        <a href="games/number_blocks.html" class="game-card card-blocks">
+        <a href="games/number_blocks.html" class="game-card card-blocks" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">🧱</div>
             <h2>Number Blocks</h2>
             <p>60s Sprint! Drag tens and ones to build the goal number fast!</p>
         </a>
 
-        <a href="games/MathTugOfWar.html" class="game-card card-math">
+        <a href="games/MathTugOfWar.html" class="game-card card-math" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">🪢</div>
             <h2>Math Tug of War</h2>
             <p>Test your math skills in an exciting tug of war battle!</p>
         </a>
 
-        <a href="games/spell_bee.html" class="game-card card-spell">
+        <a href="games/spell_bee.html" class="game-card card-spell" data-category="English">
+            <span class="cat-badge">English</span>
             <div class="icon">🐝</div>
             <h2>Spell Bee</h2>
             <p>Practice your spelling and phonics step by step.</p>
         </a>
 
-        <a href="games/learn_addition.html" class="game-card card-add">
+        <a href="games/learn_addition.html" class="game-card card-add" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">➕</div>
             <h2>Learn Addition</h2>
             <p>Master the basics of addition with visual tools.</p>
         </a>
 
-        <a href="games/number_system.html" class="game-card card-number">
+        <a href="games/number_system.html" class="game-card card-number" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">🔢</div>
             <h2>Number System</h2>
             <p>ਸੰਖਿਆਵਾਂ ਦੀ ਖੇਡ - Master Natural, Whole, and Integers!</p>
         </a>
 
-        <a href="games/counting.html" class="game-card card-count">
+        <a href="games/counting.html" class="game-card card-count" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">💯</div>
             <h2>Count to 100!</h2>
             <p>Find the missing numbers at your own pace.</p>
         </a>
 
-        <a href="games/math_balloons.html" class="game-card card-balloon">
+        <a href="games/math_balloons.html" class="game-card card-balloon" data-category="Maths">
+            <span class="cat-badge">Maths</span>
             <div class="icon">🎈</div>
             <h2>Math Balloons</h2>
             <p>Split-Screen! Compete head-to-head to pop the correct addition problems.</p>
@@ -286,6 +372,20 @@
                 elem.msRequestFullscreen();
             }
             document.getElementById('launcher').style.display = 'none';
+        }
+
+        function filterGames(category, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                if (category === 'All' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
