@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8ਵੀਂ ਗਣਿਤ - 260 MCQ ਕਵਿਜ਼ ਗੇਮ</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-hover: #334155;
+    --accent: #fb7185;
+    --accent2: #fbbf24;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --gold: #facc15;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Gurmukhi', 'Raavi', system-ui, sans-serif; }
+  body {
+    background: radial-gradient(circle at top, #4c0519 0%, #0f172a 65%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: rgba(15, 23, 42, 0.92);
+    border-bottom: 2px solid #334155;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .title-wrap h1 { font-size: 1.5rem; color: var(--accent); }
+  .title-wrap p { font-size: 0.9rem; color: var(--muted); }
+  .top-btns { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-menu { background: #fb7185; color: #0f172a; }
+  .btn-menu:hover { background: #fda4af; }
+  .btn-hub { background: #f59e0b; color: #0f172a; }
+  .btn-hub:hover { background: #fbbf24; }
+  .btn-sound { background: #334155; color: var(--text); }
+  .btn-sound:hover { background: #475569; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0f172a; }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-lb { background: rgba(250, 204, 21, 0.16); color: var(--gold); border: 1px solid rgba(250, 204, 21, 0.4); padding: 6px 12px; font-size: 0.88rem; border-radius: 10px; }
+  .btn-lb:hover { background: rgba(250, 204, 21, 0.28); }
+
+  main { flex: 1; padding: 20px 28px; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+  /* Player Name Bar */
+  .player-bar {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 16px;
+    padding: 16px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .player-input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+  .player-input-group label { font-size: 1.1rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .player-input-group input {
+    background: #0f172a;
+    color: var(--text);
+    border: 2px solid #475569;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-width: 240px;
+    max-width: 360px;
+    flex: 1;
+    outline: none;
+  }
+  .player-input-group input:focus { border-color: var(--accent); }
+  .name-warn { color: #f87171; font-size: 0.95rem; font-weight: 700; display: none; }
+  .timer-note { color: var(--muted); font-size: 0.95rem; font-weight: 600; }
+
+  /* Chapter Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .ch-card {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 16px;
+    padding: 18px;
+    transition: transform 0.18s, border-color 0.2s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 138px;
+  }
+  .ch-card:hover { transform: translateY(-3px); border-color: var(--accent); background: #2d2030; }
+  .ch-clickable { cursor: pointer; flex: 1; }
+  .ch-num { font-size: 0.85rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .ch-title { font-size: 1.15rem; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
+  .ch-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid #334155; }
+  .badge { background: rgba(251, 113, 133, 0.16); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
+  .badge.done { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+
+  /* Quiz Screen */
+  .hidden { display: none !important; }
+  .quiz-wrap { max-width: 1020px; margin: 0 auto; }
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .quiz-stats { display: flex; gap: 10px; font-size: 1rem; font-weight: 700; flex-wrap: wrap; }
+  .stat-pill { background: var(--card); padding: 8px 14px; border-radius: 12px; border: 1px solid #334155; }
+  .timer-pill {
+    background: rgba(251, 113, 133, 0.18);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    min-width: 105px;
+    text-align: center;
+  }
+  .timer-pill.danger {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: var(--wrong);
+    color: #fca5a5;
+    animation: pulse 0.6s infinite alternate;
+  }
+  @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.06); } }
+
+  .progress-bar {
+    height: 10px;
+    background: #334155;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  .timer-bar {
+    height: 7px;
+    background: #1e293b;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .timer-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 100%;
+    transition: width 1s linear, background 0.3s;
+  }
+  .timer-fill.danger { background: var(--wrong); }
+
+  .q-box {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 18px;
+  }
+  .q-chapter { font-size: 0.95rem; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+  .q-text { font-size: 1.5rem; font-weight: 700; line-height: 1.5; }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 720px) { .options { grid-template-columns: 1fr; } .q-text { font-size: 1.25rem; } }
+  .opt-btn {
+    background: var(--card);
+    color: var(--text);
+    border: 2px solid #475569;
+    border-radius: 16px;
+    padding: 18px 20px;
+    font-size: 1.18rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #273549; transform: translateY(-2px); }
+  .opt-btn:disabled { cursor: default; }
+  .opt-tag {
+    min-width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .opt-btn.correct { background: rgba(34, 197, 94, 0.22); border-color: var(--correct); }
+  .opt-btn.correct .opt-tag { background: var(--correct); color: #0f172a; }
+  .opt-btn.wrong { background: rgba(239, 68, 68, 0.22); border-color: var(--wrong); }
+  .opt-btn.wrong .opt-tag { background: var(--wrong); color: #fff; }
+
+  .quiz-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 52px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .feedback { font-size: 1.18rem; font-weight: 700; }
+  .feedback.ok { color: #4ade80; }
+  .feedback.no { color: #f87171; }
+
+  /* Result Screen */
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 16px auto;
+  }
+  @media (max-width: 860px) { .result-grid { grid-template-columns: 1fr; } }
+  .result-card, .lb-panel {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 22px;
+    padding: 28px;
+  }
+  .result-card { border-color: var(--accent); text-align: center; }
+  .stars { font-size: 2.8rem; margin-bottom: 8px; color: var(--gold); }
+  .result-player { font-size: 1.15rem; color: var(--gold); font-weight: 700; margin-bottom: 6px; }
+  .result-score { font-size: 2.6rem; font-weight: 800; color: var(--accent); margin: 10px 0; }
+  .result-msg { font-size: 1.1rem; color: var(--muted); margin-bottom: 22px; }
+  .result-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+  /* Leaderboard Table */
+  .lb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
+  .lb-header h3 { font-size: 1.25rem; color: var(--gold); }
+  .lb-table { width: 100%; border-collapse: collapse; font-size: 0.98rem; }
+  .lb-table th, .lb-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #334155; }
+  .lb-table th { color: var(--muted); font-size: 0.88rem; }
+  .lb-table tr.me { background: rgba(251, 113, 133, 0.16); font-weight: 700; }
+  .lb-empty { color: var(--muted); text-align: center; padding: 28px 10px; font-size: 1.05rem; }
+
+  /* Modal */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .modal-box {
+    background: var(--card);
+    border: 2px solid var(--gold);
+    border-radius: 22px;
+    padding: 24px 28px;
+    width: 100%;
+    max-width: 620px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-wrap">
+    <h1>📊 8ਵੀਂ ਗਣਿਤ — ਮੈਗਾ ਕਵਿਜ਼ ਗੇਮ</h1>
+    <p>PSEB (13 ਅਧਿਆਇ × 20 MCQ = 260 ਪ੍ਰਸ਼ਨ)</p>
+  </div>
+  <div class="top-btns">
+    <button class="btn btn-sound" id="soundToggle" onclick="toggleSound()">🔊 ਆਵਾਜ਼: ਚਾਲੂ</button>
+    <button class="btn btn-menu" onclick="goHome()">📋 Back to Menu</button>
+    <a class="btn btn-hub" href="../index.html" onclick="playSound('click')">🏠 Back to Hub</a>
+  </div>
+</header>
+
+<main>
+  <!-- Home / Chapter Selection -->
+  <section id="homeScreen">
+    <div class="player-bar">
+      <div class="player-input-group">
+        <label for="playerNameInput">👤 ਖਿਡਾਰੀ ਦਾ ਨਾਮ:</label>
+        <input type="text" id="playerNameInput" maxlength="25" placeholder="ਆਪਣਾ ਨਾਮ ਲਿਖੋ..." autocomplete="off" oninput="onNameInput()">
+        <span class="name-warn" id="nameWarn">⚠️ ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਆਪਣਾ ਨਾਮ ਲਿਖੋ!</span>
+      </div>
+      <div class="timer-note">⏱️ ਹਰ ਪ੍ਰਸ਼ਨ ਲਈ 15 ਸਕਿੰਟ • 🔀 ਸ਼ਫ਼ਲ ਮੋਡ</div>
+    </div>
+    <div class="grid" id="chapterGrid"></div>
+  </section>
+
+  <!-- Quiz Screen -->
+  <section id="quizScreen" class="quiz-wrap hidden">
+    <div class="quiz-top">
+      <button class="btn btn-menu" onclick="goHome()">⬅️ Back to Menu</button>
+      <div class="quiz-stats">
+        <div class="stat-pill">👤 <span id="activePlayer"></span></div>
+        <div class="stat-pill">ਪ੍ਰਸ਼ਨ: <span id="qCount">1/20</span></div>
+        <div class="stat-pill">ਸਕੋਰ: <span id="scoreVal">0</span></div>
+        <div class="stat-pill">🔥 <span id="streakVal">0</span></div>
+        <div class="stat-pill timer-pill" id="timerPill">⏱️ 15s</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+    <div class="q-box">
+      <div class="q-chapter" id="qChapter"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="options" id="optionsBox"></div>
+    <div class="quiz-footer">
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">ਅਗਲਾ ਪ੍ਰਸ਼ਨ ➡️</button>
+    </div>
+  </section>
+
+  <!-- Result Screen -->
+  <section id="resultScreen" class="hidden">
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="stars" id="resultStars">⭐⭐⭐</div>
+        <div class="result-player" id="resultPlayer"></div>
+        <h2 id="resultChapter"></h2>
+        <div class="result-score" id="resultScore">0 / 20</div>
+        <p class="result-msg" id="resultMsg"></p>
+        <div class="result-btns">
+          <button class="btn btn-primary" onclick="restartChapter()">🔄 ਦੁਬਾਰਾ ਖੇਡੋ</button>
+          <button class="btn btn-menu" onclick="goHome()">📋 Back to Menu</button>
+          <a class="btn btn-hub" href="../index.html" onclick="playSound('click')">🏠 Back to Hub</a>
+        </div>
+      </div>
+      <div class="lb-panel">
+        <div class="lb-header">
+          <h3 id="resultLbTitle">🏆 ਆਲ-ਟਾਈਮ ਲੀਡਰਬੋਰਡ</h3>
+        </div>
+        <div id="resultLbBody"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Leaderboard Modal -->
+<div class="modal-bg hidden" id="lbModal" onclick="closeModalBg(event)">
+  <div class="modal-box">
+    <div class="lb-header">
+      <h3 id="modalLbTitle">🏆 ਲੀਡਰਬੋਰਡ</h3>
+      <button class="btn btn-sound" onclick="closeLbModal()">✖ ਬੰਦ ਕਰੋ</button>
+    </div>
+    <div id="modalLbBody"></div>
+  </div>
+</div>
+
+<script>
+// --- Fullscreen Helper ---
+function enterFullscreen() {
+  const elem = document.documentElement;
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    try {
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } catch (e) {}
+  }
+}
+
+// --- Web Audio API Sound Effects ---
+let soundOn = true;
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+function initAudio() { if (!ctx) ctx = new AudioCtx(); if (ctx.state === 'suspended') ctx.resume(); }
+
+function playSound(type) {
+  if (!soundOn) return;
+  initAudio();
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  if (type === 'click') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(520, now);
+    gain.gain.setValueAtTime(0.11, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    osc.start(now); osc.stop(now + 0.08);
+  } else if (type === 'tick') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now);
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    osc.start(now); osc.stop(now + 0.05);
+  } else if (type === 'correct') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, now);
+    osc.frequency.setValueAtTime(659.25, now + 0.08);
+    osc.frequency.setValueAtTime(783.99, now + 0.16);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc.start(now); osc.stop(now + 0.35);
+  } else if (type === 'wrong') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.linearRampToValueAtTime(140, now + 0.25);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+    osc.start(now); osc.stop(now + 0.28);
+  } else if (type === 'win') {
+    [523, 659, 784, 1046].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.setValueAtTime(f, now + i * 0.11);
+      g.gain.setValueAtTime(0.16, now + i * 0.11);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now + i * 0.11); o.stop(now + i * 0.11 + 0.3);
+    });
+  }
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('soundToggle').textContent = soundOn ? '🔊 ਆਵਾਜ਼: ਚਾਲੂ' : '🔇 ਆਵਾਜ਼: ਬੰਦ';
+  if (soundOn) playSound('click');
+}
+
+// --- Fisher-Yates Shuffle ---
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// --- 13 Chapters × 20 MCQs = 260 Questions (PSEB Class 8 Maths 2025-26) ---
+const CHAPTERS = [
+  {
+    id: 1, title: "ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ",
+    q: [
+      ["ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ ਲਈ ਜੋੜ ਦਾ ਤਤਸਮਕ (Additive Identity) ਕੀ ਹੈ?", ["1", "0", "-1", "10"], 1],
+      ["ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ ਲਈ ਗੁਣਾ ਦਾ ਤਤਸਮਕ (Multiplicative Identity) ਕੀ ਹੈ?", ["0", "1", "-1", "2"], 1],
+      ["-5/9 ਦਾ ਜੋੜਾਤਮਕ ਉਲਟ (Additive Inverse) ਕੀ ਹੈ?", ["5/9", "-9/5", "9/5", "0"], 0],
+      ["-7/11 ਦਾ ਗੁਣਾਤਮਕ ਉਲਟ (Reciprocal) ਕੀ ਹੈ?", ["7/11", "-11/7", "11/7", "1"], 1],
+      ["ਕਿਹੜੀ ਪਰਿਮੇਯ ਸੰਖਿਆ ਦਾ ਕੋਈ ਉਲਟਕ੍ਰਮ (Reciprocal) ਨਹੀਂ ਹੁੰਦਾ?", ["1", "-1", "0", "1/2"], 2],
+      ["ਕਿਹੜੀਆਂ ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ ਆਪਣੇ ਉਲਟਕ੍ਰਮ ਦੇ ਬਰਾਬਰ ਹੁੰਦੀਆਂ ਹਨ?", ["0 ਅਤੇ 1", "1 ਅਤੇ -1", "2 ਅਤੇ -2", "ਸਿਰਫ਼ 0"], 1],
+      ["a + b = b + a ਕਿਹੜੇ ਗੁਣ ਨੂੰ ਦਰਸਾਉਂਦਾ ਹੈ?", ["ਜੋੜ ਦਾ ਕ੍ਰਮ-ਵਟਾਂਦਰਾ ਗੁਣ", "ਸਹਿਚਾਰਤਾ ਗੁਣ", "ਵੰਡਕਾਰੀ ਗੁਣ", "ਬੰਦ ਗੁਣ"], 0],
+      ["a × (b + c) = a × b + a × c ਕਿਹੜਾ ਗੁਣ ਹੈ?", ["ਕ੍ਰਮ-ਵਟਾਂਦਰਾ ਗੁਣ", "ਵੰਡਕਾਰੀ ਗੁਣ (Distributive)", "ਸਹਿਚਾਰਤਾ ਗੁਣ", "ਤਤਸਮਕ ਗੁਣ"], 1],
+      ["(3/5) × (5/3) ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["0", "1", "15/15", "9/25"], 1],
+      ["(-2/7) × 0 ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["-2/7", "0", "1", "2/7"], 1],
+      ["ਦੋ ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ ਦਾ ਗੁਣਨਫਲ ਹਮੇਸ਼ਾ ਕੀ ਹੁੰਦਾ ਹੈ?", ["ਪਰਿਮੇਯ ਸੰਖਿਆ", "ਅਪਰਿਮੇਯ ਸੰਖਿਆ", "0", "1"], 0],
+      ["(-4/5) × 1 = 1 × (-4/5) = -4/5 ਵਿੱਚ 1 ਕੀ ਹੈ?", ["ਗੁਣਾਤਮਕ ਤਤਸਮਕ", "ਜੋੜਾਤਮਕ ਤਤਸਮਕ", "ਉਲਟਕ੍ਰਮ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["-1/2 ਦਾ ਗੁਣਾਤਮਕ ਉਲਟ ਕੀ ਹੈ?", ["2", "-2", "1/2", "0"], 1],
+      ["(2/3) + (-2/3) ਦਾ ਮੁੱਲ ਕੀ ਹੁੰਦਾ ਹੈ?", ["4/3", "0", "1", "-4/3"], 1],
+      ["ਦੋ ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ ਵਿਚਕਾਰ ਕਿੰਨੀਆਂ ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ ਹੁੰਦੀਆਂ ਹਨ?", ["1", "10", "0", "ਅਣਗਿਣਤ"], 3],
+      ["ਕਿਹੜੀ ਪਰਿਮੇਯ ਸੰਖਿਆ ਆਪਣੇ ਰਿਣਾਤਮਕ (Negative) ਦੇ ਬਰਾਬਰ ਹੁੰਦੀ ਹੈ?", ["1", "-1", "0", "2"], 2],
+      ["ਪਰਿਮੇਯ ਸੰਖਿਆਵਾਂ ਕਿਸ ਕਿਰਿਆ ਅਧੀਨ ਬੰਦ (Closed) ਨਹੀਂ ਹੁੰਦੀਆਂ?", ["ਜੋੜ", "ਘਟਾਓ", "ਗੁਣਾ", "ਭਾਗ (0 ਨਾਲ ਭਾਗ ਕਰਕੇ)"], 3],
+      ["(-3/8) × (-7/13) ਦਾ ਚਿੰਨ੍ਹ ਕਿਹੋ ਜਿਹਾ ਹੋਵੇਗਾ?", ["ਧਨਾਤਮਕ (+)", "ਰਿਣਾਤਮਕ (-)", "0", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["(5/7) ÷ (5/7) ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["0", "1", "25/49", "5/7"], 1],
+      ["ਜੇ x + 0 = x ਹੋਵੇ, ਤਾਂ 0 ਕੀ ਅਖਵਾਉਂਦਾ ਹੈ?", ["ਜੋੜਾਤਮਕ ਤਤਸਮਕ", "ਗੁਣਾਤਮਕ ਤਤਸਮਕ", "ਉਲਟਕ੍ਰਮ", "ਚੱਲ"], 0]
+    ]
+  },
+  {
+    id: 2, title: "ਇੱਕ ਚੱਲ ਵਾਲੇ ਰੇਖੀ ਸਮੀਕਰਨ",
+    q: [
+      ["ਇੱਕ ਚੱਲ ਵਾਲੇ ਰੇਖੀ ਸਮੀਕਰਨ ਵਿੱਚ ਚੱਲ ਦੀ ਵੱਧ ਤੋਂ ਵੱਧ ਘਾਤ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["0", "1", "2", "3"], 1],
+      ["ਸਮੀਕਰਨ 3x = 2x + 18 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 18", "x = 9", "x = 6", "x = 36"], 0],
+      ["ਸਮੀਕਰਨ 5t - 3 = 3t - 5 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["t = 1", "t = -1", "t = 2", "t = -2"], 1],
+      ["ਸਮੀਕਰਨ 4z + 3 = 6 + 2z ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["z = 3/2", "z = 2/3", "z = 3", "z = 9/2"], 0],
+      ["ਸਮੀਕਰਨ 2x - 1 = 14 - x ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 5", "x = 15", "x = 3", "x = 13"], 0],
+      ["ਸਮੀਕਰਨ 2y + 5/3 = 26/3 - y ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["y = 7/3", "y = 3/7", "y = 7", "y = 3"], 0],
+      ["ਸਮੀਕਰਨ 3m = 5m - 8/5 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["m = 4/5", "m = 5/4", "m = -4/5", "m = 8/5"], 0],
+      ["ਸਮੀਕਰਨ x/2 - 1/5 = x/3 + 1/4 ਵਿੱਚ x ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["27/10", "10/27", "9/10", "27/5"], 0],
+      ["ਸਮੀਕਰਨ 3(t - 3) = 5(2t + 1) ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["t = -2", "t = 2", "t = -1", "t = 1"], 0],
+      ["ਸਮੀਕਰਨ 5x + 9 = 5 + 3x ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 2", "x = -2", "x = 7", "x = -7"], 1],
+      ["ਸਮੀਕਰਨ 8x + 4 = 3(x - 1) + 7 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 0", "x = 1", "x = -1", "x = 2"], 0],
+      ["ਸਮੀਕਰਨ x = 4/5 (x + 10) ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 40", "x = 10", "x = 20", "x = 50"], 0],
+      ["ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕਿਹੜਾ ਰੇਖੀ ਸਮੀਕਰਨ (Linear Equation) ਨਹੀਂ ਹੈ?", ["2x + 3 = 7", "x² + 1 = 5", "3y = y + 4", "m/2 = 6"], 1],
+      ["ਸਮੀਕਰਨ (x - 5)/3 = (x - 3)/5 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 8", "x = 4", "x = 2", "x = 16"], 0],
+      ["ਸਮੀਕਰਨ 6x + 1 = 2x + 9 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 2", "x = 4", "x = 8", "x = 1"], 0],
+      ["ਸਮੀਕਰਨ 0.25(4f - 3) = 0.05(10f - 9) ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["f = 0.6", "f = 0.5", "f = 1.2", "f = 0.3"], 0],
+      ["ਸਮੀਕਰਨ 2x/3 + 1 = 7x/15 + 3 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 10", "x = 5", "x = 15", "x = 20"], 0],
+      ["ਇੱਕ ਚੱਲ ਵਾਲੇ ਰੇਖੀ ਸਮੀਕਰਨ ਦੇ ਕਿੰਨੇ ਹੱਲ ਹੁੰਦੇ ਹਨ?", ["ਸਿਰਫ਼ 1 (ਵਿਲੱਖਣ)", "2", "0", "ਅਣਗਿਣਤ"], 0],
+      ["ਸਮੀਕਰਨ 7x - 9 = 16 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 25/7", "x = 7/25", "x = 1", "x = 3"], 0],
+      ["ਸਮੀਕਰਨ 4x - 2 = 2x + 6 ਦਾ ਹੱਲ ਕੀ ਹੈ?", ["x = 4", "x = 2", "x = 8", "x = 3"], 0]
+    ]
+  },
+  {
+    id: 3, title: "ਚਤੁਰਭੁਜਾਂ ਨੂੰ ਸਮਝਣਾ",
+    q: [
+      ["ਕਿਸੇ ਚਤੁਰਭੁਜ ਦੇ ਚਾਰੇ ਅੰਦਰਲੇ ਕੋਣਾਂ ਦਾ ਜੋੜ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["180°", "270°", "360°", "540°"], 2],
+      ["ਕਿਸੇ ਵੀ ਬਹੁਭੁਜ (Polygon) ਦੇ ਸਾਰੇ ਬਾਹਰੀ ਕੋਣਾਂ ਦਾ ਜੋੜ ਹਮੇਸ਼ਾ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["180°", "360°", "540°", "720°"], 1],
+      ["n ਭੁਜਾਵਾਂ ਵਾਲੀ ਬਹੁਭੁਜ ਦੇ ਅੰਦਰਲੇ ਕੋਣਾਂ ਦੇ ਜੋੜ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["(n - 2) × 180°", "n × 180°", "(n + 2) × 180°", "360° / n"], 0],
+      ["ਪੰਜਭੁਜ (Pentagon) ਦੇ ਅੰਦਰਲੇ ਕੋਣਾਂ ਦਾ ਜੋੜ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["360°", "540°", "720°", "900°"], 1],
+      ["ਛੇਭੁਜ (Hexagon) ਦੇ ਅੰਦਰਲੇ ਕੋਣਾਂ ਦਾ ਜੋੜ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["540°", "720°", "900°", "360°"], 1],
+      ["9 ਭੁਜਾਵਾਂ ਵਾਲੀ ਨਿਯਮਿਤ ਬਹੁਭੁਜ ਦੇ ਹਰੇਕ ਬਾਹਰੀ ਕੋਣ ਦਾ ਮਾਪ ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["40°", "45°", "60°", "36°"], 0],
+      ["ਜੇ ਕਿਸੇ ਨਿਯਮਿਤ ਬਹੁਭੁਜ ਦਾ ਹਰੇਕ ਬਾਹਰੀ ਕੋਣ 45° ਹੈ, ਤਾਂ ਉਸ ਦੀਆਂ ਕਿੰਨੀਆਂ ਭੁਜਾਵਾਂ ਹਨ?", ["6", "8", "9", "10"], 1],
+      ["ਸਮਾਂਤਰ ਚਤੁਰਭੁਜ (Parallelogram) ਦੇ ਸਨਮੁੱਖ ਕੋਣ ਕਿਹੋ ਜਿਹੇ ਹੁੰਦੇ ਹਨ?", ["ਬਰਾਬਰ", "90°", "180°", "ਵੱਖ-ਵੱਖ"], 0],
+      ["ਸਮਾਂਤਰ ਚਤੁਰਭੁਜ ਦੇ ਲਾਗਵੇਂ ਕੋਣਾਂ (Adjacent Angles) ਦਾ ਜੋੜ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["90°", "180°", "360°", "120°"], 1],
+      ["ਸਮਾਂਤਰ ਚਤੁਰਭੁਜ ਦੇ ਵਿਕਰਣ ਇੱਕ-ਦੂਜੇ ਨੂੰ ਕੀ ਕਰਦੇ ਹਨ?", ["ਸਮਦੁਭਾਜਿਤ (Bisect)", "ਲੰਬ ਹੁੰਦੇ ਹਨ", "ਬਰਾਬਰ ਹੁੰਦੇ ਹਨ", "ਕਦੇ ਨਹੀਂ ਕੱਟਦੇ"], 0],
+      ["ਸਮਚਤੁਰਭੁਜ (Rhombus) ਦੇ ਵਿਕਰਣ ਇੱਕ-ਦੂਜੇ ਨੂੰ ਕਿੰਨੇ ਡਿਗਰੀ 'ਤੇ ਸਮਦੁਭਾਜਿਤ ਕਰਦੇ ਹਨ?", ["60°", "90°", "120°", "180°"], 1],
+      ["ਆਇਤ (Rectangle) ਦੇ ਵਿਕਰਣ ਲੰਬਾਈ ਵਿੱਚ ਕਿਹੋ ਜਿਹੇ ਹੁੰਦੇ ਹਨ?", ["ਬਰਾਬਰ", "ਵੱਖ-ਵੱਖ", "ਦੁੱਗਣੇ", "ਅੱਧੇ"], 0],
+      ["ਜਿਸ ਚਤੁਰਭੁਜ ਦੀਆਂ ਸਨਮੁੱਖ ਭੁਜਾਵਾਂ ਦਾ ਸਿਰਫ਼ ਇੱਕ ਜੋੜਾ ਸਮਾਂਤਰ ਹੋਵੇ:", ["ਸਮਾਂਤਰ ਚਤੁਰਭੁਜ", "ਸਮਲੰਬ ਚਤੁਰਭੁਜ (Trapezium)", "ਪਤੰਗ", "ਵਰਗ"], 1],
+      ["ਪਤੰਗ (Kite) ਵਿੱਚ ਲਾਗਵੀਆਂ ਭੁਜਾਵਾਂ ਦੇ ਕਿੰਨੇ ਜੋੜੇ ਬਰਾਬਰ ਹੁੰਦੇ ਹਨ?", ["1", "2", "3", "4"], 1],
+      ["ਜੇ ਸਮਾਂਤਰ ਚਤੁਰਭੁਜ ਦਾ ਇੱਕ ਕੋਣ 70° ਹੈ, ਤਾਂ ਉਸ ਦੇ ਲਾਗਵੇਂ ਕੋਣ ਦਾ ਮਾਪ ਕੀ ਹੋਵੇਗਾ?", ["70°", "110°", "20°", "90°"], 1],
+      ["ਇੱਕ ਨਿਯਮਿਤ ਚਤੁਰਭੁਜ (Regular Quadrilateral) ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਆਇਤ", "ਵਰਗ (Square)", "ਸਮਚਤੁਰਭੁਜ", "ਸਮਲੰਬ"], 1],
+      ["ਕਿਸ ਬਹੁਭੁਜ ਦਾ ਕੋਈ ਵੀ ਵਿਕਰਣ (Diagonal) ਨਹੀਂ ਹੁੰਦਾ?", ["ਤ੍ਰਿਭੁਜ (Triangle)", "ਚਤੁਰਭੁਜ", "ਪੰਜਭੁਜ", "ਛੇਭੁਜ"], 0],
+      ["ਵਰਗ (Square) ਦੇ ਵਿਕਰਣ:", ["ਬਰਾਬਰ ਹੁੰਦੇ ਹਨ ਤੇ 90° 'ਤੇ ਸਮਦੁਭਾਜਿਤ ਕਰਦੇ ਹਨ", "ਬਰਾਬਰ ਨਹੀਂ ਹੁੰਦੇ", "60° 'ਤੇ ਕੱਟਦੇ ਹਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜੇ ਚਤੁਰਭੁਜ ਦੇ ਤਿੰਨ ਕੋਣ 80°, 90° ਅਤੇ 100° ਹਨ, ਤਾਂ ਚੌਥਾ ਕੋਣ ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["80°", "90°", "100°", "70°"], 1],
+      ["ਸਮਭੁਜੀ ਤ੍ਰਿਭੁਜ ਦੇ ਹਰੇਕ ਬਾਹਰੀ ਕੋਣ ਦਾ ਮਾਪ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["60°", "90°", "120°", "180°"], 2]
+    ]
+  },
+  {
+    id: 4, title: "ਅੰਕੜਿਆਂ ਦਾ ਪ੍ਰਬੰਧਨ",
+    q: [
+      ["ਚੱਕਰ-ਗ੍ਰਾਫ਼ (Pie Chart) ਦੇ ਕੇਂਦਰ 'ਤੇ ਕੁੱਲ ਕੋਣ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["180°", "270°", "360°", "90°"], 2],
+      ["ਪਾਈ ਚਾਰਟ ਵਿੱਚ 25% ਹਿੱਸੇ ਦਾ ਕੇਂਦਰੀ ਕੋਣ ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["45°", "90°", "120°", "180°"], 1],
+      ["ਪਾਈ ਚਾਰਟ ਵਿੱਚ 50% ਹਿੱਸੇ ਦਾ ਕੇਂਦਰੀ ਕੋਣ ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["90°", "180°", "270°", "60°"], 1],
+      ["ਇੱਕ ਸਿੱਕਾ ਉਛਾਲਣ 'ਤੇ ਚਿੱਤ (Head) ਆਉਣ ਦੀ ਸੰਭਾਵਨਾ (Probability) ਕੀ ਹੈ?", ["0", "1/2", "1", "1/4"], 1],
+      ["ਇੱਕ ਪਾਸਾ (Dice) ਸੁੱਟਣ 'ਤੇ ਕੁੱਲ ਕਿੰਨੇ ਸੰਭਵ ਪਰਿਣਾਮ ਹੁੰਦੇ ਹਨ?", ["2", "4", "6", "12"], 2],
+      ["ਇੱਕ ਪਾਸਾ ਸੁੱਟਣ 'ਤੇ ਜਿਸਤ (Even) ਸੰਖਿਆ ਆਉਣ ਦੀ ਸੰਭਾਵਨਾ ਕੀ ਹੈ?", ["1/6", "1/2", "1/3", "2/3"], 1],
+      ["ਇੱਕ ਪਾਸਾ ਸੁੱਟਣ 'ਤੇ ਅਭਾਜ (Prime) ਸੰਖਿਆ (2, 3, 5) ਆਉਣ ਦੀ ਸੰਭਾਵਨਾ ਕੀ ਹੈ?", ["1/6", "1/2", "1/3", "5/6"], 1],
+      ["ਇੱਕ ਪਾਸਾ ਸੁੱਟਣ 'ਤੇ 6 ਤੋਂ ਵੱਡੀ ਸੰਖਿਆ ਆਉਣ ਦੀ ਸੰਭਾਵਨਾ ਕੀ ਹੈ?", ["1", "1/6", "0", "1/2"], 2],
+      ["ਕਿਸੇ ਨਿਸ਼ਚਿਤ (Sure) ਘਟਨਾ ਦੀ ਸੰਭਾਵਨਾ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["0", "1/2", "1", "100"], 2],
+      ["ਕਿਸੇ ਅਸੰਭਵ (Impossible) ਘਟਨਾ ਦੀ ਸੰਭਾਵਨਾ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["0", "1", "-1", "1/2"], 0],
+      ["ਕਿਸੇ ਘਟਨਾ ਦੀ ਸੰਭਾਵਨਾ ਹਮੇਸ਼ਾ ਕਿਨ੍ਹਾਂ ਦੋ ਸੰਖਿਆਵਾਂ ਦੇ ਵਿਚਕਾਰ (ਜਾਂ ਬਰਾਬਰ) ਹੁੰਦੀ ਹੈ?", ["0 ਅਤੇ 1", "-1 ਅਤੇ 1", "1 ਅਤੇ 10", "0 ਅਤੇ 100"], 0],
+      ["ਤਾਸ਼ ਦੇ 52 ਪੱਤਿਆਂ ਵਿੱਚੋਂ ਇੱਕ ਇੱਕਾ (Ace) ਨਿਕਲਣ ਦੀ ਸੰਭਾਵਨਾ ਕੀ ਹੈ?", ["1/52", "1/13", "1/4", "1/26"], 1],
+      ["ਤਾਸ਼ ਦੇ 52 ਪੱਤਿਆਂ ਵਿੱਚੋਂ ਲਾਲ ਰੰਗ ਦਾ ਪੱਤਾ ਨਿਕਲਣ ਦੀ ਸੰਭਾਵਨਾ ਕੀ ਹੈ?", ["1/4", "1/2", "1/13", "1/52"], 1],
+      ["ਇੱਕ ਥੈਲੇ ਵਿੱਚ 4 ਲਾਲ ਅਤੇ 2 ਪੀਲੀਆਂ ਗੇਂਦਾਂ ਹਨ। ਲਾਲ ਗੇਂਦ ਨਿਕਲਣ ਦੀ ਸੰਭਾਵਨਾ:", ["2/3", "1/3", "1/2", "4/2"], 0],
+      ["ਇੱਕ ਪਾਸਾ ਸੁੱਟਣ 'ਤੇ 4 ਤੋਂ ਵੱਡੀ ਸੰਖਿਆ (5, 6) ਆਉਣ ਦੀ ਸੰਭਾਵਨਾ ਕੀ ਹੈ?", ["1/6", "1/3", "1/2", "2/3"], 1],
+      ["ਪਾਈ ਚਾਰਟ ਨੂੰ ਹੋਰ ਕਿਸ ਨਾਮ ਨਾਲ ਜਾਣਿਆ ਜਾਂਦਾ ਹੈ?", ["ਚੱਕਰ-ਗ੍ਰਾਫ਼ (Circle Graph)", "ਛੜ-ਗ੍ਰਾਫ਼", "ਰੇਖਾ-ਗ੍ਰਾਫ਼", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜੇ ਪਾਈ ਚਾਰਟ ਵਿੱਚ ਕਿਸੇ ਭਾਗ ਦਾ ਕੇਂਦਰੀ ਕੋਣ 60° ਹੈ, ਤਾਂ ਉਹ ਕੁੱਲ ਦਾ ਕਿੰਨਵਾਂ ਹਿੱਸਾ ਹੈ?", ["1/4", "1/6", "1/3", "1/2"], 1],
+      ["ਦੋ ਸਿੱਕੇ ਇਕੱਠੇ ਉਛਾਲਣ 'ਤੇ ਕੁੱਲ ਕਿੰਨੇ ਸੰਭਵ ਪਰਿਣਾਮ ਹੁੰਦੇ ਹਨ?", ["2", "4", "6", "8"], 1],
+      ["ਇੱਕ ਪਾਸਾ ਸੁੱਟਣ 'ਤੇ 5 ਆਉਣ ਦੀ ਸੰਭਾਵਨਾ ਕੀ ਹੈ?", ["1/6", "5/6", "1/5", "1/2"], 0],
+      ["1 ਤੋਂ 10 ਤੱਕ ਲਿਖੀਆਂ ਪਰਚੀਆਂ ਵਿੱਚੋਂ 6 ਤੋਂ ਛੋਟੀ ਸੰਖਿਆ ਆਉਣ ਦੀ ਸੰਭਾਵਨਾ:", ["1/2", "6/10", "4/10", "1/10"], 0]
+    ]
+  },
+  {
+    id: 5, title: "ਵਰਗ ਅਤੇ ਵਰਗਮੂਲ",
+    q: [
+      ["15 ਦਾ ਵਰਗ (15²) ਕੀ ਹੁੰਦਾ ਹੈ?", ["125", "225", "250", "175"], 1],
+      ["196 ਦਾ ਵਰਗਮੂਲ (√196) ਕੀ ਹੈ?", ["12", "14", "16", "13"], 1],
+      ["ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕਿਹੜਾ ਅੰਕ ਕਿਸੇ ਪੂਰਨ ਵਰਗ ਸੰਖਿਆ ਦਾ ਇਕਾਈ ਅੰਕ ਕਦੇ ਨਹੀਂ ਹੋ ਸਕਦਾ?", ["1", "4", "7", "9"], 2],
+      ["1234 ਦੇ ਵਰਗ ਦਾ ਇਕਾਈ ਅੰਕ ਕੀ ਹੋਵੇਗਾ?", ["4", "6", "8", "2"], 1],
+      ["79 ਦੇ ਵਰਗ ਦਾ ਇਕਾਈ ਅੰਕ ਕੀ ਹੋਵੇਗਾ?", ["1", "9", "7", "3"], 0],
+      ["ਪਹਿਲੀਆਂ 5 ਟਾਂਕ (Odd) ਸੰਖਿਆਵਾਂ (1 + 3 + 5 + 7 + 9) ਦਾ ਜੋੜ ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["5² = 25", "4² = 16", "6² = 36", "20"], 0],
+      ["400 ਦਾ ਵਰਗਮੂਲ (√400) ਕੀ ਹੈ?", ["20", "40", "200", "10"], 0],
+      ["10000 ਦਾ ਵਰਗਮੂਲ ਕੀ ਹੈ?", ["10", "100", "1000", "50"], 1],
+      ["9² ਅਤੇ 10² ਦੇ ਵਿਚਕਾਰ ਕੁੱਲ ਕਿੰਨੀਆਂ ਗੈਰ-ਵਰਗ ਸੰਖਿਆਵਾਂ ਹੁੰਦੀਆਂ ਹਨ?", ["18", "19", "20", "17"], 0],
+      ["625 ਦਾ ਵਰਗਮੂਲ (√625) ਕੀ ਹੈ?", ["15", "25", "35", "20"], 1],
+      ["2.25 ਦਾ ਵਰਗਮੂਲ (√2.25) ਕੀ ਹੈ?", ["1.5", "0.15", "15", "2.5"], 0],
+      ["ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕਿਹੜੀ ਪਾਇਥਾਗੋਰਸ ਤਿੱਕੜੀ (Pythagorean Triplet) ਹੈ?", ["(6, 8, 10)", "(2, 4, 6)", "(3, 5, 7)", "(4, 6, 8)"], 0],
+      ["4 ਅੰਕਾਂ ਵਾਲੀ ਪੂਰਨ ਵਰਗ ਸੰਖਿਆ ਦੇ ਵਰਗਮੂਲ ਵਿੱਚ ਕਿੰਨੇ ਅੰਕ ਹੁੰਦੇ ਹਨ?", ["1", "2", "3", "4"], 1],
+      ["ਕਿਸੇ ਜਿਸਤ (Even) ਸੰਖਿਆ ਦਾ ਵਰਗ ਹਮੇਸ਼ਾ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਜਿਸਤ (Even)", "ਟਾਂਕ (Odd)", "ਅਭਾਜ", "0"], 0],
+      ["12² + 5² ਦਾ ਵਰਗਮੂਲ ਕੀ ਹੋਵੇਗਾ?", ["13", "17", "15", "14"], 0],
+      ["72 ਨੂੰ ਕਿਸ ਸਭ ਤੋਂ ਛੋਟੀ ਸੰਖਿਆ ਨਾਲ ਗੁਣਾ ਕਰਨ 'ਤੇ ਉਹ ਪੂਰਨ ਵਰਗ ਬਣ ਜਾਵੇਗੀ?", ["2", "3", "4", "6"], 0],
+      ["144 ਦਾ ਵਰਗਮੂਲ ਕੀ ਹੈ?", ["11", "12", "13", "14"], 1],
+      ["20² ਦਾ ਮੁੱਲ ਕੀ ਹੁੰਦਾ ਹੈ?", ["40", "200", "400", "4000"], 2],
+      ["ਪੂਰਨ ਵਰਗ ਸੰਖਿਆ ਦੇ ਅੰਤ ਵਿੱਚ ਸਿਫ਼ਰਾਂ (0) ਦੀ ਗਿਣਤੀ ਹਮੇਸ਼ਾ ਕਿਹੋ ਜਿਹੀ ਹੁੰਦੀ ਹੈ?", ["ਜਿਸਤ (2, 4, 6...)", "ਟਾਂਕ (1, 3, 5...)", "3", "ਕੋਈ ਵੀ"], 0],
+      ["11 ਦਾ ਵਰਗ (11²) ਕੀ ਹੁੰਦਾ ਹੈ?", ["111", "121", "131", "144"], 1]
+    ]
+  },
+  {
+    id: 6, title: "ਘਣ ਅਤੇ ਘਣਮੂਲ",
+    q: [
+      ["5 ਦਾ ਘਣ (5³) ਕੀ ਹੁੰਦਾ ਹੈ?", ["25", "75", "125", "625"], 2],
+      ["8 ਦਾ ਘਣ (8³) ਕੀ ਹੁੰਦਾ ਹੈ?", ["64", "256", "512", "729"], 2],
+      ["10 ਦਾ ਘਣ (10³) ਕੀ ਹੁੰਦਾ ਹੈ?", ["100", "1000", "10000", "30"], 1],
+      ["27 ਦਾ ਘਣਮੂਲ (∛27) ਕੀ ਹੈ?", ["3", "9", "6", "2"], 0],
+      ["64 ਦਾ ਘਣਮੂਲ (∛64) ਕੀ ਹੈ?", ["2", "4", "8", "16"], 1],
+      ["125 ਦਾ ਘਣਮੂਲ (∛125) ਕੀ ਹੈ?", ["5", "15", "25", "3"], 0],
+      ["1000 ਦਾ ਘਣਮੂਲ (∛1000) ਕੀ ਹੈ?", ["10", "100", "50", "1"], 0],
+      ["512 ਦਾ ਘਣਮੂਲ (∛512) ਕੀ ਹੈ?", ["6", "7", "8", "9"], 2],
+      ["729 ਦਾ ਘਣਮੂਲ (∛729) ਕੀ ਹੈ?", ["7", "8", "9", "11"], 2],
+      ["ਕਿਸੇ ਟਾਂਕ (Odd) ਸੰਖਿਆ ਦਾ ਘਣ ਹਮੇਸ਼ਾ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਜਿਸਤ", "ਟਾਂਕ (Odd)", "0", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਸੰਖਿਆ 23 ਦੇ ਘਣ ਦਾ ਇਕਾਈ ਅੰਕ ਕੀ ਹੋਵੇਗਾ?", ["3", "7", "9", "1"], 1],
+      ["ਸੰਖਿਆ 12 ਦੇ ਘਣ ਦਾ ਇਕਾਈ ਅੰਕ ਕੀ ਹੋਵੇਗਾ?", ["2", "4", "6", "8"], 3],
+      ["1729 ਨੂੰ ਕਿਸ ਪ੍ਰਸਿੱਧ ਨਾਮ ਨਾਲ ਜਾਣਿਆ ਜਾਂਦਾ ਹੈ?", ["ਹਾਰਡੀ-ਰਾਮਾਨੁਜਨ ਸੰਖਿਆ", "ਪਾਇਥਾਗੋਰਸ ਸੰਖਿਆ", "ਨਿਊਟਨ ਸੰਖਿਆ", "ਅਭਾਜ ਸੰਖਿਆ"], 0],
+      ["(-2)³ ਦਾ ਮੁੱਲ ਕੀ ਹੁੰਦਾ ਹੈ?", ["+8", "-8", "-6", "+6"], 1],
+      ["200 ਨੂੰ ਕਿਸ ਸਭ ਤੋਂ ਛੋਟੀ ਸੰਖਿਆ ਨਾਲ ਗੁਣਾ ਕਰਨ 'ਤੇ ਪੂਰਨ ਘਣ ਬਣ ਜਾਵੇਗਾ?", ["2", "5", "4", "10"], 1],
+      ["128 ਨੂੰ ਕਿਸ ਸਭ ਤੋਂ ਛੋਟੀ ਸੰਖਿਆ ਨਾਲ ਭਾਗ ਕਰਨ 'ਤੇ ਪੂਰਨ ਘਣ ਬਣੇਗਾ?", ["2", "4", "8", "16"], 0],
+      ["216 ਦਾ ਘਣਮੂਲ (∛216) ਕੀ ਹੈ?", ["4", "6", "8", "12"], 1],
+      ["343 ਦਾ ਘਣਮੂਲ (∛343) ਕੀ ਹੈ?", ["6", "7", "8", "9"], 1],
+      ["4³ + 3³ ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["71", "91", "64", "27"], 1],
+      ["1³ + 2³ + 3³ ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["36", "18", "27", "64"], 0]
+    ]
+  },
+  {
+    id: 7, title: "ਰਾਸ਼ੀਆਂ ਦੀ ਤੁਲਨਾ",
+    q: [
+      ["ਕਟੌਤੀ (Discount) ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦੀ ਹੈ?", ["ਅੰਕਿਤ ਮੁੱਲ - ਵੇਚ ਮੁੱਲ", "ਵੇਚ ਮੁੱਲ - ਅੰਕਿਤ ਮੁੱਲ", "ਖ਼ਰੀਦ ਮੁੱਲ + ਲਾਭ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਟੌਤੀ ਪ੍ਰਤੀਸ਼ਤ ਹਮੇਸ਼ਾ ਕਿਸ 'ਤੇ ਕੱਢੀ ਜਾਂਦੀ ਹੈ?", ["ਖ਼ਰੀਦ ਮੁੱਲ 'ਤੇ", "ਅੰਕਿਤ ਮੁੱਲ (Marked Price) 'ਤੇ", "ਵੇਚ ਮੁੱਲ 'ਤੇ", "ਟੈਕਸ 'ਤੇ"], 1],
+      ["₹500 ਅੰਕਿਤ ਮੁੱਲ ਵਾਲੀ ਵਸਤੂ 'ਤੇ 10% ਕਟੌਤੀ ਤੋਂ ਬਾਅਦ ਵੇਚ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["₹490", "₹450", "₹400", "₹550"], 1],
+      ["GST ਦਾ ਪੂਰਾ ਨਾਮ ਕੀ ਹੈ?", ["Goods and Services Tax", "General Sales Tax", "Government Service Tax", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਵਿਕਰੀ ਕਰ (Tax/GST) ਹਮੇਸ਼ਾ ਬਿੱਲ ਦੀ ਰਕਮ ਵਿੱਚ ਕੀ ਕੀਤਾ ਜਾਂਦਾ ਹੈ?", ["ਜੋੜਿਆ ਜਾਂਦਾ ਹੈ", "ਘਟਾਇਆ ਜਾਂਦਾ ਹੈ", "ਗੁਣਾ ਕੀਤਾ ਜਾਂਦਾ ਹੈ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਮਿਸ਼ਰਤ ਵਿਆਜ (Compound Interest) ਲਈ ਮਿਸ਼ਰਧਨ (A) ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["P(1 + R/100)ⁿ", "P × R × T / 100", "P(1 - R/100)ⁿ", "P + R + T"], 0],
+      ["ਮਿਸ਼ਰਤ ਵਿਆਜ (CI) ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["ਮਿਸ਼ਰਧਨ (A) - ਮੂਲਧਨ (P)", "P + A", "P × A", "A / P"], 0],
+      ["₹1000 'ਤੇ 10% ਸਾਲਾਨਾ ਦਰ ਨਾਲ 2 ਸਾਲਾਂ ਦਾ ਮਿਸ਼ਰਧਨ (ਮਿਸ਼ਰਤ ਵਿਆਜ ਅਨੁਸਾਰ) ਕੀ ਹੋਵੇਗਾ?", ["₹1200", "₹1210", "₹1100", "₹1250"], 1],
+      ["₹1000 'ਤੇ 10% ਸਾਲਾਨਾ ਦਰ ਨਾਲ 2 ਸਾਲਾਂ ਦਾ ਮਿਸ਼ਰਤ ਵਿਆਜ (CI) ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["₹200", "₹210", "₹100", "₹220"], 1],
+      ["1 ਸਾਲ ਲਈ ਸਾਧਾਰਨ ਵਿਆਜ (SI) ਅਤੇ ਮਿਸ਼ਰਤ ਵਿਆਜ (CI) (ਸਾਲਾਨਾ ਸੰਯੋਜਨ) ਕਿਹੋ ਜਿਹੇ ਹੁੰਦੇ ਹਨ?", ["ਬਰਾਬਰ", "CI ਵੱਧ", "SI ਵੱਧ", "ਦੁੱਗਣੇ"], 0],
+      ["ਜੇ ₹800 ਦੀ ਵਸਤੂ 'ਤੇ 5% GST ਲੱਗੇ, ਤਾਂ ਬਿੱਲ ਦੀ ਕੁੱਲ ਰਕਮ ਕਿੰਨੀ ਹੋਵੇਗੀ?", ["₹805", "₹840", "₹760", "₹850"], 1],
+      ["ਅਨੁਪਾਤ 3 : 4 ਨੂੰ ਪ੍ਰਤੀਸ਼ਤ ਵਿੱਚ ਬਦਲੋ:", ["50%", "75%", "60%", "80%"], 1],
+      ["₹1000 ਅੰਕਿਤ ਮੁੱਲ ਵਾਲੀ ਕਮੀਜ਼ ₹800 ਵਿੱਚ ਵਿਕੀ। ਕਟੌਤੀ ਪ੍ਰਤੀਸ਼ਤ ਕਿੰਨੀ ਹੈ?", ["10%", "20%", "25%", "15%"], 1],
+      ["ਕਿਸੇ ਮਸ਼ੀਨ ਦਾ ਮੁੱਲ ਹਰ ਸਾਲ 10% ਘੱਟਦਾ ਹੈ। ₹10,000 ਦੀ ਮਸ਼ੀਨ 1 ਸਾਲ ਬਾਅਦ ਕਿੰਨੇ ਦੀ ਹੋਵੇਗੀ?", ["₹9,000", "₹11,000", "₹8,000", "₹9,500"], 0],
+      ["ਜੇ ਵਿਆਜ ਛਿਮਾਹੀ (Half-yearly) ਜੁੜਦਾ ਹੋਵੇ, ਤਾਂ ਸਾਲਾਨਾ ਦਰ (R) ਕੀ ਹੋ ਜਾਂਦੀ ਹੈ?", ["ਦੁੱਗਣੀ", "ਅੱਧੀ (R/2)", "ਬਰਾਬਰ", "ਚੌਥਾਈ"], 1],
+      ["ਜੇ ਵਿਆਜ ਛਿਮਾਹੀ ਜੁੜਦਾ ਹੋਵੇ, ਤਾਂ 1 ਸਾਲ ਵਿੱਚ ਸਮਾਂ (n) ਕਿੰਨੀਆਂ ਛਿਮਾਹੀਆਂ ਹੋਵੇਗਾ?", ["1", "2", "3", "4"], 1],
+      ["300 ਦਾ 20% ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["30", "60", "90", "20"], 1],
+      ["₹400 ਦਾ 25% ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["₹50", "₹100", "₹150", "₹200"], 1],
+      ["ਇੱਕ ਪਿੰਡ ਦੀ ਆਬਾਦੀ 10,000 ਹੈ। 10% ਸਾਲਾਨਾ ਵਾਧੇ ਨਾਲ 1 ਸਾਲ ਬਾਅਦ ਆਬਾਦੀ:", ["11,000", "10,100", "12,000", "9,000"], 0],
+      ["₹200 'ਤੇ 20% ਕਟੌਤੀ ਕਿੰਨੇ ਰੁਪਏ ਹੋਵੇਗੀ?", ["₹20", "₹40", "₹60", "₹160"], 1]
+    ]
+  },
+  {
+    id: 8, title: "ਬੀਜਗਣਿਤਕ ਵਿਅੰਜਕ ਅਤੇ ਤਤਸਮਕ",
+    q: [
+      ["(a + b)² ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["a² + b²", "a² + 2ab + b²", "a² - 2ab + b²", "a² - b²"], 1],
+      ["(a - b)² ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["a² - 2ab + b²", "a² + 2ab + b²", "a² - b²", "a² - 2ab - b²"], 0],
+      ["(a + b)(a - b) ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["a² + b²", "a² - b²", "a² - 2ab + b²", "2a² - 2b²"], 1],
+      ["(x + a)(x + b) ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["x² + (a + b)x + ab", "x² + abx + (a + b)", "x² - ab", "x² + a² + b²"], 0],
+      ["4x × 5y ਦਾ ਗੁਣਨਫਲ ਕੀ ਹੋਵੇਗਾ?", ["9xy", "20xy", "20x + y", "45xy"], 1],
+      ["(-3p) × (7p²) ਦਾ ਗੁਣਨਫਲ ਕੀ ਹੋਵੇਗਾ?", ["-21p³", "21p³", "-21p²", "4p³"], 0],
+      ["2x(3x + 5) ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["6x² + 10x", "6x + 10", "5x² + 7x", "6x² + 5"], 0],
+      ["(x + 3)(x + 3) ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੈ?", ["x² + 9", "x² + 6x + 9", "x² + 3x + 9", "2x + 6"], 1],
+      ["(x + 5)(x - 5) ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੈ?", ["x² - 25", "x² + 25", "x² - 10x + 25", "x² - 10"], 0],
+      ["3a²b × 4ab² ਦਾ ਗੁਣਨਫਲ ਕੀ ਹੋਵੇਗਾ?", ["12a³b³", "7a³b³", "12a²b²", "12ab"], 0],
+      ["7x² - 4x + 5 ਵਿੱਚੋਂ 3x² - 2x + 1 ਘਟਾਉਣ 'ਤੇ ਕੀ ਮਿਲੇਗਾ?", ["4x² - 2x + 4", "4x² - 6x + 6", "10x² - 6x + 6", "4x² + 2x + 4"], 0],
+      ["(2x + y)² ਦਾ ਵਿਸਤਾਰ ਰੂਪ ਕੀ ਹੈ?", ["4x² + y²", "4x² + 4xy + y²", "2x² + 4xy + y²", "4x² + 2xy + y²"], 1],
+      ["(a - 4)² ਦਾ ਵਿਸਤਾਰ ਰੂਪ ਕੀ ਹੈ?", ["a² - 16", "a² - 8a + 16", "a² + 8a + 16", "a² - 4a + 16"], 1],
+      ["ਤਤਸਮਕ ਦੀ ਵਰਤੋਂ ਨਾਲ 51² - 49² ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["100", "200", "2", "4"], 1],
+      ["5x × 0 × 3y ਦਾ ਮੁੱਲ ਕੀ ਹੁੰਦਾ ਹੈ?", ["15xy", "0", "8xy", "1"], 1],
+      ["ਇੱਕ ਆਇਤ ਦੀ ਲੰਬਾਈ 4x ਅਤੇ ਚੌੜਾਈ 3y ਹੈ, ਤਾਂ ਖੇਤਰਫਲ ਕੀ ਹੋਵੇਗਾ?", ["7xy", "12xy", "14xy", "12x + y"], 1],
+      ["ਇੱਕ ਘਣਾਵ ਦੀਆਂ ਭੁਜਾਵਾਂ 2a, 3b ਅਤੇ 4c ਹਨ। ਇਸ ਦਾ ਆਇਤਨ ਕੀ ਹੋਵੇਗਾ?", ["9abc", "24abc", "12abc", "24a + b + c"], 1],
+      ["(x + 2)(x + 4) ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੈ?", ["x² + 6x + 8", "x² + 8x + 6", "x² + 6x + 6", "x² + 8"], 0],
+      ["ਪਦ -5x²y ਵਿੱਚ y ਦਾ ਗੁਣਾਂਕ ਕੀ ਹੈ?", ["-5", "-5x²", "5x²", "x²"], 1],
+      ["a(b - c) + b(c - a) + c(a - b) ਦਾ ਮੁੱਲ ਕੀ ਹੁੰਦਾ ਹੈ?", ["abc", "0", "1", "a + b + c"], 1]
+    ]
+  },
+  {
+    id: 9, title: "ਖੇਤਰਮਿਤੀ",
+    q: [
+      ["ਸਮਲੰਬ ਚਤੁਰਭੁਜ (Trapezium) ਦੇ ਖੇਤਰਫਲ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["1/2 × ਸਮਾਂਤਰ ਭੁਜਾਵਾਂ ਦਾ ਜੋੜ × ਉਚਾਈ", "ਆਧਾਰ × ਉਚਾਈ", "d₁ × d₂", "l × b"], 0],
+      ["ਸਮਚਤੁਰਭੁਜ (Rhombus) ਦੇ ਖੇਤਰਫਲ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["d₁ × d₂", "1/2 × d₁ × d₂", "4 × ਭੁਜਾ", "l × b"], 1],
+      ["ਜੇ ਸਮਚਤੁਰਭੁਜ ਦੇ ਵਿਕਰਣ 10 cm ਅਤੇ 8 cm ਹਨ, ਤਾਂ ਖੇਤਰਫਲ ਕੀ ਹੋਵੇਗਾ?", ["80 cm²", "40 cm²", "18 cm²", "20 cm²"], 1],
+      ["ਘਣ (Cube) ਦੀ ਕੁੱਲ ਸਤ੍ਹਾ ਦੇ ਖੇਤਰਫਲ (TSA) ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["4l²", "6l²", "l³", "2l²"], 1],
+      ["ਘਣ (Cube) ਦੀ ਪਾਸਵੀਂ ਸਤ੍ਹਾ ਦੇ ਖੇਤਰਫਲ (LSA) ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["4l²", "6l²", "l³", "3l²"], 0],
+      ["ਘਣ (Cube) ਦੇ ਆਇਤਨ (Volume) ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["6l²", "4l²", "l³", "3l"], 2],
+      ["ਘਣਾਵ (Cuboid) ਦੇ ਆਇਤਨ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["l × b × h", "2(lb + bh + hl)", "2h(l + b)", "l + b + h"], 0],
+      ["ਘਣਾਵ ਦੀ ਕੁੱਲ ਸਤ੍ਹਾ ਦੇ ਖੇਤਰਫਲ (TSA) ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["l × b × h", "2(lb + bh + hl)", "2h(l + b)", "6l²"], 1],
+      ["ਬੇਲਣ (Cylinder) ਦੀ ਵਕਰ ਸਤ੍ਹਾ ਦੇ ਖੇਤਰਫਲ (CSA) ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["2πrh", "πr²h", "2πr(r + h)", "πr²"], 0],
+      ["ਬੇਲਣ (Cylinder) ਦੀ ਕੁੱਲ ਸਤ੍ਹਾ ਦੇ ਖੇਤਰਫਲ (TSA) ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["2πrh", "2πr(r + h)", "πr²h", "2πr"], 1],
+      ["ਬੇਲਣ (Cylinder) ਦੇ ਆਇਤਨ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["2πrh", "πr²h", "2πr(r + h)", "1/3 πr²h"], 1],
+      ["5 cm ਭੁਜਾ ਵਾਲੇ ਘਣ ਦਾ ਆਇਤਨ ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["25 cm³", "125 cm³", "150 cm³", "100 cm³"], 1],
+      ["4 cm ਭੁਜਾ ਵਾਲੇ ਘਣ ਦੀ ਕੁੱਲ ਸਤ੍ਹਾ ਦਾ ਖੇਤਰਫਲ ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["64 cm²", "96 cm²", "16 cm²", "48 cm²"], 1],
+      ["1 m³ (ਘਣ ਮੀਟਰ) ਕਿੰਨੇ ਲੀਟਰ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["10 ਲੀਟਰ", "100 ਲੀਟਰ", "1000 ਲੀਟਰ", "1 ਲੀਟਰ"], 2],
+      ["1000 cm³ ਕਿੰਨੇ ਲੀਟਰ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["1 ਲੀਟਰ", "10 ਲੀਟਰ", "100 ਲੀਟਰ", "0.1 ਲੀਟਰ"], 0],
+      ["ਜੇ ਘਣ ਦੀ ਭੁਜਾ ਦੁੱਗਣੀ ਕਰ ਦਿੱਤੀ ਜਾਵੇ, ਤਾਂ ਇਸ ਦਾ ਆਇਤਨ ਕਿੰਨੇ ਗੁਣਾ ਹੋ ਜਾਵੇਗਾ?", ["2 ਗੁਣਾ", "4 ਗੁਣਾ", "8 ਗੁਣਾ", "6 ਗੁਣਾ"], 2],
+      ["ਜੇ ਘਣ ਦੀ ਭੁਜਾ ਦੁੱਗਣੀ ਕਰ ਦਿੱਤੀ ਜਾਵੇ, ਤਾਂ ਸਤ੍ਹਾ ਦਾ ਖੇਤਰਫਲ ਕਿੰਨੇ ਗੁਣਾ ਹੋ ਜਾਵੇਗਾ?", ["2 ਗੁਣਾ", "4 ਗੁਣਾ", "8 ਗੁਣਾ", "6 ਗੁਣਾ"], 1],
+      ["ਸਮਲੰਬ ਚਤੁਰਭੁਜ ਦੀਆਂ ਸਮਾਂਤਰ ਭੁਜਾਵਾਂ 10 cm, 6 cm ਅਤੇ ਉਚਾਈ 5 cm ਹੈ। ਖੇਤਰਫਲ:", ["40 cm²", "80 cm²", "30 cm²", "50 cm²"], 0],
+      ["7 cm ਅਰਧ-ਵਿਆਸ ਅਤੇ 10 cm ਉਚਾਈ ਵਾਲੇ ਬੇਲਣ ਦੀ ਵਕਰ ਸਤ੍ਹਾ ਦਾ ਖੇਤਰਫਲ (π = 22/7):", ["440 cm²", "1540 cm²", "220 cm²", "700 cm²"], 0],
+      ["ਆਇਤਨ ਦੀ ਮਿਆਰੀ ਇਕਾਈ ਕੀ ਹੁੰਦੀ ਹੈ?", ["ਵਰਗ ਇਕਾਈ (m²)", "ਘਣ ਇਕਾਈ (m³ ਜਾਂ cm³)", "cm", "kg"], 1]
+    ]
+  },
+  {
+    id: 10, title: "ਘਾਤ-ਅੰਕ ਅਤੇ ਘਾਤ",
+    q: [
+      ["a⁻ᵐ ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["-aᵐ", "1 / aᵐ", "aᵐ", "0"], 1],
+      ["2⁻³ ਦਾ ਮੁੱਲ ਕੀ ਹੁੰਦਾ ਹੈ?", ["-8", "1/8", "-6", "8"], 1],
+      ["(1/3)⁻² ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["1/9", "9", "-9", "6"], 1],
+      ["(3⁰ + 4⁻¹) × 2² ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["5", "4", "1", "8"], 0],
+      ["(-4)⁵ ÷ (-4)⁸ ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੈ?", ["(-4)⁻³", "(-4)³", "(-4)¹³", "4³"], 0],
+      ["(5⁻¹ × 2⁻¹) × 6⁻¹ ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["1/60", "60", "1/13", "1/30"], 0],
+      ["(2⁻¹ + 3⁻¹ + 4⁻¹)⁰ ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["0", "1", "9", "1/9"], 1],
+      ["aᵐ × bᵐ ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੁੰਦਾ ਹੈ?", ["(ab)ᵐ", "(ab)²ᵐ", "(a + b)ᵐ", "abᵐ"], 0],
+      ["0.00005 ਦਾ ਮਿਆਰੀ ਰੂਪ (Standard Form) ਕੀ ਹੈ?", ["5 × 10⁻⁵", "5 × 10⁵", "5 × 10⁻⁴", "5 × 10⁻⁶"], 0],
+      ["3 × 10⁻⁴ ਦਾ ਸਾਧਾਰਨ ਰੂਪ (Usual Form) ਕੀ ਹੈ?", ["0.0003", "0.003", "0.00003", "30000"], 0],
+      ["(-3)⁴ × (5/3)⁴ ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੈ?", ["5⁴", "3⁴", "15⁴", "-5⁴"], 0],
+      ["ਜੇ 5ᵐ ÷ 5⁻³ = 5⁵ ਹੋਵੇ, ਤਾਂ m ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["2", "8", "-2", "3"], 0],
+      ["(1/2)⁻³ + (1/3)⁻² ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["17", "13", "15", "11"], 0],
+      ["10⁻² ਕਿਸ ਦਸ਼ਮਲਵ ਦੇ ਬਰਾਬਰ ਹੈ?", ["0.1", "0.01", "0.001", "-100"], 1],
+      ["(-2)⁻⁴ ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["1/16", "-1/16", "16", "-16"], 0],
+      ["(2⁵ ÷ 2⁸) × 2⁵ ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["2² = 4", "2⁸", "2⁻²", "2"], 0],
+      ["7⁰ × 8⁰ × 9⁰ ਦਾ ਮੁੱਲ ਕੀ ਹੁੰਦਾ ਹੈ?", ["0", "1", "3", "504"], 1],
+      ["(3⁻⁷ ÷ 3⁻¹⁰) × 3⁻⁵ ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੈ?", ["3⁻²", "3²", "3⁻⁸", "3¹²"], 0],
+      ["0.0000072 ਦਾ ਮਿਆਰੀ ਰੂਪ ਕੀ ਹੈ?", ["7.2 × 10⁻⁶", "7.2 × 10⁻⁵", "7.2 × 10⁻⁷", "72 × 10⁻⁶"], 0],
+      ["(2/3)⁻² ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["9/4", "4/9", "-4/9", "-9/4"], 0]
+    ]
+  },
+  {
+    id: 11, title: "ਸਿੱਧਾ ਅਤੇ ਉਲਟ ਸਮਾਨੁਪਾਤ",
+    q: [
+      ["ਜਦੋਂ x ਵਧਣ ਨਾਲ y ਵੀ ਉਸੇ ਅਨੁਪਾਤ ਵਿੱਚ ਵਧੇ, ਤਾਂ ਇਹ ਕਿਹੜਾ ਸਮਾਨੁਪਾਤ ਹੈ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ (Direct)", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 0],
+      ["ਜਦੋਂ x ਵਧਣ ਨਾਲ y ਉਸੇ ਅਨੁਪਾਤ ਵਿੱਚ ਘਟੇ, ਤਾਂ ਇਹ ਕਿਹੜਾ ਸਮਾਨੁਪਾਤ ਹੈ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ (Inverse)", "ਦੋਵੇਂ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਸਿੱਧੇ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕੀ ਸਥਿਰ (Constant) ਰਹਿੰਦਾ ਹੈ?", ["x / y", "x × y", "x + y", "x - y"], 0],
+      ["ਉਲਟ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕੀ ਸਥਿਰ (Constant) ਰਹਿੰਦਾ ਹੈ?", ["x / y", "x × y", "x + y", "x - y"], 1],
+      ["ਮਜ਼ਦੂਰਾਂ ਦੀ ਗਿਣਤੀ ਅਤੇ ਕੰਮ ਪੂਰਾ ਕਰਨ ਵਿੱਚ ਲੱਗਿਆ ਸਮਾਂ ਕਿਸ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹੁੰਦੇ ਹਨ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 1],
+      ["ਵਸਤੂਆਂ ਦੀ ਗਿਣਤੀ ਅਤੇ ਉਹਨਾਂ ਦੀ ਕੁੱਲ ਕੀਮਤ ਕਿਸ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹੁੰਦੀਆਂ ਹਨ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 0],
+      ["ਇੱਕਸਮਾਨ ਚਾਲ 'ਤੇ, ਤੈਅ ਕੀਤੀ ਦੂਰੀ ਅਤੇ ਲੱਗਿਆ ਸਮਾਂ ਕਿਸ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹੁੰਦੇ ਹਨ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 0],
+      ["ਨਿਸ਼ਚਿਤ ਦੂਰੀ ਲਈ, ਵਾਹਨ ਦੀ ਚਾਲ ਅਤੇ ਲੱਗਿਆ ਸਮਾਂ ਕਿਸ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹੁੰਦੇ ਹਨ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 1],
+      ["ਜੇ 5 ਮੀਟਰ ਕੱਪੜੇ ਦੀ ਕੀਮਤ ₹250 ਹੈ, ਤਾਂ 8 ਮੀਟਰ ਕੱਪੜੇ ਦੀ ਕੀਮਤ ਕੀ ਹੋਵੇਗੀ?", ["₹350", "₹400", "₹450", "₹300"], 1],
+      ["ਜੇ 6 ਮਜ਼ਦੂਰ ਇੱਕ ਕੰਧ 10 ਦਿਨਾਂ ਵਿੱਚ ਬਣਾਉਂਦੇ ਹਨ, ਤਾਂ 12 ਮਜ਼ਦੂਰ ਕਿੰਨੇ ਦਿਨਾਂ ਵਿੱਚ ਬਣਾਉਣਗੇ?", ["20 ਦਿਨ", "5 ਦਿਨ", "15 ਦਿਨ", "8 ਦਿਨ"], 1],
+      ["ਜੇ 40 km/h ਦੀ ਚਾਲ ਨਾਲ ਇੱਕ ਕਾਰ 3 ਘੰਟੇ ਵਿੱਚ ਪਹੁੰਚਦੀ ਹੈ, ਤਾਂ 60 km/h ਦੀ ਚਾਲ ਨਾਲ ਕਿੰਨਾ ਸਮਾਂ ਲੱਗੇਗਾ?", ["2 ਘੰਟੇ", "4.5 ਘੰਟੇ", "1.5 ਘੰਟੇ", "4 ਘੰਟੇ"], 0],
+      ["ਜੇ x ਅਤੇ y ਸਿੱਧੇ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹਨ, x₁ = 4, y₁ = 12 ਅਤੇ x₂ = 7, ਤਾਂ y₂ ਕੀ ਹੋਵੇਗਾ?", ["21", "28", "15", "18"], 0],
+      ["ਜੇ x ਅਤੇ y ਉਲਟ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹਨ, x₁ = 6, y₁ = 8 ਅਤੇ x₂ = 12, ਤਾਂ y₂ ਕੀ ਹੋਵੇਗਾ?", ["16", "4", "6", "3"], 1],
+      ["ਪੈਟਰੋਲ ਦੀ ਮਾਤਰਾ ਅਤੇ ਕਾਰ ਦੁਆਰਾ ਤੈਅ ਕੀਤੀ ਦੂਰੀ ਕਿਸ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹਨ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 0],
+      ["ਜੇ 15 ਕਿਤਾਬਾਂ ਦਾ ਭਾਰ 3 kg ਹੈ, ਤਾਂ 25 ਕਿਤਾਬਾਂ ਦਾ ਭਾਰ ਕਿੰਨਾ ਹੋਵੇਗਾ?", ["4 kg", "5 kg", "6 kg", "7 kg"], 1],
+      ["ਜੇ 5 ਟੂਟੀਆਂ ਇੱਕ ਟੈਂਕੀ 60 ਮਿੰਟਾਂ ਵਿੱਚ ਭਰਦੀਆਂ ਹਨ, ਤਾਂ 10 ਟੂਟੀਆਂ ਕਿੰਨੇ ਮਿੰਟਾਂ ਵਿੱਚ ਭਰਨਗੀਆਂ?", ["120 ਮਿੰਟ", "30 ਮਿੰਟ", "40 ਮਿੰਟ", "20 ਮਿੰਟ"], 1],
+      ["ਬੈਂਕ ਵਿੱਚ ਜਮ੍ਹਾਂ ਰਕਮ ਅਤੇ ਉਸ 'ਤੇ ਮਿਲਣ ਵਾਲਾ ਸਾਲਾਨਾ ਵਿਆਜ ਕਿਸ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹਨ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 0],
+      ["ਪਹੀਏ ਦੀਆਂ ਤਾਰਾਂ (Spokes) ਦੀ ਗਿਣਤੀ ਅਤੇ ਦੋ ਲਾਗਵੀਆਂ ਤਾਰਾਂ ਵਿਚਕਾਰਲਾ ਕੋਣ ਕਿਸ ਸਮਾਨੁਪਾਤ ਵਿੱਚ ਹਨ?", ["ਸਿੱਧਾ ਸਮਾਨੁਪਾਤ", "ਉਲਟ ਸਮਾਨੁਪਾਤ", "ਕੋਈ ਨਹੀਂ", "ਦੋਵੇਂ"], 1],
+      ["ਜੇ 2 kg ਖੰਡ ਵਿੱਚ 9 × 10⁶ ਦਾਣੇ ਹਨ, ਤਾਂ 4 kg ਖੰਡ ਵਿੱਚ ਕਿੰਨੇ ਦਾਣੇ ਹੋਣਗੇ?", ["18 × 10⁶", "4.5 × 10⁶", "9 × 10¹²", "36 × 10⁶"], 0],
+      ["ਇੱਕ ਨਕਸ਼ੇ ਦਾ ਪੈਮਾਨਾ 1 cm = 100 km ਹੈ। ਨਕਸ਼ੇ 'ਤੇ 4 cm ਦੂਰੀ ਅਸਲ ਵਿੱਚ ਕਿੰਨੀ ਹੋਵੇਗੀ?", ["400 km", "25 km", "40 km", "4000 km"], 0]
+    ]
+  },
+  {
+    id: 12, title: "ਗੁਣਨਖੰਡੀਕਰਨ",
+    q: [
+      ["12x ਅਤੇ 36 ਦਾ ਸਾਂਝਾ ਗੁਣਨਖੰਡ (Common Factor) ਕੀ ਹੈ?", ["12", "12x", "36", "6x"], 0],
+      ["7x - 42 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["7(x - 6)", "7(x - 42)", "6(x - 7)", "x(7 - 42)"], 0],
+      ["x² - 9 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(x - 3)²", "(x + 3)(x - 3)", "(x + 9)(x - 1)", "(x + 3)²"], 1],
+      ["a² + 6a + 9 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(a + 3)²", "(a - 3)²", "(a + 9)(a + 1)", "(a + 3)(a - 3)"], 0],
+      ["p² - 10p + 25 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(p + 5)²", "(p - 5)²", "(p - 25)(p - 1)", "(p + 5)(p - 5)"], 1],
+      ["4x² - 25y² ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(2x + 5y)(2x - 5y)", "(4x + 5y)(4x - 5y)", "(2x - 5y)²", "(2x + 25y)(2x - y)"], 0],
+      ["x² + 5x + 6 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(x + 2)(x + 3)", "(x + 1)(x + 6)", "(x - 2)(x - 3)", "(x + 5)(x + 1)"], 0],
+      ["y² + 7y + 12 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(y + 3)(y + 4)", "(y + 2)(y + 6)", "(y + 1)(y + 12)", "(y - 3)(y - 4)"], 0],
+      ["x² - 5x + 6 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(x - 2)(x - 3)", "(x + 2)(x + 3)", "(x - 6)(x + 1)", "(x - 5)(x - 1)"], 0],
+      ["28x⁴ ÷ 56x ਦਾ ਭਾਗਫਲ ਕੀ ਹੋਵੇਗਾ?", ["x³ / 2", "2x³", "x⁴ / 2", "2x⁴"], 0],
+      ["(5x² - 6x) ÷ 3x ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["(5x - 6) / 3", "5x - 2", "5x² - 2", "2x - 6"], 0],
+      ["10x² - 18x³ + 14x⁴ ਦਾ ਸਾਂਝਾ ਗੁਣਨਖੰਡ ਕੀ ਹੈ?", ["2x²", "2x", "x⁴", "10x²"], 0],
+      ["ax + ay + bx + by ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(a + b)(x + y)", "(a + x)(b + y)", "(a - b)(x + y)", "ab(x + y)"], 0],
+      ["(x² - 16) ÷ (x + 4) ਦਾ ਭਾਗਫਲ ਕੀ ਹੋਵੇਗਾ?", ["x - 4", "x + 4", "x - 16", "4"], 0],
+      ["49p² - 36 ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(7p + 6)(7p - 6)", "(7p - 6)²", "(49p + 6)(p - 6)", "(7p + 36)(7p - 1)"], 0],
+      ["15xy²z³ ÷ 5xyz ਦਾ ਭਾਗਫਲ ਕੀ ਹੋਵੇਗਾ?", ["3yz²", "3xyz", "3y²z³", "5yz²"], 0],
+      ["x² + xy + 8x + 8y ਦੇ ਗੁਣਨਖੰਡ ਕੀ ਹਨ?", ["(x + 8)(x + y)", "(x + y)(x - 8)", "8x(x + y)", "(x + 4)(x + 2y)"], 0],
+      ["(2x + 3)² ਦਾ ਸਹੀ ਵਿਸਤਾਰ ਕੀ ਹੈ?", ["4x² + 12x + 9", "2x² + 9", "4x² + 9", "4x² + 6x + 9"], 0],
+      ["2x, 3x² ਅਤੇ 4 ਦਾ ਸਾਂਝਾ ਗੁਣਨਖੰਡ ਕੀ ਹੈ?", ["1", "2", "x", "2x"], 0],
+      ["(3x + 3) ÷ 3 ਦਾ ਮੁੱਲ ਕੀ ਹੋਵੇਗਾ?", ["x + 1", "x + 3", "3x", "x"], 0]
+    ]
+  },
+  {
+    id: 13, title: "ਗ੍ਰਾਫ਼ਾਂ ਬਾਰੇ ਜਾਣ-ਪਛਾਣ",
+    q: [
+      ["ਸਮੇਂ ਦੇ ਨਾਲ ਲਗਾਤਾਰ ਬਦਲਦੇ ਅੰਕੜਿਆਂ ਨੂੰ ਦਰਸਾਉਣ ਲਈ ਕਿਹੜਾ ਗ੍ਰਾਫ਼ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ?", ["ਰੇਖਾ-ਗ੍ਰਾਫ਼ (Line Graph)", "ਪਾਈ ਚਾਰਟ", "ਚਿੱਤਰ ਗ੍ਰਾਫ਼", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਾਰਟੀਜ਼ੀਅਨ ਤਲ ਵਿੱਚ ਲੇਟਵੇਂ ਧੁਰੇ (Horizontal Axis) ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["x-ਧੁਰਾ", "y-ਧੁਰਾ", "ਮੂਲ-ਬਿੰਦੂ", "ਨਿਰਦੇਸ਼-ਅੰਕ"], 0],
+      ["ਕਾਰਟੀਜ਼ੀਅਨ ਤਲ ਵਿੱਚ ਖੜ੍ਹਵੇਂ ਧੁਰੇ (Vertical Axis) ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["x-ਧੁਰਾ", "y-ਧੁਰਾ", "ਮੂਲ-ਬਿੰਦੂ", "ਵਿਕਰਣ"], 1],
+      ["ਜਿੱਥੇ x-ਧੁਰਾ ਅਤੇ y-ਧੁਰਾ ਆਪਸ ਵਿੱਚ ਕੱਟਦੇ ਹਨ, ਉਸ ਬਿੰਦੂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਮੂਲ-ਬਿੰਦੂ (Origin)", "ਸਿਖ਼ਰ", "ਕੇਂਦਰ-ਬਿੰਦੂ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਮੂਲ-ਬਿੰਦੂ (Origin) ਦੇ ਨਿਰਦੇਸ਼-ਅੰਕ (Coordinates) ਕੀ ਹੁੰਦੇ ਹਨ?", ["(1, 1)", "(0, 0)", "(0, 1)", "(1, 0)"], 1],
+      ["ਬਿੰਦੂ (4, 7) ਵਿੱਚ x-ਨਿਰਦੇਸ਼-ਅੰਕ ਕੀ ਹੈ?", ["4", "7", "11", "3"], 0],
+      ["ਬਿੰਦੂ (3, 9) ਵਿੱਚ y-ਨਿਰਦੇਸ਼-ਅੰਕ ਕੀ ਹੈ?", ["3", "9", "12", "6"], 1],
+      ["ਬਿੰਦੂ (5, 0) ਕਿਸ ਧੁਰੇ 'ਤੇ ਸਥਿਤ ਹੁੰਦਾ ਹੈ?", ["x-ਧੁਰੇ 'ਤੇ", "y-ਧੁਰੇ 'ਤੇ", "ਮੂਲ-ਬਿੰਦੂ 'ਤੇ", "ਕਿਸੇ 'ਤੇ ਨਹੀਂ"], 0],
+      ["ਬਿੰਦੂ (0, 6) ਕਿਸ ਧੁਰੇ 'ਤੇ ਸਥਿਤ ਹੁੰਦਾ ਹੈ?", ["x-ਧੁਰੇ 'ਤੇ", "y-ਧੁਰੇ 'ਤੇ", "ਮੂਲ-ਬਿੰਦੂ 'ਤੇ", "ਕਿਸੇ 'ਤੇ ਨਹੀਂ"], 1],
+      ["x-ਧੁਰੇ 'ਤੇ ਸਥਿਤ ਹਰੇਕ ਬਿੰਦੂ ਦਾ y-ਨਿਰਦੇਸ਼-ਅੰਕ ਹਮੇਸ਼ਾ ਕੀ ਹੁੰਦਾ ਹੈ?", ["0", "1", "5", "ਕੋਈ ਵੀ"], 0],
+      ["y-ਧੁਰੇ 'ਤੇ ਸਥਿਤ ਹਰੇਕ ਬਿੰਦੂ ਦਾ x-ਨਿਰਦੇਸ਼-ਅੰਕ ਹਮੇਸ਼ਾ ਕੀ ਹੁੰਦਾ ਹੈ?", ["0", "1", "-1", "ਕੋਈ ਵੀ"], 0],
+      ["ਜੇ ਕਿਸੇ ਗ੍ਰਾਫ਼ ਦੇ ਸਾਰੇ ਬਿੰਦੂ ਇੱਕ ਸਿੱਧੀ ਰੇਖਾ 'ਤੇ ਹੋਣ, ਤਾਂ ਉਸ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਰੇਖੀ ਗ੍ਰਾਫ਼ (Linear Graph)", "ਪਾਈ ਚਾਰਟ", "ਛੜ-ਗ੍ਰਾਫ਼", "ਵਕਰ ਗ੍ਰਾਫ਼"], 0],
+      ["ਬਿੰਦੂ (2, 5) ਦੀ y-ਧੁਰੇ ਤੋਂ ਲੰਬ ਦੂਰੀ ਕਿੰਨੀ ਹੈ?", ["2 ਇਕਾਈਆਂ", "5 ਇਕਾਈਆਂ", "7 ਇਕਾਈਆਂ", "3 ਇਕਾਈਆਂ"], 0],
+      ["ਬਿੰਦੂ (2, 5) ਦੀ x-ਧੁਰੇ ਤੋਂ ਲੰਬ ਦੂਰੀ ਕਿੰਨੀ ਹੈ?", ["2 ਇਕਾਈਆਂ", "5 ਇਕਾਈਆਂ", "7 ਇਕਾਈਆਂ", "3 ਇਕਾਈਆਂ"], 1],
+      ["ਕੀ ਬਿੰਦੂ (1, 1), (2, 2), (3, 3) ਇੱਕ ਸਿੱਧੀ ਰੇਖਾ 'ਤੇ ਸਥਿਤ ਹਨ?", ["ਹਾਂ (ਮੂਲ-ਬਿੰਦੂ ਵਿੱਚੋਂ ਲੰਘਦੀ)", "ਨਹੀਂ", "ਕਦੇ ਨਹੀਂ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸੁਤੰਤਰ ਚੱਲ (Independent Variable) ਆਮ ਤੌਰ 'ਤੇ ਕਿਸ ਧੁਰੇ 'ਤੇ ਲਿਆ ਜਾਂਦਾ ਹੈ?", ["x-ਧੁਰੇ 'ਤੇ", "y-ਧੁਰੇ 'ਤੇ", "ਦੋਵਾਂ 'ਤੇ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਨਿਰਭਰ ਚੱਲ (Dependent Variable) ਆਮ ਤੌਰ 'ਤੇ ਕਿਸ ਧੁਰੇ 'ਤੇ ਲਿਆ ਜਾਂਦਾ ਹੈ?", ["x-ਧੁਰੇ 'ਤੇ", "y-ਧੁਰੇ 'ਤੇ", "ਕਿਸੇ 'ਤੇ ਨਹੀਂ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਸਮਾਂ-ਦੂਰੀ ਗ੍ਰਾਫ਼ ਵਿੱਚ ਸਮਾਂ ਕਿਸ ਧੁਰੇ 'ਤੇ ਦਰਸਾਇਆ ਜਾਂਦਾ ਹੈ?", ["x-ਧੁਰੇ 'ਤੇ", "y-ਧੁਰੇ 'ਤੇ", "ਮੂਲ-ਬਿੰਦੂ 'ਤੇ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜਮ੍ਹਾਂ ਰਕਮ ਅਤੇ ਸਾਧਾਰਨ ਵਿਆਜ ਦਾ ਗ੍ਰਾਫ਼ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਮੂਲ-ਬਿੰਦੂ ਵਿੱਚੋਂ ਲੰਘਦੀ ਸਿੱਧੀ ਰੇਖਾ", "ਚੱਕਰ", "ਟੇਢੀ ਵਕਰ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਨਿਰਦੇਸ਼-ਅੰਕ ਜਿਮਾਇਤੀ (Coordinate Geometry) ਦੇ ਪਿਤਾਮਾ ਕਿਸ ਨੂੰ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?", ["ਰੇਨੇ ਦੇਕਾਰਤ (René Descartes)", "ਨਿਊਟਨ", "ਪਾਇਥਾਗੋਰਸ", "ਰਾਮਾਨੁਜਨ"], 0]
+    ]
+  }
+];
+
+// --- State ---
+const TAGS = ['ੳ', 'ਅ', 'ੲ', 'ਸ'];
+const TIME_LIMIT = 15;
+let currentChIdx = 0;
+let activeQuestions = [];
+let currentQIdx = 0;
+let score = 0;
+let streak = 0;
+let answered = false;
+let playerName = '';
+let timerInterval = null;
+let timeLeft = TIME_LIMIT;
+let totalTimeUsed = 0;
+let lastRunId = null;
+
+function resetNameField() {
+  playerName = '';
+  const input = document.getElementById('playerNameInput');
+  input.value = '';
+  document.getElementById('nameWarn').style.display = 'none';
+}
+
+function onNameInput() {
+  playerName = document.getElementById('playerNameInput').value.trim();
+  if (playerName) document.getElementById('nameWarn').style.display = 'none';
+}
+
+// --- Leaderboard Helpers (Class 8 Maths Separate Storage) ---
+function getLeaderboard(chId) {
+  try {
+    return JSON.parse(localStorage.getItem('pseb8_math_lb_' + chId) || '[]');
+  } catch { return []; }
+}
+
+function addLeaderboardEntry(chId, name, sc, timeSec) {
+  const list = getLeaderboard(chId);
+  const runId = Date.now();
+  lastRunId = runId;
+  list.push({ id: runId, name, score: sc, time: timeSec, date: new Date().toLocaleDateString('pa-IN') });
+  list.sort((a, b) => (b.score - a.score) || (a.time - b.time));
+  const top = list.slice(0, 15);
+  localStorage.setItem('pseb8_math_lb_' + chId, JSON.stringify(top));
+  return top;
+}
+
+function renderLeaderboardHTML(chId, highlightId = null) {
+  const list = getLeaderboard(chId);
+  if (!list.length) {
+    return '<div class="lb-empty">ਅਜੇ ਕੋਈ ਸਕੋਰ ਦਰਜ ਨਹੀਂ ਹੋਇਆ। ਪਹਿਲੇ ਖਿਡਾਰੀ ਬਣੋ!</div>';
+  }
+  const medals = ['🥇', '🥈', '🥉'];
+  let rows = list.map((r, i) => `
+    <tr class="${r.id === highlightId ? 'me' : ''}">
+      <td>${medals[i] || (i + 1)}</td>
+      <td>${escapeHtml(r.name)}</td>
+      <td><strong>${r.score}/20</strong></td>
+      <td>${r.time}s</td>
+    </tr>
+  `).join('');
+  return `
+    <table class="lb-table">
+      <thead><tr><th>#</th><th>ਖਿਡਾਰੀ</th><th>ਸਕੋਰ</th><th>ਸਮਾਂ</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+function openLbModal(chId, chTitle) {
+  playSound('click');
+  document.getElementById('modalLbTitle').textContent = `🏆 ਅਧਿਆਇ ${chId}: ${chTitle}`;
+  document.getElementById('modalLbBody').innerHTML = renderLeaderboardHTML(chId);
+  document.getElementById('lbModal').classList.remove('hidden');
+}
+
+function closeLbModal() {
+  playSound('click');
+  document.getElementById('lbModal').classList.add('hidden');
+}
+
+function closeModalBg(e) {
+  if (e.target.id === 'lbModal') closeLbModal();
+}
+
+// --- Home Screen ---
+function renderHome() {
+  const grid = document.getElementById('chapterGrid');
+  grid.innerHTML = '';
+  CHAPTERS.forEach((ch, idx) => {
+    const lb = getLeaderboard(ch.id);
+    const top = lb.length ? lb[0] : null;
+    const card = document.createElement('div');
+    card.className = 'ch-card';
+    card.innerHTML = `
+      <div class="ch-clickable" onclick="startChapter(${idx})">
+        <div class="ch-num">ਅਧਿਆਇ ${ch.id} • 20 MCQ</div>
+        <div class="ch-title">${ch.title}</div>
+      </div>
+      <div class="ch-meta">
+        <span class="badge ${top ? 'done' : ''}" onclick="startChapter(${idx})" style="cursor:pointer;">
+          ${top ? '🥇 ' + escapeHtml(top.name) + ' (' + top.score + '/20)' : '▶ ਸ਼ੁਰੂ ਕਰੋ'}
+        </span>
+        <button class="btn btn-lb" onclick="openLbModal(${ch.id}, '${ch.title.replace(/'/g, "\\'")}')">🏆 ਲੀਡਰਬੋਰਡ</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// --- Quiz Flow & 15s Timer ---
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function startTimer() {
+  stopTimer();
+  timeLeft = TIME_LIMIT;
+  updateTimerUI();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft > 0 && timeLeft <= 5) playSound('tick');
+    if (timeLeft <= 0) {
+      stopTimer();
+      handleTimeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const pill = document.getElementById('timerPill');
+  const fill = document.getElementById('timerFill');
+  pill.textContent = `⏱️ ${timeLeft}s`;
+  fill.style.width = `${(timeLeft / TIME_LIMIT) * 100}%`;
+  if (timeLeft <= 5) {
+    pill.classList.add('danger');
+    fill.classList.add('danger');
+  } else {
+    pill.classList.remove('danger');
+    fill.classList.remove('danger');
+  }
+}
+
+function prepareShuffledQuestions(ch) {
+  return shuffleArray(ch.q).map(([questionText, options, correctIdx]) => {
+    const tagged = options.map((opt, idx) => ({ text: opt, isCorrect: idx === correctIdx }));
+    const shuffledOpts = shuffleArray(tagged);
+    return {
+      text: questionText,
+      options: shuffledOpts.map(o => o.text),
+      correctIdx: shuffledOpts.findIndex(o => o.isCorrect)
+    };
+  });
+}
+
+function startChapter(idx) {
+  playerName = document.getElementById('playerNameInput').value.trim() || playerName;
+  if (!playerName) {
+    playSound('wrong');
+    document.getElementById('nameWarn').style.display = 'inline';
+    document.getElementById('playerNameInput').focus();
+    return;
+  }
+  enterFullscreen();
+  playSound('click');
+  currentChIdx = idx;
+  activeQuestions = prepareShuffledQuestions(CHAPTERS[idx]);
+  currentQIdx = 0;
+  score = 0;
+  streak = 0;
+  totalTimeUsed = 0;
+  document.getElementById('activePlayer').textContent = playerName;
+  document.getElementById('homeScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const ch = CHAPTERS[currentChIdx];
+  const item = activeQuestions[currentQIdx];
+  document.getElementById('qChapter').textContent = `ਅਧਿਆਇ ${ch.id}: ${ch.title}`;
+  document.getElementById('qCount').textContent = `${currentQIdx + 1}/${activeQuestions.length}`;
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+  document.getElementById('progressFill').style.width = `${(currentQIdx / activeQuestions.length) * 100}%`;
+  document.getElementById('qText').textContent = `${currentQIdx + 1}. ${item.text}`;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('nextBtn').classList.add('hidden');
+
+  const box = document.getElementById('optionsBox');
+  box.innerHTML = '';
+  item.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-tag">${TAGS[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => checkAnswer(i, btn);
+    box.appendChild(btn);
+  });
+
+  startTimer();
+}
+
+function handleTimeUp() {
+  if (answered) return;
+  answered = true;
+  totalTimeUsed += TIME_LIMIT;
+  const item = activeQuestions[currentQIdx];
+  const correctIdx = item.correctIdx;
+  const allBtns = document.querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+  allBtns[correctIdx].classList.add('correct');
+  streak = 0;
+  playSound('wrong');
+
+  const fb = document.getElementById('feedback');
+  fb.textContent = `⏰ ਸਮਾਂ ਸਮਾਪਤ! ਸਹੀ ਉੱਤਰ: (${TAGS[correctIdx]}) ${item.options[correctIdx]}`;
+  fb.className = 'feedback no';
+  document.getElementById('streakVal').textContent = streak;
+  document.getElementById('progressFill').style.width = `${((currentQIdx + 1) / activeQuestions.length) * 100}%`;
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = (currentQIdx === activeQuestions.length - 1) ? 'ਨਤੀਜਾ ਦੇਖੋ 🏆' : 'ਅਗਲਾ ਪ੍ਰਸ਼ਨ ➡️';
+  nextBtn.classList.remove('hidden');
+}
+
+function checkAnswer(selectedIdx, btn) {
+  if (answered) return;
+  answered = true;
+  stopTimer();
+  totalTimeUsed += (TIME_LIMIT - timeLeft);
+
+  const item = activeQuestions[currentQIdx];
+  const correctIdx = item.correctIdx;
+  const allBtns = document.querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback');
+  if (selectedIdx === correctIdx) {
+    btn.classList.add('correct');
+    score++;
+    streak++;
+    playSound('correct');
+    fb.textContent = '✅ ਸ਼ਾਬਾਸ਼! ਬਿਲਕੁਲ ਸਹੀ ਉੱਤਰ!';
+    fb.className = 'feedback ok';
+  } else {
+    btn.classList.add('wrong');
+    allBtns[correctIdx].classList.add('correct');
+    streak = 0;
+    playSound('wrong');
+    fb.textContent = `❌ ਗਲਤ! ਸਹੀ ਉੱਤਰ: (${TAGS[correctIdx]}) ${item.options[correctIdx]}`;
+    fb.className = 'feedback no';
+  }
+
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+  document.getElementById('progressFill').style.width = `${((currentQIdx + 1) / activeQuestions.length) * 100}%`;
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = (currentQIdx === activeQuestions.length - 1) ? 'ਨਤੀਜਾ ਦੇਖੋ 🏆' : 'ਅਗਲਾ ਪ੍ਰਸ਼ਨ ➡️';
+  nextBtn.classList.remove('hidden');
+}
+
+function nextQuestion() {
+  playSound('click');
+  if (currentQIdx < activeQuestions.length - 1) {
+    currentQIdx++;
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  stopTimer();
+  const ch = CHAPTERS[currentChIdx];
+  addLeaderboardEntry(ch.id, playerName, score, totalTimeUsed);
+  playSound('win');
+
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  document.getElementById('resultPlayer').textContent = `👤 ${playerName} • ⏱️ ${totalTimeUsed} ਸਕਿੰਟ`;
+  document.getElementById('resultChapter').textContent = `ਅਧਿਆਇ ${ch.id}: ${ch.title}`;
+  document.getElementById('resultScore').textContent = `${score} / ${activeQuestions.length}`;
+
+  const pct = Math.round((score / activeQuestions.length) * 100);
+  let stars = '⭐', msg = 'ਹੋਰ ਅਭਿਆਸ ਕਰੋ! ਤੁਸੀਂ ਹੋਰ ਵਧੀਆ ਕਰ ਸਕਦੇ ਹੋ।';
+  if (pct >= 85) { stars = '⭐⭐⭐'; msg = 'ਸ਼ਾਨਦਾਰ ਪ੍ਰਦਰਸ਼ਨ! ਸਾਰੇ ਟੌਪਿਕ ਪੱਕੇ ਹਨ।'; }
+  else if (pct >= 60) { stars = '⭐⭐'; msg = 'ਵਧੀਆ ਕੋਸ਼ਿਸ਼! ਥੋੜ੍ਹੀ ਹੋਰ ਦੁਹਰਾਈ ਨਾਲ 100% ਆ ਸਕਦੇ ਹਨ।'; }
+  document.getElementById('resultStars').textContent = stars;
+  document.getElementById('resultMsg').textContent = `${pct}% — ${msg}`;
+
+  document.getElementById('resultLbTitle').textContent = `🏆 ਅਧਿਆਇ ${ch.id} — ਆਲ-ਟਾਈਮ ਲੀਡਰਬੋਰਡ`;
+  document.getElementById('resultLbBody').innerHTML = renderLeaderboardHTML(ch.id, lastRunId);
+}
+
+function restartChapter() {
+  startChapter(currentChIdx);
+}
+
+function goHome() {
+  stopTimer();
+  playSound('click');
+  resetNameField();
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('homeScreen').classList.remove('hidden');
+  renderHome();
+}
+
+resetNameField();
+renderHome();
+</script>
+</body>
+</html>
