@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7ਵੀਂ ਵਿਗਿਆਨ - 260 MCQ ਕਵਿਜ਼ ਗੇਮ</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-hover: #334155;
+    --accent: #34d399;
+    --accent2: #2dd4bf;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --gold: #facc15;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Gurmukhi', 'Raavi', system-ui, sans-serif; }
+  body {
+    background: radial-gradient(circle at top, #134e4a 0%, #0f172a 65%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: rgba(15, 23, 42, 0.92);
+    border-bottom: 2px solid #334155;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .title-wrap h1 { font-size: 1.5rem; color: var(--accent); }
+  .title-wrap p { font-size: 0.9rem; color: var(--muted); }
+  .top-btns { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-menu { background: #34d399; color: #0f172a; }
+  .btn-menu:hover { background: #6ee7b7; }
+  .btn-hub { background: #f59e0b; color: #0f172a; }
+  .btn-hub:hover { background: #fbbf24; }
+  .btn-sound { background: #334155; color: var(--text); }
+  .btn-sound:hover { background: #475569; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0f172a; }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-lb { background: rgba(250, 204, 21, 0.16); color: var(--gold); border: 1px solid rgba(250, 204, 21, 0.4); padding: 6px 12px; font-size: 0.88rem; border-radius: 10px; }
+  .btn-lb:hover { background: rgba(250, 204, 21, 0.28); }
+
+  main { flex: 1; padding: 20px 28px; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+  /* Player Name Bar */
+  .player-bar {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 16px;
+    padding: 16px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .player-input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+  .player-input-group label { font-size: 1.1rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .player-input-group input {
+    background: #0f172a;
+    color: var(--text);
+    border: 2px solid #475569;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-width: 240px;
+    max-width: 360px;
+    flex: 1;
+    outline: none;
+  }
+  .player-input-group input:focus { border-color: var(--accent); }
+  .name-warn { color: #f87171; font-size: 0.95rem; font-weight: 700; display: none; }
+  .timer-note { color: var(--muted); font-size: 0.95rem; font-weight: 600; }
+
+  /* Chapter Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .ch-card {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 16px;
+    padding: 18px;
+    transition: transform 0.18s, border-color 0.2s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 138px;
+  }
+  .ch-card:hover { transform: translateY(-3px); border-color: var(--accent); background: #243247; }
+  .ch-clickable { cursor: pointer; flex: 1; }
+  .ch-num { font-size: 0.85rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .ch-title { font-size: 1.15rem; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
+  .ch-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid #334155; }
+  .badge { background: rgba(52, 211, 153, 0.15); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
+  .badge.done { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+
+  /* Quiz Screen */
+  .hidden { display: none !important; }
+  .quiz-wrap { max-width: 1020px; margin: 0 auto; }
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .quiz-stats { display: flex; gap: 10px; font-size: 1rem; font-weight: 700; flex-wrap: wrap; }
+  .stat-pill { background: var(--card); padding: 8px 14px; border-radius: 12px; border: 1px solid #334155; }
+  .timer-pill {
+    background: rgba(52, 211, 153, 0.18);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    min-width: 105px;
+    text-align: center;
+  }
+  .timer-pill.danger {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: var(--wrong);
+    color: #fca5a5;
+    animation: pulse 0.6s infinite alternate;
+  }
+  @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.06); } }
+
+  .progress-bar {
+    height: 10px;
+    background: #334155;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  .timer-bar {
+    height: 7px;
+    background: #1e293b;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .timer-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 100%;
+    transition: width 1s linear, background 0.3s;
+  }
+  .timer-fill.danger { background: var(--wrong); }
+
+  .q-box {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 18px;
+  }
+  .q-chapter { font-size: 0.95rem; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+  .q-text { font-size: 1.5rem; font-weight: 700; line-height: 1.5; }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 720px) { .options { grid-template-columns: 1fr; } .q-text { font-size: 1.25rem; } }
+  .opt-btn {
+    background: var(--card);
+    color: var(--text);
+    border: 2px solid #475569;
+    border-radius: 16px;
+    padding: 18px 20px;
+    font-size: 1.18rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #273549; transform: translateY(-2px); }
+  .opt-btn:disabled { cursor: default; }
+  .opt-tag {
+    min-width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .opt-btn.correct { background: rgba(34, 197, 94, 0.22); border-color: var(--correct); }
+  .opt-btn.correct .opt-tag { background: var(--correct); color: #0f172a; }
+  .opt-btn.wrong { background: rgba(239, 68, 68, 0.22); border-color: var(--wrong); }
+  .opt-btn.wrong .opt-tag { background: var(--wrong); color: #fff; }
+
+  .quiz-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 52px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .feedback { font-size: 1.18rem; font-weight: 700; }
+  .feedback.ok { color: #4ade80; }
+  .feedback.no { color: #f87171; }
+
+  /* Result Screen */
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 16px auto;
+  }
+  @media (max-width: 860px) { .result-grid { grid-template-columns: 1fr; } }
+  .result-card, .lb-panel {
+    background: var(--card);
+    border: 2px solid #334155;
+    border-radius: 22px;
+    padding: 28px;
+  }
+  .result-card { border-color: var(--accent); text-align: center; }
+  .stars { font-size: 2.8rem; margin-bottom: 8px; color: var(--gold); }
+  .result-player { font-size: 1.15rem; color: var(--gold); font-weight: 700; margin-bottom: 6px; }
+  .result-score { font-size: 2.6rem; font-weight: 800; color: var(--accent); margin: 10px 0; }
+  .result-msg { font-size: 1.1rem; color: var(--muted); margin-bottom: 22px; }
+  .result-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+  /* Leaderboard Table */
+  .lb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
+  .lb-header h3 { font-size: 1.25rem; color: var(--gold); }
+  .lb-table { width: 100%; border-collapse: collapse; font-size: 0.98rem; }
+  .lb-table th, .lb-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #334155; }
+  .lb-table th { color: var(--muted); font-size: 0.88rem; }
+  .lb-table tr.me { background: rgba(52, 211, 153, 0.16); font-weight: 700; }
+  .lb-empty { color: var(--muted); text-align: center; padding: 28px 10px; font-size: 1.05rem; }
+
+  /* Modal */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .modal-box {
+    background: var(--card);
+    border: 2px solid var(--gold);
+    border-radius: 22px;
+    padding: 24px 28px;
+    width: 100%;
+    max-width: 620px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-wrap">
+    <h1>🌿 7ਵੀਂ ਵਿਗਿਆਨ — ਮੈਗਾ ਕਵਿਜ਼ ਗੇਮ</h1>
+    <p>PSEB (13 ਅਧਿਆਇ × 20 MCQ = 260 ਪ੍ਰਸ਼ਨ)</p>
+  </div>
+  <div class="top-btns">
+    <button class="btn btn-sound" id="soundToggle" onclick="toggleSound()">🔊 ਆਵਾਜ਼: ਚਾਲੂ</button>
+    <button class="btn btn-menu" onclick="goHome()">📋 Back to Menu</button>
+    <a class="btn btn-hub" href="../index.html" onclick="playSound('click')">🏠 Back to Hub</a>
+  </div>
+</header>
+
+<main>
+  <!-- Home / Chapter Selection -->
+  <section id="homeScreen">
+    <div class="player-bar">
+      <div class="player-input-group">
+        <label for="playerNameInput">👤 ਖਿਡਾਰੀ ਦਾ ਨਾਮ:</label>
+        <input type="text" id="playerNameInput" maxlength="25" placeholder="ਆਪਣਾ ਨਾਮ ਲਿਖੋ..." autocomplete="off" oninput="onNameInput()">
+        <span class="name-warn" id="nameWarn">⚠️ ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਆਪਣਾ ਨਾਮ ਲਿਖੋ!</span>
+      </div>
+      <div class="timer-note">⏱️ ਹਰ ਪ੍ਰਸ਼ਨ ਲਈ 15 ਸਕਿੰਟ • 🔀 ਸ਼ਫ਼ਲ ਮੋਡ</div>
+    </div>
+    <div class="grid" id="chapterGrid"></div>
+  </section>
+
+  <!-- Quiz Screen -->
+  <section id="quizScreen" class="quiz-wrap hidden">
+    <div class="quiz-top">
+      <button class="btn btn-menu" onclick="goHome()">⬅️ Back to Menu</button>
+      <div class="quiz-stats">
+        <div class="stat-pill">👤 <span id="activePlayer"></span></div>
+        <div class="stat-pill">ਪ੍ਰਸ਼ਨ: <span id="qCount">1/20</span></div>
+        <div class="stat-pill">ਸਕੋਰ: <span id="scoreVal">0</span></div>
+        <div class="stat-pill">🔥 <span id="streakVal">0</span></div>
+        <div class="stat-pill timer-pill" id="timerPill">⏱️ 15s</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+    <div class="q-box">
+      <div class="q-chapter" id="qChapter"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="options" id="optionsBox"></div>
+    <div class="quiz-footer">
+      <div class="feedback" id="feedback"></div>
+      <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">ਅਗਲਾ ਪ੍ਰਸ਼ਨ ➡️</button>
+    </div>
+  </section>
+
+  <!-- Result Screen -->
+  <section id="resultScreen" class="hidden">
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="stars" id="resultStars">⭐⭐⭐</div>
+        <div class="result-player" id="resultPlayer"></div>
+        <h2 id="resultChapter"></h2>
+        <div class="result-score" id="resultScore">0 / 20</div>
+        <p class="result-msg" id="resultMsg"></p>
+        <div class="result-btns">
+          <button class="btn btn-primary" onclick="restartChapter()">🔄 ਦੁਬਾਰਾ ਖੇਡੋ</button>
+          <button class="btn btn-menu" onclick="goHome()">📋 Back to Menu</button>
+          <a class="btn btn-hub" href="../index.html" onclick="playSound('click')">🏠 Back to Hub</a>
+        </div>
+      </div>
+      <div class="lb-panel">
+        <div class="lb-header">
+          <h3 id="resultLbTitle">🏆 ਆਲ-ਟਾਈਮ ਲੀਡਰਬੋਰਡ</h3>
+        </div>
+        <div id="resultLbBody"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Leaderboard Modal -->
+<div class="modal-bg hidden" id="lbModal" onclick="closeModalBg(event)">
+  <div class="modal-box">
+    <div class="lb-header">
+      <h3 id="modalLbTitle">🏆 ਲੀਡਰਬੋਰਡ</h3>
+      <button class="btn btn-sound" onclick="closeLbModal()">✖ ਬੰਦ ਕਰੋ</button>
+    </div>
+    <div id="modalLbBody"></div>
+  </div>
+</div>
+
+<script>
+// --- Fullscreen Helper ---
+function enterFullscreen() {
+  const elem = document.documentElement;
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    try {
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } catch (e) {}
+  }
+}
+
+// --- Web Audio API Sound Effects ---
+let soundOn = true;
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+function initAudio() { if (!ctx) ctx = new AudioCtx(); if (ctx.state === 'suspended') ctx.resume(); }
+
+function playSound(type) {
+  if (!soundOn) return;
+  initAudio();
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  if (type === 'click') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(520, now);
+    gain.gain.setValueAtTime(0.11, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    osc.start(now); osc.stop(now + 0.08);
+  } else if (type === 'tick') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now);
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    osc.start(now); osc.stop(now + 0.05);
+  } else if (type === 'correct') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, now);
+    osc.frequency.setValueAtTime(659.25, now + 0.08);
+    osc.frequency.setValueAtTime(783.99, now + 0.16);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc.start(now); osc.stop(now + 0.35);
+  } else if (type === 'wrong') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.linearRampToValueAtTime(140, now + 0.25);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+    osc.start(now); osc.stop(now + 0.28);
+  } else if (type === 'win') {
+    [523, 659, 784, 1046].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.setValueAtTime(f, now + i * 0.11);
+      g.gain.setValueAtTime(0.16, now + i * 0.11);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now + i * 0.11); o.stop(now + i * 0.11 + 0.3);
+    });
+  }
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('soundToggle').textContent = soundOn ? '🔊 ਆਵਾਜ਼: ਚਾਲੂ' : '🔇 ਆਵਾਜ਼: ਬੰਦ';
+  if (soundOn) playSound('click');
+}
+
+// --- Fisher-Yates Shuffle ---
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// --- 13 Chapters × 20 MCQs = 260 Questions (PSEB Class 7 Science 2025-26) ---
+const CHAPTERS = [
+  {
+    id: 1, title: "ਪੌਦਿਆਂ ਵਿੱਚ ਪੋਸ਼ਣ",
+    q: [
+      ["ਹਰੇ ਪੌਦੇ ਆਪਣਾ ਭੋਜਨ ਆਪ ਬਣਾਉਂਦੇ ਹਨ, ਇਸ ਲਈ ਉਹਨਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਪਰਪੋਸ਼ੀ", "ਸਵੈ-ਪੋਸ਼ੀ", "ਮ੍ਰਿਤਜੀਵੀ", "ਪਰਜੀਵੀ"], 1],
+      ["ਪੌਦਿਆਂ ਦੀਆਂ ਭੋਜਨ ਫੈਕਟਰੀਆਂ ਕਿਸ ਨੂੰ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?", ["ਜੜ੍ਹਾਂ", "ਤਣਾ", "ਪੱਤੇ", "ਫੁੱਲ"], 2],
+      ["ਪੱਤਿਆਂ ਵਿੱਚ ਮੌਜੂਦ ਹਰੇ ਰੰਗ ਦੇ ਵਰਣਕ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਕਲੋਰੋਫਿੱਲ", "ਹੀਮੋਗਲੋਬਿਨ", "ਸਟਾਰਚ", "ਪ੍ਰੋਟੀਨ"], 0],
+      ["ਪੱਤਿਆਂ ਦੀ ਸਤ੍ਹਾ 'ਤੇ ਮੌਜੂਦ ਬਰੀਕ ਛੇਕਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਰੱਖਿਅਕ ਸੈੱਲ", "ਸਟੋਮੈਟਾ (ਰੰਧਰ)", "ਵਹਿਣੀਆਂ", "ਜੜ੍ਹਾਂ"], 1],
+      ["ਪ੍ਰਕਾਸ਼-ਸੰਸ਼ਲੇਸ਼ਣ ਦੌਰਾਨ ਪੌਦੇ ਹਵਾ ਵਿੱਚੋਂ ਕਿਹੜੀ ਗੈਸ ਲੈਂਦੇ ਹਨ?", ["ਆਕਸੀਜਨ", "ਕਾਰਬਨ ਡਾਈਆਕਸਾਈਡ", "ਨਾਈਟ੍ਰੋਜਨ", "ਹਾਈਡ੍ਰੋਜਨ"], 1],
+      ["ਪ੍ਰਕਾਸ਼-ਸੰਸ਼ਲੇਸ਼ਣ ਦੌਰਾਨ ਕਿਹੜੀ ਗੈਸ ਮੁਕਤ ਹੁੰਦੀ ਹੈ?", ["ਕਾਰਬਨ ਡਾਈਆਕਸਾਈਡ", "ਆਕਸੀਜਨ", "ਨਾਈਟ੍ਰੋਜਨ", "ਮੀਥੇਨ"], 1],
+      ["ਪ੍ਰਕਾਸ਼-ਸੰਸ਼ਲੇਸ਼ਣ ਵਿੱਚ ਪੌਦਿਆਂ ਦੁਆਰਾ ਬਣਾਇਆ ਭੋਜਨ ਕਿਸ ਰੂਪ ਵਿੱਚ ਜਮ੍ਹਾਂ ਹੁੰਦਾ ਹੈ?", ["ਸਟਾਰਚ (ਮੰਡ)", "ਚਰਬੀ", "ਲੂਣ", "ਵਿਟਾਮਿਨ"], 0],
+      ["ਪੱਤੇ ਵਿੱਚ ਸਟਾਰਚ ਦੀ ਮੌਜੂਦਗੀ ਦੀ ਜਾਂਚ ਕਿਸ ਘੋਲ ਨਾਲ ਕੀਤੀ ਜਾਂਦੀ ਹੈ?", ["ਆਇਓਡੀਨ ਘੋਲ", "ਨਮਕ ਦਾ ਘੋਲ", "ਖੰਡ ਦਾ ਘੋਲ", "ਸਿਰਕਾ"], 0],
+      ["ਸਾਰੇ ਸਜੀਵਾਂ ਲਈ ਊਰਜਾ ਦਾ ਮੁੱਖ ਸਰੋਤ ਕੀ ਹੈ?", ["ਚੰਦਰਮਾ", "ਸੂਰਜ", "ਹਵਾ", "ਪਾਣੀ"], 1],
+      ["ਅਮਰਵੇਲ (Cuscuta) ਕਿਸ ਦੀ ਉਦਾਹਰਨ ਹੈ?", ["ਸਵੈ-ਪੋਸ਼ੀ", "ਪਰਜੀਵੀ (Parasite)", "ਮ੍ਰਿਤਜੀਵੀ", "ਕੀਟ-ਆਹਾਰੀ"], 1],
+      ["ਕੀੜਿਆਂ ਨੂੰ ਫਸਾ ਕੇ ਖਾਣ ਵਾਲਾ ਪੌਦਾ ਕਿਹੜਾ ਹੈ?", ["ਅਮਰਵੇਲ", "ਘੜਾ ਬੂਟੀ (Pitcher Plant)", "ਗੁਲਾਬ", "ਅੰਬ"], 1],
+      ["ਮ੍ਰਿਤ ਅਤੇ ਗਲ਼ੇ-ਸੜੇ ਪਦਾਰਥਾਂ ਤੋਂ ਪੋਸ਼ਣ ਲੈਣ ਵਾਲੇ ਜੀਵਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਪਰਜੀਵੀ", "ਮ੍ਰਿਤਜੀਵੀ (Saprotrophs)", "ਸਵੈ-ਪੋਸ਼ੀ", "ਕੀਟ-ਆਹਾਰੀ"], 1],
+      ["ਖੁੰਬ (Mushroom) ਅਤੇ ਬ੍ਰੈੱਡ 'ਤੇ ਉੱਗਣ ਵਾਲੀ ਉੱਲੀ ਕਿਸ ਕਿਸਮ ਦੇ ਜੀਵ ਹਨ?", ["ਮ੍ਰਿਤਜੀਵੀ", "ਸਵੈ-ਪੋਸ਼ੀ", "ਪਰਜੀਵੀ", "ਕੀਟ-ਆਹਾਰੀ"], 0],
+      ["ਲਾਈਕਨ (Lichen) ਵਿੱਚ ਕਿਹੜੇ ਦੋ ਜੀਵਾਂ ਦਾ ਸਹਿਜੀਵੀ ਸੰਬੰਧ ਹੁੰਦਾ ਹੈ?", ["ਕਾਈ (ਐਲਗੀ) ਅਤੇ ਉੱਲੀ", "ਜੀਵਾਣੂ ਅਤੇ ਵਿਸ਼ਾਣੂ", "ਅਮਰਵੇਲ ਅਤੇ ਰੁੱਖ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਫਲੀਦਾਰ ਪੌਦਿਆਂ ਦੀਆਂ ਜੜ੍ਹਾਂ ਵਿੱਚ ਰਹਿਣ ਵਾਲਾ ਨਾਈਟ੍ਰੋਜਨ ਸਥਿਰੀਕਰਨ ਜੀਵਾਣੂ ਕਿਹੜਾ ਹੈ?", ["ਰਾਈਜ਼ੋਬੀਅਮ", "ਲੈਕਟੋਬੈਸੀਲਸ", "ਅਮੀਬਾ", "ਈਸਟ"], 0],
+      ["ਸਟੋਮੈਟਾ ਕਿਸ ਦੁਆਰਾ ਘਿਰੇ ਹੁੰਦੇ ਹਨ?", ["ਰੱਖਿਅਕ ਸੈੱਲਾਂ ਦੁਆਰਾ", "ਜੜ੍ਹਾਂ ਦੁਆਰਾ", "ਫੁੱਲਾਂ ਦੁਆਰਾ", "ਤਣੇ ਦੁਆਰਾ"], 0],
+      ["ਛੱਪੜਾਂ ਵਿੱਚ ਖੜ੍ਹੇ ਪਾਣੀ 'ਤੇ ਹਰੇ ਰੰਗ ਦੇ ਧੱਬੇ ਕਿਸ ਕਾਰਨ ਬਣਦੇ ਹਨ?", ["ਕਾਈ (ਐਲਗੀ)", "ਉੱਲੀ", "ਅਮਰਵੇਲ", "ਰੇਤ"], 0],
+      ["ਪੌਦੇ ਮਿੱਟੀ ਵਿੱਚੋਂ ਪਾਣੀ ਅਤੇ ਖਣਿਜ ਕਿਸ ਭਾਗ ਰਾਹੀਂ ਸੋਖਦੇ ਹਨ?", ["ਪੱਤੇ", "ਜੜ੍ਹਾਂ", "ਫੁੱਲ", "ਬੀਜ"], 1],
+      ["ਸਜੀਵਾਂ ਦੀਆਂ ਸਰੀਰਕ ਇਕਾਈਆਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸੈੱਲ", "ਅੰਗ", "ਟਿਸ਼ੂ", "ਬੀਜ"], 0],
+      ["ਪ੍ਰੋਟੀਨ ਵਿੱਚ ਕਿਹੜਾ ਤੱਤ ਜ਼ਰੂਰੀ ਤੌਰ 'ਤੇ ਮੌਜੂਦ ਹੁੰਦਾ ਹੈ?", ["ਨਾਈਟ੍ਰੋਜਨ", "ਸੋਨਾ", "ਚਾਂਦੀ", "ਲੋਹਾ"], 0]
+    ]
+  },
+  {
+    id: 2, title: "ਜੰਤੂਆਂ ਵਿੱਚ ਪੋਸ਼ਣ",
+    q: [
+      ["ਮਨੁੱਖੀ ਸਰੀਰ ਦੀ ਸਭ ਤੋਂ ਵੱਡੀ ਗ੍ਰੰਥੀ ਕਿਹੜੀ ਹੈ?", ["ਪੈਨਕ੍ਰੀਆਸ", "ਜਿਗਰ (Liver)", "ਲਾਰ ਗ੍ਰੰਥੀ", "ਮਿਹਦਾ"], 1],
+      ["ਪਿੱਤ ਰਸ (Bile) ਕਿੱਥੇ ਪੈਦਾ ਹੁੰਦਾ ਹੈ?", ["ਮਿਹਦੇ ਵਿੱਚ", "ਜਿਗਰ ਵਿੱਚ", "ਛੋਟੀ ਆਂਦਰ ਵਿੱਚ", "ਮੂੰਹ ਵਿੱਚ"], 1],
+      ["ਪਿੱਤ ਰਸ ਕਿਸ ਦੇ ਪਾਚਨ ਵਿੱਚ ਮਹੱਤਵਪੂਰਨ ਭੂਮਿਕਾ ਨਿਭਾਉਂਦਾ ਹੈ?", ["ਚਰਬੀ (ਵਸਾ)", "ਸਟਾਰਚ", "ਵਿਟਾਮਿਨ", "ਪਾਣੀ"], 0],
+      ["ਲਾਰ (Saliva) ਭੋਜਨ ਵਿਚਲੇ ਸਟਾਰਚ ਨੂੰ ਕਿਸ ਵਿੱਚ ਬਦਲਦੀ ਹੈ?", ["ਪ੍ਰੋਟੀਨ", "ਸ਼ੱਕਰ (ਖੰਡ)", "ਚਰਬੀ", "ਲੂਣ"], 1],
+      ["ਭੋਜਨ ਦਾ ਪੂਰਨ ਪਾਚਨ ਕਿੱਥੇ ਹੁੰਦਾ ਹੈ?", ["ਮਿਹਦੇ ਵਿੱਚ", "ਛੋਟੀ ਆਂਦਰ ਵਿੱਚ", "ਵੱਡੀ ਆਂਦਰ ਵਿੱਚ", "ਭੋਜਨ ਨਲੀ ਵਿੱਚ"], 1],
+      ["ਅਣਪਚੇ ਭੋਜਨ ਵਿੱਚੋਂ ਪਾਣੀ ਅਤੇ ਲੂਣਾਂ ਦਾ ਸੋਖਣ ਕਿੱਥੇ ਹੁੰਦਾ ਹੈ?", ["ਛੋਟੀ ਆਂਦਰ", "ਵੱਡੀ ਆਂਦਰ", "ਮਿਹਦਾ", "ਮੂੰਹ"], 1],
+      ["ਛੋਟੀ ਆਂਦਰ ਦੀ ਅੰਦਰੂਨੀ ਕੰਧ 'ਤੇ ਉਂਗਲਾਂ ਵਰਗੇ ਉਭਾਰਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਵਿੱਲੀ (ਰਸਾਂਕੁਰ)", "ਸਟੋਮੈਟਾ", "ਦੰਦ", "ਗ੍ਰੰਥੀਆਂ"], 0],
+      ["ਮਿਹਦੇ ਵਿੱਚ ਕਿਹੜਾ ਤੇਜ਼ਾਬ ਪੈਦਾ ਹੁੰਦਾ ਹੈ ਜੋ ਜੀਵਾਣੂਆਂ ਨੂੰ ਮਾਰਦਾ ਹੈ?", ["ਸਲਫਿਊਰਿਕ ਤੇਜ਼ਾਬ", "ਹਾਈਡ੍ਰੋਕਲੋਰਿਕ ਤੇਜ਼ਾਬ (HCl)", "ਸਿਟ੍ਰਿਕ ਤੇਜ਼ਾਬ", "ਐਸੀਟਿਕ ਤੇਜ਼ਾਬ"], 1],
+      ["ਮਨੁੱਖੀ ਛੋਟੀ ਆਂਦਰ ਦੀ ਲੰਬਾਈ ਲਗਭਗ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["1.5 ਮੀਟਰ", "7.5 ਮੀਟਰ", "20 ਮੀਟਰ", "0.5 ਮੀਟਰ"], 1],
+      ["ਮਨੁੱਖੀ ਵੱਡੀ ਆਂਦਰ ਦੀ ਲੰਬਾਈ ਲਗਭਗ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["1.5 ਮੀਟਰ", "7.5 ਮੀਟਰ", "10 ਮੀਟਰ", "5 ਮੀਟਰ"], 0],
+      ["ਚੀਰਨ ਅਤੇ ਫਾੜਨ ਵਾਲੇ ਦੰਦਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਕੱਟਣ ਵਾਲੇ ਦੰਦ", "ਸੂਏ ਦੰਦ (Canines)", "ਦਾੜ੍ਹਾਂ", "ਅੱਗਲੀਆਂ ਦਾੜ੍ਹਾਂ"], 1],
+      ["ਬਾਲਗ ਮਨੁੱਖ ਦੇ ਮੂੰਹ ਵਿੱਚ ਕੁੱਲ ਕਿੰਨੇ ਸਥਾਈ ਦੰਦ ਹੁੰਦੇ ਹਨ?", ["20", "28", "32", "36"], 2],
+      ["ਘਾਹ ਖਾਣ ਵਾਲੇ ਜੰਤੂਆਂ (ਜਿਵੇਂ ਗਾਂ, ਮੱਝ) ਨੂੰ ਕੀ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?", ["ਜੁਗਾਲੀ ਕਰਨ ਵਾਲੇ (Ruminants)", "ਮਾਸਾਹਾਰੀ", "ਪਰਜੀਵੀ", "ਮ੍ਰਿਤਜੀਵੀ"], 0],
+      ["ਘਾਹ ਵਿੱਚ ਕਿਹੜਾ ਕਾਰਬੋਹਾਈਡ੍ਰੇਟ ਭਰਪੂਰ ਹੁੰਦਾ ਹੈ ਜਿਸ ਨੂੰ ਮਨੁੱਖ ਨਹੀਂ ਪਚਾ ਸਕਦੇ?", ["ਗਲੂਕੋਜ਼", "ਸੈਲੂਲੋਜ਼", "ਸ਼ੱਕਰ", "ਸਟਾਰਚ"], 1],
+      ["ਅਮੀਬਾ ਆਪਣਾ ਭੋਜਨ ਕਿਸ ਦੀ ਮਦਦ ਨਾਲ ਫੜਦਾ ਹੈ?", ["ਪੈਰਾਂ ਨਾਲ", "ਅਭਾਸੀ ਪੈਰ (Pseudopodia)", "ਦੰਦਾਂ ਨਾਲ", "ਖੰਭਾਂ ਨਾਲ"], 1],
+      ["ਅਮੀਬਾ ਵਿੱਚ ਭੋਜਨ ਦਾ ਪਾਚਨ ਕਿੱਥੇ ਹੁੰਦਾ ਹੈ?", ["ਭੋਜਨ ਰਸਧਾਨੀ (Food Vacuole)", "ਕੇਂਦਰਕ", "ਮਿਹਦਾ", "ਆਂਦਰ"], 0],
+      ["ਪਿੱਤ ਰਸ ਕਿਸ ਥੈਲੀ ਵਿੱਚ ਜਮ੍ਹਾਂ ਰਹਿੰਦਾ ਹੈ?", ["ਪਿੱਤਾ (Gall Bladder)", "ਮਿਹਦਾ", "ਫੇਫੜੇ", "ਗੁਰਦੇ"], 0],
+      ["ਜੀਭ ਦਾ ਮੁੱਖ ਕੰਮ ਕੀ ਹੈ?", ["ਸਵਾਦ ਦਾ ਪਤਾ ਲਗਾਉਣਾ ਤੇ ਬੋਲਣ ਵਿੱਚ ਮਦਦ", "ਸਾਹ ਲੈਣਾ", "ਲਹੂ ਪੰਪ ਕਰਨਾ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਦਸਤ (Diarrhoea) ਲੱਗਣ 'ਤੇ ਸਰੀਰ ਵਿੱਚ ਪਾਣੀ ਦੀ ਕਮੀ ਪੂਰੀ ਕਰਨ ਲਈ ਕੀ ਦਿੱਤਾ ਜਾਂਦਾ ਹੈ?", ["ORS ਘੋਲ", "ਤੇਲ", "ਦੁੱਧ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਪ੍ਰੋਟੀਨ ਦੇ ਪਾਚਨ ਤੋਂ ਬਾਅਦ ਕੀ ਬਣਦਾ ਹੈ?", ["ਫੈਟੀ ਐਸਿਡ", "ਅਮੀਨੋ ਐਸਿਡ", "ਗਲੂਕੋਜ਼", "ਸਟਾਰਚ"], 1]
+    ]
+  },
+  {
+    id: 3, title: "ਤਾਪ",
+    q: [
+      ["ਕਿਸੇ ਵਸਤੂ ਦੀ ਗਰਮੀ ਦੇ ਦਰਜੇ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਬਲ", "ਤਾਪਮਾਨ", "ਦਾਬ", "ਗਤੀ"], 1],
+      ["ਤਾਪਮਾਨ ਮਾਪਣ ਵਾਲੇ ਯੰਤਰ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਬੈਰੋਮੀਟਰ", "ਥਰਮਾਮੀਟਰ", "ਸਪੀਡੋਮੀਟਰ", "ਐਮੀਟਰ"], 1],
+      ["ਡਾਕਟਰੀ ਥਰਮਾਮੀਟਰ ਵਿੱਚ ਕਿਹੜੀ ਧਾਤ ਭਰੀ ਹੁੰਦੀ ਹੈ?", ["ਲੋਹਾ", "ਪਾਰਾ (Mercury)", "ਤਾਂਬਾ", "ਸੋਨਾ"], 1],
+      ["ਡਾਕਟਰੀ ਥਰਮਾਮੀਟਰ ਦੀ ਸੈਲਸੀਅਸ ਸਕੇਲ 'ਤੇ ਸੀਮਾ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["0°C ਤੋਂ 100°C", "35°C ਤੋਂ 42°C", "-10°C ਤੋਂ 110°C", "20°C ਤੋਂ 50°C"], 1],
+      ["ਤੰਦਰੁਸਤ ਮਨੁੱਖੀ ਸਰੀਰ ਦਾ ਆਮ ਤਾਪਮਾਨ ਕਿੰਨਾ ਹੁੰਦਾ ਹੈ?", ["37°C", "98.6°C", "35°C", "40°C"], 0],
+      ["ਪ੍ਰਯੋਗਸ਼ਾਲਾ ਥਰਮਾਮੀਟਰ ਦੀ ਆਮ ਤੌਰ 'ਤੇ ਸੀਮਾ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["35°C ਤੋਂ 42°C", "-10°C ਤੋਂ 110°C", "0°C ਤੋਂ 50°C", "50°C ਤੋਂ 100°C"], 1],
+      ["ਡਾਕਟਰੀ ਥਰਮਾਮੀਟਰ ਵਿੱਚ ਪਾਰੇ ਨੂੰ ਆਪਣੇ ਆਪ ਹੇਠਾਂ ਡਿੱਗਣ ਤੋਂ ਕੌਣ ਰੋਕਦਾ ਹੈ?", ["ਵਲ (Kink)", "ਬਲਬ", "ਸਕੇਲ", "ਕੱਚ"], 0],
+      ["ਤਾਪ ਹਮੇਸ਼ਾ ਕਿਸ ਦਿਸ਼ਾ ਵਿੱਚ ਵਹਿੰਦਾ ਹੈ?", ["ਠੰਡੀ ਵਸਤੂ ਤੋਂ ਗਰਮ ਵੱਲ", "ਗਰਮ ਵਸਤੂ ਤੋਂ ਠੰਡੀ ਵੱਲ", "ਦੋਵੇਂ ਪਾਸੇ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਠੋਸਾਂ ਵਿੱਚ ਤਾਪ ਦਾ ਸਥਾਨਾਂਤਰਣ ਮੁੱਖ ਤੌਰ 'ਤੇ ਕਿਸ ਵਿਧੀ ਨਾਲ ਹੁੰਦਾ ਹੈ?", ["ਚਾਲਨ (Conduction)", "ਸੰਵਹਿਣ", "ਵਿਕਿਰਣ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਦ੍ਰਵਾਂ ਅਤੇ ਗੈਸਾਂ ਵਿੱਚ ਤਾਪ ਦਾ ਸਥਾਨਾਂਤਰਣ ਕਿਸ ਵਿਧੀ ਨਾਲ ਹੁੰਦਾ ਹੈ?", ["ਚਾਲਨ", "ਸੰਵਹਿਣ (Convection)", "ਵਿਕਿਰਣ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਸੂਰਜ ਦਾ ਤਾਪ ਧਰਤੀ ਤੱਕ ਕਿਸ ਵਿਧੀ ਦੁਆਰਾ ਪਹੁੰਚਦਾ ਹੈ?", ["ਚਾਲਨ", "ਸੰਵਹਿਣ", "ਵਿਕਿਰਣ (Radiation)", "ਕੋਈ ਨਹੀਂ"], 2],
+      ["ਤਾਪ ਸਥਾਨਾਂਤਰਣ ਦੀ ਕਿਸ ਵਿਧੀ ਲਈ ਕਿਸੇ ਮਾਧਿਅਮ ਦੀ ਲੋੜ ਨਹੀਂ ਹੁੰਦੀ?", ["ਚਾਲਨ", "ਸੰਵਹਿਣ", "ਵਿਕਿਰਣ", "ਸਾਰਿਆਂ ਲਈ"], 2],
+      ["ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕਿਹੜਾ ਤਾਪ ਦਾ ਸੁਚਾਲਕ ਹੈ?", ["ਲੱਕੜ", "ਪਲਾਸਟਿਕ", "ਤਾਂਬਾ", "ਰਬੜ"], 2],
+      ["ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕਿਹੜਾ ਤਾਪ ਦਾ ਕੁਚਾਲਕ ਹੈ?", ["ਲੋਹਾ", "ਐਲੂਮੀਨੀਅਮ", "ਲੱਕੜ", "ਚਾਂਦੀ"], 2],
+      ["ਦਿਨ ਵੇਲੇ ਸਮੁੰਦਰ ਤੋਂ ਜ਼ਮੀਨ ਵੱਲ ਚੱਲਣ ਵਾਲੀ ਠੰਡੀ ਹਵਾ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸਮੁੰਦਰੀ ਸਮੀਰ", "ਥਲ ਸਮੀਰ", "ਤੂਫ਼ਾਨ", "ਲੂ"], 0],
+      ["ਰਾਤ ਵੇਲੇ ਜ਼ਮੀਨ ਤੋਂ ਸਮੁੰਦਰ ਵੱਲ ਚੱਲਣ ਵਾਲੀ ਠੰਡੀ ਹਵਾ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸਮੁੰਦਰੀ ਸਮੀਰ", "ਥਲ ਸਮੀਰ", "ਚੱਕਰਵਾਤ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਗਰਮੀਆਂ ਵਿੱਚ ਸਾਨੂੰ ਕਿਸ ਰੰਗ ਦੇ ਕੱਪੜੇ ਪਹਿਨਣੇ ਚਾਹੀਦੇ ਹਨ?", ["ਕਾਲੇ", "ਹਲਕੇ (ਚਿੱਟੇ) ਰੰਗ ਦੇ", "ਗੂੜ੍ਹੇ ਨੀਲੇ", "ਗੂੜ੍ਹੇ ਲਾਲ"], 1],
+      ["ਸਰਦੀਆਂ ਵਿੱਚ ਗੂੜ੍ਹੇ ਰੰਗ ਦੇ ਕੱਪੜੇ ਕਿਉਂ ਪਹਿਨੇ ਜਾਂਦੇ ਹਨ?", ["ਇਹ ਤਾਪ ਨੂੰ ਵੱਧ ਸੋਖਦੇ ਹਨ", "ਇਹ ਤਾਪ ਨੂੰ ਪਰਾਵਰਤਿਤ ਕਰਦੇ ਹਨ", "ਇਹ ਹਲਕੇ ਹੁੰਦੇ ਹਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸਰਦੀਆਂ ਵਿੱਚ ਉੱਨੀ ਕੱਪੜੇ ਸਾਨੂੰ ਗਰਮ ਕਿਉਂ ਰੱਖਦੇ ਹਨ?", ["ਉੱਨ ਅਤੇ ਫਸੀ ਹੋਈ ਹਵਾ ਤਾਪ ਦੇ ਕੁਚਾਲਕ ਹਨ", "ਉੱਨ ਤਾਪ ਪੈਦਾ ਕਰਦੀ ਹੈ", "ਉੱਨ ਸੁਚਾਲਕ ਹੈ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਲੱਕੜ ਦਾ ਚਮਚ ਆਈਸ-ਕ੍ਰੀਮ ਦੇ ਕੱਪ ਵਿੱਚ ਡੁਬੋਣ 'ਤੇ ਉਸ ਦਾ ਦੂਜਾ ਸਿਰਾ:", ["ਠੰਡਾ ਨਹੀਂ ਹੁੰਦਾ", "ਚਾਲਨ ਨਾਲ ਠੰਡਾ ਹੁੰਦਾ ਹੈ", "ਸੰਵਹਿਣ ਨਾਲ ਠੰਡਾ ਹੁੰਦਾ ਹੈ", "ਗਰਮ ਹੋ ਜਾਂਦਾ ਹੈ"], 0]
+    ]
+  },
+  {
+    id: 4, title: "ਤੇਜ਼ਾਬ, ਖਾਰ ਅਤੇ ਲੂਣ",
+    q: [
+      ["ਤੇਜ਼ਾਬਾਂ (Acids) ਦਾ ਸਵਾਦ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਕੌੜਾ", "ਖੱਟਾ", "ਮਿੱਠਾ", "ਨਮਕੀਨ"], 1],
+      ["ਖਾਰਾਂ (Bases) ਦਾ ਸਵਾਦ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਖੱਟਾ", "ਕੌੜਾ", "ਮਿੱਠਾ", "ਸਵਾਦ-ਰਹਿਤ"], 1],
+      ["ਛੂਹਣ 'ਤੇ ਸਾਬਣ ਵਰਗੇ ਚਿਕਨੇ ਕਿਹੜੇ ਪਦਾਰਥ ਲੱਗਦੇ ਹਨ?", ["ਤੇਜ਼ਾਬ", "ਖਾਰ", "ਲੂਣ", "ਪਾਣੀ"], 1],
+      ["ਤੇਜ਼ਾਬ ਨੀਲੇ ਲਿਟਮਸ ਪੇਪਰ ਨੂੰ ਕਿਸ ਰੰਗ ਵਿੱਚ ਬਦਲ ਦਿੰਦੇ ਹਨ?", ["ਲਾਲ", "ਹਰਾ", "ਪੀਲਾ", "ਕਾਲਾ"], 0],
+      ["ਖਾਰ ਲਾਲ ਲਿਟਮਸ ਪੇਪਰ ਨੂੰ ਕਿਸ ਰੰਗ ਵਿੱਚ ਬਦਲ ਦਿੰਦੇ ਹਨ?", ["ਪੀਲਾ", "ਨੀਲਾ", "ਗੁਲਾਬੀ", "ਸਫ਼ੈਦ"], 1],
+      ["ਲਿਟਮਸ (ਕੁਦਰਤੀ ਸੂਚਕ) ਕਿਸ ਤੋਂ ਪ੍ਰਾਪਤ ਕੀਤਾ ਜਾਂਦਾ ਹੈ?", ["ਲਾਈਕਨ", "ਗੁਲਾਬ", "ਨਿੰਬੂ", "ਆਲੂ"], 0],
+      ["ਦਹੀਂ ਵਿੱਚ ਕਿਹੜਾ ਤੇਜ਼ਾਬ ਹੁੰਦਾ ਹੈ?", ["ਸਿਟ੍ਰਿਕ ਤੇਜ਼ਾਬ", "ਲੈਕਟਿਕ ਤੇਜ਼ਾਬ", "ਐਸੀਟਿਕ ਤੇਜ਼ਾਬ", "ਫਾਰਮਿਕ ਤੇਜ਼ਾਬ"], 1],
+      ["ਸਿਰਕੇ (Vinegar) ਵਿੱਚ ਕਿਹੜਾ ਤੇਜ਼ਾਬ ਹੁੰਦਾ ਹੈ?", ["ਐਸੀਟਿਕ ਤੇਜ਼ਾਬ", "ਟਾਰਟਾਰਿਕ ਤੇਜ਼ਾਬ", "ਆਕਜ਼ੈਲਿਕ ਤੇਜ਼ਾਬ", "ਲੈਕਟਿਕ ਤੇਜ਼ਾਬ"], 0],
+      ["ਨਿੰਬੂ ਅਤੇ ਸੰਤਰੇ ਵਿੱਚ ਕਿਹੜਾ ਤੇਜ਼ਾਬ ਪਾਇਆ ਜਾਂਦਾ ਹੈ?", ["ਸਿਟ੍ਰਿਕ ਤੇਜ਼ਾਬ", "ਫਾਰਮਿਕ ਤੇਜ਼ਾਬ", "ਲੈਕਟਿਕ ਤੇਜ਼ਾਬ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕੀੜੀ ਦੇ ਡੰਗ ਵਿੱਚ ਕਿਹੜਾ ਤੇਜ਼ਾਬ ਹੁੰਦਾ ਹੈ?", ["ਫਾਰਮਿਕ ਤੇਜ਼ਾਬ", "ਐਸੀਟਿਕ ਤੇਜ਼ਾਬ", "ਸਿਟ੍ਰਿਕ ਤੇਜ਼ਾਬ", "ਆਕਜ਼ੈਲਿਕ ਤੇਜ਼ਾਬ"], 0],
+      ["ਪਾਲਕ ਵਿੱਚ ਕਿਹੜਾ ਤੇਜ਼ਾਬ ਪਾਇਆ ਜਾਂਦਾ ਹੈ?", ["ਆਕਜ਼ੈਲਿਕ ਤੇਜ਼ਾਬ", "ਲੈਕਟਿਕ ਤੇਜ਼ਾਬ", "ਫਾਰਮਿਕ ਤੇਜ਼ਾਬ", "ਐਸੀਟਿਕ ਤੇਜ਼ਾਬ"], 0],
+      ["ਹਲਦੀ ਦਾ ਦਾਗ ਸਾਬਣ (ਖਾਰ) ਨਾਲ ਧੋਣ 'ਤੇ ਕਿਸ ਰੰਗ ਦਾ ਹੋ ਜਾਂਦਾ ਹੈ?", ["ਨੀਲਾ", "ਲਾਲ", "ਹਰਾ", "ਕਾਲਾ"], 1],
+      ["ਗੁੜ੍ਹਲ (China Rose) ਦਾ ਸੂਚਕ ਤੇਜ਼ਾਬੀ ਘੋਲ ਨੂੰ ਕਿਸ ਰੰਗ ਵਿੱਚ ਬਦਲਦਾ ਹੈ?", ["ਗੂੜ੍ਹਾ ਗੁਲਾਬੀ (ਮੈਜੈਂਟਾ)", "ਹਰਾ", "ਪੀਲਾ", "ਨੀਲਾ"], 0],
+      ["ਗੁੜ੍ਹਲ ਦਾ ਸੂਚਕ ਖਾਰੀ ਘੋਲ ਨੂੰ ਕਿਸ ਰੰਗ ਵਿੱਚ ਬਦਲਦਾ ਹੈ?", ["ਲਾਲ", "ਹਰਾ", "ਕਾਲਾ", "ਚਿੱਟਾ"], 1],
+      ["ਫੀਨੋਲਫਥੈਲੀਨ ਸੂਚਕ ਖਾਰੀ ਘੋਲ ਵਿੱਚ ਕਿਹੜਾ ਰੰਗ ਦਿੰਦਾ ਹੈ?", ["ਰੰਗਹੀਣ", "ਗੁਲਾਬੀ", "ਪੀਲਾ", "ਨੀਲਾ"], 1],
+      ["ਤੇਜ਼ਾਬ ਅਤੇ ਖਾਰ ਦੀ ਆਪਸੀ ਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਉਦਾਸੀਨੀਕਰਨ (Neutralisation)", "ਜੰਗ ਲੱਗਣਾ", "ਖਮੀਰਨ", "ਕ੍ਰਿਸਟਲੀਕਰਨ"], 0],
+      ["ਉਦਾਸੀਨੀਕਰਨ ਕਿਰਿਆ ਵਿੱਚ ਲੂਣ ਅਤੇ ਪਾਣੀ ਦੇ ਨਾਲ ਹੋਰ ਕੀ ਪੈਦਾ ਹੁੰਦਾ ਹੈ?", ["ਤਾਪ", "ਪ੍ਰਕਾਸ਼", "ਧੁਨੀ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਮਿਹਦੇ ਵਿੱਚ ਬਦਹਜ਼ਮੀ (ਤੇਜ਼ਾਬੀਪਨ) ਦੂਰ ਕਰਨ ਲਈ ਕਿਹੜਾ ਖਾਰ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ?", ["ਮਿਲਕ ਆਫ਼ ਮੈਗਨੀਸ਼ੀਆ", "ਸਿਰਕਾ", "ਨਿੰਬੂ ਰਸ", "ਨਮਕ"], 0],
+      ["ਕੀੜੀ ਦੇ ਡੰਗ ਦੇ ਪ੍ਰਭਾਵ ਨੂੰ ਖ਼ਤਮ ਕਰਨ ਲਈ ਕੀ ਮਲ਼ਿਆ ਜਾਂਦਾ ਹੈ?", ["ਨਿੰਬੂ", "ਮਿੱਠਾ ਸੋਡਾ (ਬੇਕਿੰਗ ਸੋਡਾ) ਜਾਂ ਕੈਲਾਮਾਈਨ", "ਸਿਰਕਾ", "ਪਾਣੀ"], 1],
+      ["ਜੇ ਮਿੱਟੀ ਜ਼ਿਆਦਾ ਤੇਜ਼ਾਬੀ ਹੋਵੇ, ਤਾਂ ਉਸ ਦਾ ਇਲਾਜ ਕਿਸ ਨਾਲ ਕੀਤਾ ਜਾਂਦਾ ਹੈ?", ["ਬਿਨਾਂ ਬੁਝਿਆ ਜਾਂ ਬੁਝਿਆ ਚੂਨਾ", "ਸਿਰਕਾ", "ਨਿੰਬੂ", "ਜੈਵਿਕ ਖਾਦ"], 0]
+    ]
+  },
+  {
+    id: 5, title: "ਭੌਤਿਕ ਅਤੇ ਰਸਾਇਣਿਕ ਪਰਿਵਰਤਨ",
+    q: [
+      ["ਉਹ ਪਰਿਵਰਤਨ ਜਿਸ ਵਿੱਚ ਕੋਈ ਨਵਾਂ ਪਦਾਰਥ ਨਹੀਂ ਬਣਦਾ, ਕੀ ਅਖਵਾਉਂਦਾ ਹੈ?", ["ਰਸਾਇਣਿਕ ਪਰਿਵਰਤਨ", "ਭੌਤਿਕ ਪਰਿਵਰਤਨ", "ਜੰਗ ਲੱਗਣਾ", "ਬਲਣ"], 1],
+      ["ਉਹ ਪਰਿਵਰਤਨ ਜਿਸ ਵਿੱਚ ਇੱਕ ਜਾਂ ਵੱਧ ਨਵੇਂ ਪਦਾਰਥ ਬਣਦੇ ਹਨ:", ["ਭੌਤਿਕ ਪਰਿਵਰਤਨ", "ਰਸਾਇਣਿਕ ਪਰਿਵਰਤਨ", "ਕ੍ਰਿਸਟਲੀਕਰਨ", "ਪਿਘਲਣਾ"], 1],
+      ["ਬਰਫ਼ ਦਾ ਪਿਘਲ ਕੇ ਪਾਣੀ ਬਣਨਾ ਕਿਹੜਾ ਪਰਿਵਰਤਨ ਹੈ?", ["ਭੌਤਿਕ ਪਰਿਵਰਤਨ", "ਰਸਾਇਣਿਕ ਪਰਿਵਰਤਨ", "ਦੋਵੇਂ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਦੁੱਧ ਦਾ ਦਹੀਂ ਬਣਨਾ ਕਿਹੜਾ ਪਰਿਵਰਤਨ ਹੈ?", ["ਭੌਤਿਕ ਪਰਿਵਰਤਨ", "ਰਸਾਇਣਿਕ ਪਰਿਵਰਤਨ", "ਉਲਟਾਉਣਯੋਗ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਲੋਹੇ ਨੂੰ ਜੰਗ ਲੱਗਣਾ ਕਿਹੜਾ ਪਰਿਵਰਤਨ ਹੈ?", ["ਭੌਤਿਕ", "ਰਸਾਇਣਿਕ", "ਦੋਵੇਂ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਲੋਹੇ ਨੂੰ ਜੰਗ ਲੱਗਣ ਲਈ ਕਿਹੜੀਆਂ ਦੋ ਚੀਜ਼ਾਂ ਜ਼ਰੂਰੀ ਹਨ?", ["ਆਕਸੀਜਨ ਅਤੇ ਪਾਣੀ (ਨਮੀ)", "ਨਾਈਟ੍ਰੋਜਨ ਅਤੇ ਤੇਲ", "ਸਿਰਫ਼ ਹਵਾ", "ਸਿਰਫ਼ ਧੁੱਪ"], 0],
+      ["ਲੋਹੇ 'ਤੇ ਜ਼ਿੰਕ (ਜਿਸਤ) ਦੀ ਪਰਤ ਚੜ੍ਹਾਉਣ ਦੀ ਪ੍ਰਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਗੈਲਵੇਨਾਈਜ਼ੇਸ਼ਨ (ਮੁਲੰਮਾਕਰਨ)", "ਕ੍ਰਿਸਟਲੀਕਰਨ", "ਉਦਾਸੀਨੀਕਰਨ", "ਪਰਾਵਰਤਨ"], 0],
+      ["ਮੈਗਨੀਸ਼ੀਅਮ ਰਿਬਨ ਨੂੰ ਜਲਾਉਣ 'ਤੇ ਚਿੱਟੇ ਰੰਗ ਦੀ ਸੁਆਹ ਕੀ ਹੁੰਦੀ ਹੈ?", ["ਮੈਗਨੀਸ਼ੀਅਮ ਆਕਸਾਈਡ", "ਕਾਰਬਨ", "ਲੋਹਾ", "ਚੂਨਾ"], 0],
+      ["ਮੈਗਨੀਸ਼ੀਅਮ ਆਕਸਾਈਡ ਨੂੰ ਪਾਣੀ ਵਿੱਚ ਘੋਲਣ 'ਤੇ ਕੀ ਬਣਦਾ ਹੈ?", ["ਮੈਗਨੀਸ਼ੀਅਮ ਹਾਈਡ੍ਰੋਆਕਸਾਈਡ", "ਤੇਜ਼ਾਬ", "ਨਮਕ", "ਖੰਡ"], 0],
+      ["ਕਾਪਰ ਸਲਫੇਟ (ਨੀਲੇ ਥੋਥੇ) ਦੇ ਘੋਲ ਵਿੱਚ ਲੋਹੇ ਦੀ ਕਿੱਲ ਪਾਉਣ 'ਤੇ ਘੋਲ ਦਾ ਰੰਗ ਕਿਹੋ ਜਿਹਾ ਹੋ ਜਾਂਦਾ ਹੈ?", ["ਲਾਲ", "ਹਰਾ (ਆਇਰਨ ਸਲਫੇਟ)", "ਪੀਲਾ", "ਕਾਲਾ"], 1],
+      ["ਸਿਰਕੇ ਅਤੇ ਬੇਕਿੰਗ ਸੋਡੇ ਦੀ ਕਿਰਿਆ ਨਾਲ ਕਿਹੜੀ ਗੈਸ ਨਿਕਲਦੀ ਹੈ?", ["ਆਕਸੀਜਨ", "ਕਾਰਬਨ ਡਾਈਆਕਸਾਈਡ", "ਹਾਈਡ੍ਰੋਜਨ", "ਨਾਈਟ੍ਰੋਜਨ"], 1],
+      ["ਕਾਰਬਨ ਡਾਈਆਕਸਾਈਡ ਗੈਸ ਚੂਨੇ ਦੇ ਪਾਣੀ ਨੂੰ ਕਿਹੋ ਜਿਹਾ ਕਰ ਦਿੰਦੀ ਹੈ?", ["ਦੁੱਧੀਆ", "ਨੀਲਾ", "ਲਾਲ", "ਹਰਾ"], 0],
+      ["ਕਿਸੇ ਪਦਾਰਥ ਦੇ ਘੋਲ ਵਿੱਚੋਂ ਉਸ ਦੇ ਸ਼ੁੱਧ ਵੱਡੇ ਕ੍ਰਿਸਟਲ ਪ੍ਰਾਪਤ ਕਰਨ ਦੀ ਪ੍ਰਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਗੈਲਵੇਨਾਈਜ਼ੇਸ਼ਨ", "ਕ੍ਰਿਸਟਲੀਕਰਨ", "ਜੰਗ ਲੱਗਣਾ", "ਬਲਣ"], 1],
+      ["ਕ੍ਰਿਸਟਲੀਕਰਨ ਕਿਸ ਕਿਸਮ ਦਾ ਪਰਿਵਰਤਨ ਹੈ?", ["ਭੌਤਿਕ ਪਰਿਵਰਤਨ", "ਰਸਾਇਣਿਕ ਪਰਿਵਰਤਨ", "ਜੈਵਿਕ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸਟੇਨਲੈੱਸ ਸਟੀਲ ਲੋਹੇ ਵਿੱਚ ਕੀ ਮਿਲਾ ਕੇ ਬਣਾਇਆ ਜਾਂਦਾ ਹੈ?", ["ਕਾਰਬਨ, ਕ੍ਰੋਮੀਅਮ, ਨਿਕਲ ਅਤੇ ਮੈਂਗਨੀਜ਼", "ਸੋਨਾ ਤੇ ਚਾਂਦੀ", "ਤਾਂਬਾ ਤੇ ਪਲਾਸਟਿਕ", "ਰੇਤ"], 0],
+      ["ਪਟਾਕਿਆਂ ਦਾ ਫਟਣਾ ਕਿਹੜਾ ਪਰਿਵਰਤਨ ਹੈ?", ["ਭੌਤਿਕ", "ਰਸਾਇਣਿਕ", "ਕ੍ਰਿਸਟਲੀਕਰਨ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਕੱਟੇ ਹੋਏ ਸੇਬ ਦਾ ਹਵਾ ਵਿੱਚ ਭੂਰਾ ਹੋਣਾ ਕਿਹੜਾ ਪਰਿਵਰਤਨ ਹੈ?", ["ਭੌਤਿਕ", "ਰਸਾਇਣਿਕ", "ਉਲਟਾਉਣਯੋਗ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਕਾਗਜ਼ ਨੂੰ ਟੁਕੜਿਆਂ ਵਿੱਚ ਕੱਟਣਾ ਕਿਹੜਾ ਪਰਿਵਰਤਨ ਹੈ?", ["ਭੌਤਿਕ", "ਰਸਾਇਣਿਕ", "ਦੋਵੇਂ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਪ੍ਰਕਾਸ਼-ਸੰਸ਼ਲੇਸ਼ਣ ਅਤੇ ਭੋਜਨ ਦਾ ਪਚਣਾ ਕਿਹੜੇ ਪਰਿਵਰਤਨ ਹਨ?", ["ਭੌਤਿਕ", "ਰਸਾਇਣਿਕ", "ਦੋਵੇਂ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਦਿੱਲੀ ਵਿੱਚ ਕੁਤਬ ਮੀਨਾਰ ਨੇੜੇ ਲੋਹੇ ਦਾ ਸਤੰਭ ਕਿਸ ਗੁਣ ਲਈ ਮਸ਼ਹੂਰ ਹੈ?", ["ਇਸ ਨੂੰ ਜੰਗ ਨਹੀਂ ਲੱਗਦਾ", "ਇਹ ਸੋਨੇ ਦਾ ਹੈ", "ਇਹ ਲੱਕੜ ਦਾ ਹੈ", "ਕੋਈ ਨਹੀਂ"], 0]
+    ]
+  },
+  {
+    id: 6, title: "ਸਜੀਵਾਂ ਵਿੱਚ ਸਾਹ ਕਿਰਿਆ",
+    q: [
+      ["ਸੈੱਲਾਂ ਵਿੱਚ ਭੋਜਨ ਦੇ ਟੁੱਟ ਕੇ ਊਰਜਾ ਮੁਕਤ ਕਰਨ ਦੀ ਪ੍ਰਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਪਾਚਨ", "ਸੈਲੂਲਰ ਸਾਹ ਕਿਰਿਆ", "ਪ੍ਰਜਣਨ", "ਪਰਿਵਹਨ"], 1],
+      ["ਆਕਸੀਜਨ ਦੀ ਮੌਜੂਦਗੀ ਵਿੱਚ ਹੋਣ ਵਾਲੀ ਸਾਹ ਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਆਕਸੀ ਸਾਹ ਕਿਰਿਆ", "ਅਣਆਕਸੀ ਸਾਹ ਕਿਰਿਆ", "ਖਮੀਰਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਆਕਸੀਜਨ ਦੀ ਗੈਰ-ਮੌਜੂਦਗੀ ਵਿੱਚ ਹੋਣ ਵਾਲੀ ਸਾਹ ਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਆਕਸੀ", "ਅਣਆਕਸੀ ਸਾਹ ਕਿਰਿਆ", "ਪ੍ਰਕਾਸ਼-ਸੰਸ਼ਲੇਸ਼ਣ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਈਸਟ (Yeast) ਅਣਆਕਸੀ ਸਾਹ ਕਿਰਿਆ ਦੁਆਰਾ ਕੀ ਬਣਾਉਂਦਾ ਹੈ?", ["ਅਲਕੋਹਲ ਅਤੇ CO2", "ਲੈਕਟਿਕ ਐਸਿਡ", "ਆਕਸੀਜਨ", "ਸਟਾਰਚ"], 0],
+      ["ਭਾਰੀ ਕਸਰਤ ਦੌਰਾਨ ਮਾਸਪੇਸ਼ੀਆਂ ਵਿੱਚ ਕਿਸ ਦੇ ਜਮ੍ਹਾਂ ਹੋਣ ਨਾਲ ਕੜਵੱਲ (Cramps) ਪੈਂਦੇ ਹਨ?", ["ਅਲਕੋਹਲ", "ਲੈਕਟਿਕ ਐਸਿਡ", "ਗਲੂਕੋਜ਼", "ਪਾਣੀ"], 1],
+      ["ਇੱਕ ਆਮ ਬਾਲਗ ਮਨੁੱਖ ਆਰਾਮ ਦੀ ਅਵਸਥਾ ਵਿੱਚ ਇੱਕ ਮਿੰਟ ਵਿੱਚ ਕਿੰਨੀ ਵਾਰ ਸਾਹ ਲੈਂਦਾ ਹੈ?", ["5-8 ਵਾਰ", "15-18 ਵਾਰ", "40-50 ਵਾਰ", "72 ਵਾਰ"], 1],
+      ["ਸਾਹ ਅੰਦਰ ਖਿੱਚਣ ਸਮੇਂ ਪਸਲੀਆਂ ਕਿਸ ਪਾਸੇ ਗਤੀ ਕਰਦੀਆਂ ਹਨ?", ["ਉੱਪਰ ਅਤੇ ਬਾਹਰ ਵੱਲ", "ਹੇਠਾਂ ਅਤੇ ਅੰਦਰ ਵੱਲ", "ਸਥਿਰ ਰਹਿੰਦੀਆਂ ਹਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸਾਹ ਅੰਦਰ ਖਿੱਚਣ ਸਮੇਂ ਡਾਇਆਫ੍ਰਾਮ ਕਿਸ ਪਾਸੇ ਜਾਂਦਾ ਹੈ?", ["ਉੱਪਰ ਵੱਲ", "ਹੇਠਾਂ ਵੱਲ", "ਖੱਬੇ ਵੱਲ", "ਸੱਜੇ ਵੱਲ"], 1],
+      ["ਛੱਡੇ ਗਏ ਸਾਹ ਵਿੱਚ ਕਾਰਬਨ ਡਾਈਆਕਸਾਈਡ ਦੀ ਮਾਤਰਾ ਲਗਭਗ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["0.04%", "4.4%", "21%", "78%"], 1],
+      ["ਅੰਦਰ ਖਿੱਚੀ ਗਈ ਹਵਾ ਵਿੱਚ ਆਕਸੀਜਨ ਦੀ ਮਾਤਰਾ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["21%", "16.4%", "4.4%", "0.04%"], 0],
+      ["ਕਾਕਰੋਚ ਵਿੱਚ ਸਾਹ ਲੈਣ ਲਈ ਸਰੀਰ ਦੇ ਪਾਸਿਆਂ 'ਤੇ ਬਣੇ ਛੋਟੇ ਛੇਕਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸਾਹ ਛੇਕ (Spiracles)", "ਗਲਫੜੇ", "ਫੇਫੜੇ", "ਸਟੋਮੈਟਾ"], 0],
+      ["ਕੀੜਿਆਂ ਵਿੱਚ ਗੈਸਾਂ ਦੇ ਆਦਾਨ-ਪ੍ਰਦਾਨ ਲਈ ਬਣੀਆਂ ਹਵਾ-ਨਲੀਆਂ ਦੇ ਜਾਲ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਟ੍ਰੈਕੀਆ (ਸਾਹ ਨਲੀਆਂ)", "ਗਲਫੜੇ", "ਨਾੜੀਆਂ", "ਚਮੜੀ"], 0],
+      ["ਗੰਡੋਆ (Earthworm) ਕਿਸ ਰਾਹੀਂ ਸਾਹ ਲੈਂਦਾ ਹੈ?", ["ਫੇਫੜੇ", "ਗਿੱਲੀ ਚਮੜੀ", "ਗਲਫੜੇ", "ਨੱਕ"], 1],
+      ["ਮੱਛੀਆਂ ਪਾਣੀ ਵਿੱਚ ਘੁਲੀ ਆਕਸੀਜਨ ਕਿਸ ਅੰਗ ਰਾਹੀਂ ਲੈਂਦੀਆਂ ਹਨ?", ["ਫੇਫੜੇ", "ਗਲਫੜੇ (Gills)", "ਚਮੜੀ", "ਸਟੋਮੈਟਾ"], 1],
+      ["ਡੱਡੂ ਕਿਹੜੇ ਅੰਗਾਂ ਰਾਹੀਂ ਸਾਹ ਲੈ ਸਕਦਾ ਹੈ?", ["ਫੇਫੜੇ ਅਤੇ ਗਿੱਲੀ ਚਮੜੀ ਦੋਵੇਂ", "ਸਿਰਫ਼ ਗਲਫੜੇ", "ਸਿਰਫ਼ ਨੱਕ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਪੌਦਿਆਂ ਦੇ ਪੱਤਿਆਂ ਵਿੱਚ ਗੈਸਾਂ ਦਾ ਆਦਾਨ-ਪ੍ਰਦਾਨ ਕਿਸ ਰਾਹੀਂ ਹੁੰਦਾ ਹੈ?", ["ਸਟੋਮੈਟਾ", "ਫੁੱਲ", "ਬੀਜ", "ਤਣਾ"], 0],
+      ["ਸਾਹ ਛੱਡਣ ਸਮੇਂ ਪਸਲੀਆਂ ਕਿਸ ਪਾਸੇ ਜਾਂਦੀਆਂ ਹਨ?", ["ਹੇਠਾਂ ਅਤੇ ਅੰਦਰ ਵੱਲ", "ਉੱਪਰ ਅਤੇ ਬਾਹਰ ਵੱਲ", "ਸਥਿਰ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਛਾਤੀ ਖੋੜ (Chest Cavity) ਦੇ ਹੇਠਾਂ ਸਥਿਤ ਵੱਡੀ ਪੇਸ਼ੀਦਾਰ ਪਰਤ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਡਾਇਆਫ੍ਰਾਮ", "ਫੇਫੜਾ", "ਜਿਗਰ", "ਮਿਹਦਾ"], 0],
+      ["ਤੰਬਾਕੂਨੋਸ਼ੀ (Smoking) ਸਰੀਰ ਦੇ ਕਿਹੜੇ ਅੰਗ ਨੂੰ ਸਭ ਤੋਂ ਵੱਧ ਨੁਕਸਾਨ ਪਹੁੰਚਾਉਂਦੀ ਹੈ?", ["ਫੇਫੜਿਆਂ ਨੂੰ", "ਦੰਦਾਂ ਨੂੰ", "ਵਾਲਾਂ ਨੂੰ", "ਨਹੁੰਆਂ ਨੂੰ"], 0],
+      ["ਚੂਨੇ ਦੇ ਪਾਣੀ ਵਿੱਚ ਫੂਕ ਮਾਰਨ 'ਤੇ ਉਹ ਦੁੱਧੀਆ ਕਿਉਂ ਹੋ ਜਾਂਦਾ ਹੈ?", ["ਛੱਡੇ ਸਾਹ ਵਿੱਚ CO2 ਹੋਣ ਕਰਕੇ", "ਆਕਸੀਜਨ ਕਰਕੇ", "ਨਾਈਟ੍ਰੋਜਨ ਕਰਕੇ", "ਗਰਮੀ ਕਰਕੇ"], 0]
+    ]
+  },
+  {
+    id: 7, title: "ਜੰਤੂਆਂ ਅਤੇ ਪੌਦਿਆਂ ਵਿੱਚ ਪਰਿਵਹਨ",
+    q: [
+      ["ਲਹੂ ਦੇ ਤਰਲ ਭਾਗ ਨੂੰ ਕੀ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?", ["ਪਲਾਜ਼ਮਾ", "ਹੀਮੋਗਲੋਬਿਨ", "ਪਲੇਟਲੈਟਸ", "ਸੈੱਲ"], 0],
+      ["ਲਹੂ ਦਾ ਲਾਲ ਰੰਗ ਕਿਸ ਵਰਣਕ ਕਾਰਨ ਹੁੰਦਾ ਹੈ?", ["ਕਲੋਰੋਫਿੱਲ", "ਹੀਮੋਗਲੋਬਿਨ", "ਪਲਾਜ਼ਮਾ", "ਪਿੱਤ"], 1],
+      ["ਸਰੀਰ ਵਿੱਚ ਰੋਗਾਣੂਆਂ ਨਾਲ ਲੜਨ ਵਾਲੇ ਲਹੂ ਦੇ ਸੈੱਲ ਕਿਹੜੇ ਹਨ?", ["ਲਾਲ ਲਹੂ ਸੈੱਲ (RBC)", "ਚਿੱਟੇ ਲਹੂ ਸੈੱਲ (WBC)", "ਪਲੇਟਲੈਟਸ", "ਪਲਾਜ਼ਮਾ"], 1],
+      ["ਸੱਟ ਲੱਗਣ 'ਤੇ ਲਹੂ ਦਾ ਥੱਕਾ (Clot) ਜਮਾਉਣ ਵਿੱਚ ਕੌਣ ਮਦਦ ਕਰਦਾ ਹੈ?", ["RBC", "WBC", "ਪਲੇਟਲੈਟਸ", "ਪਲਾਜ਼ਮਾ"], 2],
+      ["ਆਕਸੀਜਨ ਭਰਪੂਰ ਲਹੂ ਨੂੰ ਦਿਲ ਤੋਂ ਸਰੀਰ ਦੇ ਸਾਰੇ ਭਾਗਾਂ ਤੱਕ ਕੌਣ ਲੈ ਕੇ ਜਾਂਦੀਆਂ ਹਨ?", ["ਧਮਣੀਆਂ (Arteries)", "ਸ਼ਿਰਾਵਾਂ (Veins)", "ਕੇਸ਼ਿਕਾਵਾਂ", "ਨਸਾਂ"], 0],
+      ["CO2 ਭਰਪੂਰ ਲਹੂ ਨੂੰ ਸਰੀਰ ਦੇ ਭਾਗਾਂ ਤੋਂ ਵਾਪਸ ਦਿਲ ਤੱਕ ਕੌਣ ਲਿਆਉਂਦੀਆਂ ਹਨ?", ["ਧਮਣੀਆਂ", "ਸ਼ਿਰਾਵਾਂ (Veins)", "ਜ਼ਾਇਲਮ", "ਫਲੋਇਮ"], 1],
+      ["ਮਨੁੱਖੀ ਦਿਲ ਦੇ ਕਿੰਨੇ ਖਾਨੇ (Chambers) ਹੁੰਦੇ ਹਨ?", ["2", "3", "4", "6"], 2],
+      ["ਇੱਕ ਤੰਦਰੁਸਤ ਵਿਅਕਤੀ ਦੀ ਨਬਜ਼ ਦਰ (Pulse Rate) ਪ੍ਰਤੀ ਮਿੰਟ ਕਿੰਨੀ ਹੁੰਦੀ ਹੈ?", ["20-30", "72-80", "120-150", "10-15"], 1],
+      ["ਡਾਕਟਰ ਦਿਲ ਦੀ ਧੜਕਣ ਸੁਣਨ ਲਈ ਕਿਹੜੇ ਯੰਤਰ ਦੀ ਵਰਤੋਂ ਕਰਦੇ ਹਨ?", ["ਥਰਮਾਮੀਟਰ", "ਸਟੈਥੋਸਕੋਪ", "ਬੈਰੋਮੀਟਰ", "ਮਾਈਕ੍ਰੋਸਕੋਪ"], 1],
+      ["ਲਹੂ-ਸੰਚਾਰ ਪ੍ਰਣਾਲੀ ਦੀ ਖੋਜ ਕਿਸ ਵਿਗਿਆਨੀ ਨੇ ਕੀਤੀ?", ["ਵਿਲੀਅਮ ਹਾਰਵੇ", "ਨਿਊਟਨ", "ਲੂਈਸ ਪਾਸਚਰ", "ਡਾਰਵਿਨ"], 0],
+      ["ਮਨੁੱਖੀ ਮਲ-ਤਿਆਗ ਪ੍ਰਣਾਲੀ ਦਾ ਮੁੱਖ ਅੰਗ ਕਿਹੜਾ ਹੈ?", ["ਗੁਰਦੇ (Kidneys)", "ਫੇਫੜੇ", "ਮਿਹਦਾ", "ਦਿਲ"], 0],
+      ["ਮਨੁੱਖ ਵਿੱਚ ਮੁੱਖ ਮਲ-ਤਿਆਗ ਉਤਪਾਦ ਕੀ ਹੈ?", ["ਯੂਰੀਆ", "ਯੂਰਿਕ ਐਸਿਡ", "ਅਮੋਨੀਆ", "ਆਕਸੀਜਨ"], 0],
+      ["ਗੁਰਦੇ ਫੇਲ੍ਹ ਹੋਣ 'ਤੇ ਲਹੂ ਨੂੰ ਮਸ਼ੀਨ ਰਾਹੀਂ ਸਾਫ਼ ਕਰਨ ਦੀ ਪ੍ਰਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਡਾਇਲਸਿਸ", "ਖਮੀਰਨ", "ਪਾਚਨ", "ਸਾਹ ਕਿਰਿਆ"], 0],
+      ["ਮੱਛੀਆਂ ਵਰਗੇ ਜਲ-ਜੀਵ ਆਪਣਾ ਮਲ-ਤਿਆਗ ਕਿਸ ਰੂਪ ਵਿੱਚ ਕਰਦੇ ਹਨ?", ["ਅਮੋਨੀਆ", "ਯੂਰਿਕ ਐਸਿਡ", "ਯੂਰੀਆ", "ਨਮਕ"], 0],
+      ["ਪੰਛੀ, ਕਿਰਲੀਆਂ ਅਤੇ ਸੱਪ ਆਪਣਾ ਮਲ-ਤਿਆਗ ਕਿਸ ਰੂਪ ਵਿੱਚ ਕਰਦੇ ਹਨ?", ["ਯੂਰਿਕ ਐਸਿਡ", "ਅਮੋਨੀਆ", "ਯੂਰੀਆ", "ਪਾਣੀ"], 0],
+      ["ਪੌਦਿਆਂ ਵਿੱਚ ਪਾਣੀ ਅਤੇ ਖਣਿਜਾਂ ਦਾ ਪਰਿਵਹਨ ਕਿਹੜਾ ਟਿਸ਼ੂ ਕਰਦਾ ਹੈ?", ["ਜ਼ਾਇਲਮ (Xylem)", "ਫਲੋਇਮ (Phloem)", "ਸਟੋਮੈਟਾ", "ਰੈਟੀਨਾ"], 0],
+      ["ਪੌਦਿਆਂ ਵਿੱਚ ਪੱਤਿਆਂ ਤੋਂ ਬਣੇ ਭੋਜਨ ਦਾ ਪਰਿਵਹਨ ਕੌਣ ਕਰਦਾ ਹੈ?", ["ਜ਼ਾਇਲਮ", "ਫਲੋਇਮ (Phloem)", "ਜੜ੍ਹ-ਰੋਮ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਪੌਦਿਆਂ ਦੇ ਪੱਤਿਆਂ ਰਾਹੀਂ ਪਾਣੀ ਦੇ ਵਾਸ਼ਪ ਬਣ ਕੇ ਉੱਡਣ ਦੀ ਪ੍ਰਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਵਾਸ਼ਪ-ਉਤਸਰਜਨ (Transpiration)", "ਪ੍ਰਕਾਸ਼-ਸੰਸ਼ਲੇਸ਼ਣ", "ਪਰਾਗਣ", "ਨਿਸ਼ੇਚਣ"], 0],
+      ["ਪਸੀਨੇ ਵਿੱਚ ਪਾਣੀ ਦੇ ਨਾਲ ਹੋਰ ਕੀ ਹੁੰਦਾ ਹੈ?", ["ਲੂਣ", "ਖੰਡ", "ਤੇਲ", "ਸਟਾਰਚ"], 0],
+      ["ਸਪੰਜ ਅਤੇ ਹਾਈਡ੍ਰਾ ਵਰਗੇ ਜੰਤੂਆਂ ਵਿੱਚ ਲਹੂ-ਸੰਚਾਰ ਪ੍ਰਣਾਲੀ:", ["ਨਹੀਂ ਹੁੰਦੀ", "ਚਾਰ ਖਾਨਿਆਂ ਵਾਲੀ ਹੁੰਦੀ ਹੈ", "ਧਮਣੀਆਂ ਵਾਲੀ ਹੁੰਦੀ ਹੈ", "ਕੋਈ ਨਹੀਂ"], 0]
+    ]
+  },
+  {
+    id: 8, title: "ਪੌਦਿਆਂ ਵਿੱਚ ਪ੍ਰਜਣਨ",
+    q: [
+      ["ਪੌਦੇ ਦੇ ਕਾਇਕ ਭਾਗ (ਜੜ੍ਹ, ਤਣਾ, ਪੱਤੇ) ਤੋਂ ਨਵਾਂ ਪੌਦਾ ਬਣਨ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਕਾਇਕ ਪ੍ਰਜਣਨ", "ਲਿੰਗੀ ਪ੍ਰਜਣਨ", "ਪਰਾਗਣ", "ਨਿਸ਼ੇਚਣ"], 0],
+      ["ਆਲੂ ਉੱਤੇ ਬਣੇ ਨਿਸ਼ਾਨ ਜਿਨ੍ਹਾਂ ਤੋਂ ਨਵੇਂ ਪੌਦੇ ਉੱਗਦੇ ਹਨ, ਕੀ ਅਖਵਾਉਂਦੇ ਹਨ?", ["ਅੱਖਾਂ (ਕਲੀਆਂ)", "ਬੀਜ", "ਫੁੱਲ", "ਜੜ੍ਹਾਂ"], 0],
+      ["ਪੱਥਰਚੱਟ (Bryophyllum) ਵਿੱਚ ਪ੍ਰਜਣਨ ਕਿਸ ਭਾਗ ਰਾਹੀਂ ਹੁੰਦਾ ਹੈ?", ["ਜੜ੍ਹ", "ਤਣਾ", "ਪੱਤੇ ਦੇ ਕਿਨਾਰਿਆਂ ਦੀਆਂ ਕਲੀਆਂ", "ਫੁੱਲ"], 2],
+      ["ਈਸਟ (Yeast) ਵਿੱਚ ਅਲਿੰਗੀ ਪ੍ਰਜਣਨ ਕਿਸ ਵਿਧੀ ਨਾਲ ਹੁੰਦਾ ਹੈ?", ["ਕਲੀ ਨਿਕਲਣਾ (ਬਡਿੰਗ)", "ਖੰਡਨ", "ਬੀਜਾਣੂ ਨਿਰਮਾਣ", "ਪਰਾਗਣ"], 0],
+      ["ਸਪਾਇਰੋਗਾਇਰਾ (ਕਾਈ) ਵਿੱਚ ਪ੍ਰਜਣਨ ਕਿਸ ਵਿਧੀ ਰਾਹੀਂ ਹੁੰਦਾ ਹੈ?", ["ਖੰਡਨ (Fragmentation)", "ਬਡਿੰਗ", "ਲਿੰਗੀ", "ਕਲਮ ਲਗਾਉਣਾ"], 0],
+      ["ਫਰਨ, ਮੌਸ ਅਤੇ ਬ੍ਰੈੱਡ ਦੀ ਉੱਲੀ ਵਿੱਚ ਪ੍ਰਜਣਨ ਕਿਸ ਦੁਆਰਾ ਹੁੰਦਾ ਹੈ?", ["ਬੀਜਾਣੂ ਨਿਰਮਾਣ (Spore Formation)", "ਬਡਿੰਗ", "ਖੰਡਨ", "ਕਲਮ"], 0],
+      ["ਪੌਦੇ ਦਾ ਪ੍ਰਜਣਨ ਅੰਗ ਕਿਹੜਾ ਹੁੰਦਾ ਹੈ?", ["ਜੜ੍ਹ", "ਤਣਾ", "ਪੱਤਾ", "ਫੁੱਲ"], 3],
+      ["ਫੁੱਲ ਦਾ ਨਰ ਪ੍ਰਜਣਨ ਅੰਗ ਕਿਹੜਾ ਹੈ?", ["ਪੁੰਕੇਸਰ (Stamen)", "ਇਸਤਰੀਕੇਸਰ (Pistil)", "ਪੰਖੜੀਆਂ", "ਹਰੀਆਂ ਪੱਤੀਆਂ"], 0],
+      ["ਫੁੱਲ ਦਾ ਮਾਦਾ ਪ੍ਰਜਣਨ ਅੰਗ ਕਿਹੜਾ ਹੈ?", ["ਪੁੰਕੇਸਰ", "ਇਸਤਰੀਕੇਸਰ (Pistil)", "ਪਰਾਗਕੋਸ਼", "ਤੰਤੂ"], 1],
+      ["ਇੱਕਲਿੰਗੀ ਫੁੱਲ ਦੀ ਉਦਾਹਰਨ ਕਿਹੜੀ ਹੈ?", ["ਸਰ੍ਹੋਂ", "ਗੁਲਾਬ", "ਪਪੀਤਾ ਅਤੇ ਮੱਕੀ", "ਪਿਟੂਨੀਆ"], 2],
+      ["ਦੋ-ਲਿੰਗੀ ਫੁੱਲ ਦੀ ਉਦਾਹਰਨ ਕਿਹੜੀ ਹੈ?", ["ਮੱਕੀ", "ਪਪੀਤਾ", "ਖੀਰਾ", "ਸਰ੍ਹੋਂ ਅਤੇ ਗੁਲਾਬ"], 3],
+      ["ਪਰਾਗਕੋਸ਼ ਤੋਂ ਪਰਾਗ ਕਣਾਂ ਦਾ ਸਟਿਗਮਾ 'ਤੇ ਪਹੁੰਚਣਾ ਕੀ ਅਖਵਾਉਂਦਾ ਹੈ?", ["ਨਿਸ਼ੇਚਣ", "ਪਰਾਗਣ (Pollination)", "ਖੰਡਨ", "ਬਡਿੰਗ"], 1],
+      ["ਨਰ ਅਤੇ ਮਾਦਾ ਯੁਗਮਕਾਂ ਦੇ ਸੁਮੇਲ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਪਰਾਗਣ", "ਨਿਸ਼ੇਚਣ (Fertilisation)", "ਬਡਿੰਗ", "ਖੰਡਨ"], 1],
+      ["ਨਿਸ਼ੇਚਣ ਤੋਂ ਬਾਅਦ ਬਣਿਆ ਸੈੱਲ ਕੀ ਅਖਵਾਉਂਦਾ ਹੈ?", ["ਯੁਗਮਜ (Zygote)", "ਪਰਾਗ ਕਣ", "ਬੀਜਾਣੂ", "ਕਲੀ"], 0],
+      ["ਨਿਸ਼ੇਚਣ ਤੋਂ ਬਾਅਦ ਅੰਡਕੋਸ਼ (Ovary) ਕਿਸ ਵਿੱਚ ਬਦਲ ਜਾਂਦਾ ਹੈ?", ["ਬੀਜ", "ਫ਼ਲ", "ਪੱਤਾ", "ਜੜ੍ਹ"], 1],
+      ["ਨਿਸ਼ੇਚਣ ਤੋਂ ਬਾਅਦ ਬੀਜ-ਅੰਡ (Ovules) ਕਿਸ ਵਿੱਚ ਵਿਕਸਿਤ ਹੁੰਦੇ ਹਨ?", ["ਫ਼ਲ", "ਬੀਜ", "ਫੁੱਲ", "ਤਣਾ"], 1],
+      ["ਸਹਿੰਜਣਾ (Drumstick) ਅਤੇ ਮੈਪਲ ਦੇ ਬੀਜਾਂ ਦਾ ਖਿੰਡਾਅ ਕਿਸ ਦੁਆਰਾ ਹੁੰਦਾ ਹੈ?", ["ਹਵਾ ਦੁਆਰਾ", "ਪਾਣੀ ਦੁਆਰਾ", "ਜੰਤੂਆਂ ਦੁਆਰਾ", "ਫਟਣ ਨਾਲ"], 0],
+      ["ਨਾਰੀਅਲ ਦੇ ਬੀਜ ਦਾ ਖਿੰਡਾਅ ਕਿਸ ਦੁਆਰਾ ਹੁੰਦਾ ਹੈ?", ["ਹਵਾ", "ਪਾਣੀ", "ਪੰਛੀ", "ਕੀੜੇ"], 1],
+      ["ਜ਼ੈਂਥੀਅਮ (Xanthium) ਵਰਗੇ ਕੰਡੇਦਾਰ ਬੀਜਾਂ ਦਾ ਖਿੰਡਾਅ ਕਿਸ ਦੁਆਰਾ ਹੁੰਦਾ ਹੈ?", ["ਜੰਤੂਆਂ ਦੁਆਰਾ", "ਪਾਣੀ ਦੁਆਰਾ", "ਹਵਾ ਦੁਆਰਾ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਅਰਿੰਡ (Castor) ਅਤੇ ਬਾਲਸਮ ਦੇ ਬੀਜ ਕਿਵੇਂ ਖਿੰਡਦੇ ਹਨ?", ["ਫ਼ਲਾਂ ਦੇ ਝਟਕੇ ਨਾਲ ਫਟਣ ਦੁਆਰਾ", "ਪਾਣੀ ਦੁਆਰਾ", "ਹਵਾ ਦੁਆਰਾ", "ਕੋਈ ਨਹੀਂ"], 0]
+    ]
+  },
+  {
+    id: 9, title: "ਗਤੀ ਅਤੇ ਸਮਾਂ",
+    q: [
+      ["ਇਕਾਈ ਸਮੇਂ ਵਿੱਚ ਤੈਅ ਕੀਤੀ ਦੂਰੀ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸਮਾਂ", "ਚਾਲ (Speed)", "ਬਲ", "ਦਾਬ"], 1],
+      ["ਚਾਲ ਦਾ ਸੂਤਰ ਕੀ ਹੈ?", ["ਦੂਰੀ × ਸਮਾਂ", "ਦੂਰੀ / ਸਮਾਂ", "ਸਮਾਂ / ਦੂਰੀ", "ਦੂਰੀ + ਸਮਾਂ"], 1],
+      ["ਚਾਲ ਦੀ ਮੂਲ (SI) ਇਕਾਈ ਕੀ ਹੈ?", ["km/min", "m/s", "m/min", "km/s"], 1],
+      ["ਸਮੇਂ ਦੀ ਮੂਲ (SI) ਇਕਾਈ ਕੀ ਹੈ?", ["ਘੰਟਾ", "ਮਿੰਟ", "ਸਕਿੰਟ (s)", "ਦਿਨ"], 2],
+      ["ਸਿੱਧੀ ਰੇਖਾ ਵਿੱਚ ਅਚੱਲ ਚਾਲ ਨਾਲ ਚੱਲਣ ਵਾਲੀ ਵਸਤੂ ਦੀ ਗਤੀ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਇੱਕਸਮਾਨ ਗਤੀ", "ਅਸਮਾਨ ਗਤੀ", "ਡੋਲਣ ਗਤੀ", "ਚੱਕਰਾਕਾਰ ਗਤੀ"], 0],
+      ["ਸਧਾਰਨ ਪੈਂਡੂਲਮ ਦੀ ਗਤੀ ਕਿਸ ਗਤੀ ਦੀ ਉਦਾਹਰਨ ਹੈ?", ["ਸਿੱਧੀ ਗਤੀ", "ਆਵਰਤੀ / ਡੋਲਣ ਗਤੀ", "ਅਸਮਾਨ ਗਤੀ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਪੈਂਡੂਲਮ ਦੁਆਰਾ ਇੱਕ ਡੋਲਣ ਪੂਰਾ ਕਰਨ ਵਿੱਚ ਲੱਗੇ ਸਮੇਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਚਾਲ", "ਆਵਰਤ ਕਾਲ (Time Period)", "ਦੂਰੀ", "ਆਵ੍ਰਿਤੀ"], 1],
+      ["ਵਾਹਨਾਂ ਦੀ ਚਾਲ ਨੂੰ ਸਿੱਧਾ km/h ਵਿੱਚ ਮਾਪਣ ਵਾਲੇ ਯੰਤਰ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਓਡੋਮੀਟਰ", "ਸਪੀਡੋਮੀਟਰ", "ਥਰਮਾਮੀਟਰ", "ਬੈਰੋਮੀਟਰ"], 1],
+      ["ਵਾਹਨ ਦੁਆਰਾ ਤੈਅ ਕੀਤੀ ਕੁੱਲ ਦੂਰੀ ਮਾਪਣ ਵਾਲੇ ਯੰਤਰ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸਪੀਡੋਮੀਟਰ", "ਓਡੋਮੀਟਰ", "ਐਮੀਟਰ", "ਸਟੈਥੋਸਕੋਪ"], 1],
+      ["ਇੱਕਸਮਾਨ ਗਤੀ ਲਈ ਦੂਰੀ-ਸਮਾਂ ਗ੍ਰਾਫ਼ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਸਿੱਧੀ ਰੇਖਾ", "ਗੋਲ ਚੱਕਰ", "ਟੇਢੀ ਰੇਖਾ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜੇ ਕੋਈ ਵਸਤੂ ਵਿਰਾਮ (ਰੁਕੀ) ਅਵਸਥਾ ਵਿੱਚ ਹੋਵੇ, ਤਾਂ ਦੂਰੀ-ਸਮਾਂ ਗ੍ਰਾਫ਼ ਕੀ ਦਰਸਾਉਂਦਾ ਹੈ?", ["ਸਮਾਂ-ਧੁਰੇ ਦੇ ਸਮਾਂਤਰ ਸਿੱਧੀ ਰੇਖਾ", "ਉੱਪਰ ਜਾਂਦੀ ਰੇਖਾ", "ਚੱਕਰ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਇੱਕ ਕਾਰ 40 km/h ਦੀ ਚਾਲ ਨਾਲ 2 ਘੰਟੇ ਚੱਲਦੀ ਹੈ। ਉਸ ਨੇ ਕਿੰਨੀ ਦੂਰੀ ਤੈਅ ਕੀਤੀ?", ["20 km", "80 km", "42 km", "60 km"], 1],
+      ["ਇੱਕ ਸਾਈਕਲ 200 ਮੀਟਰ ਦੂਰੀ 20 ਸਕਿੰਟਾਂ ਵਿੱਚ ਤੈਅ ਕਰਦੀ ਹੈ। ਉਸ ਦੀ ਚਾਲ ਕੀ ਹੈ?", ["10 m/s", "20 m/s", "4000 m/s", "5 m/s"], 0],
+      ["ਪ੍ਰਾਚੀਨ ਸਮੇਂ ਵਿੱਚ ਸਮਾਂ ਮਾਪਣ ਲਈ ਕਿਹੜੇ ਯੰਤਰ ਵਰਤੇ ਜਾਂਦੇ ਸਨ?", ["ਧੁੱਪ-ਘੜੀ, ਰੇਤ-ਘੜੀ ਅਤੇ ਪਾਣੀ-ਘੜੀ", "ਡਿਜੀਟਲ ਘੜੀ", "ਸਪੀਡੋਮੀਟਰ", "ਕੰਪਿਊਟਰ"], 0],
+      ["ਇੱਕ ਸਧਾਰਨ ਪੈਂਡੂਲਮ 20 ਡੋਲਣ ਪੂਰੇ ਕਰਨ ਲਈ 40 ਸਕਿੰਟ ਲੈਂਦਾ ਹੈ। ਇਸ ਦਾ ਆਵਰਤ ਕਾਲ ਕੀ ਹੈ?", ["2 ਸਕਿੰਟ", "0.5 ਸਕਿੰਟ", "20 ਸਕਿੰਟ", "800 ਸਕਿੰਟ"], 0],
+      ["ਅੱਜ-ਕੱਲ੍ਹ ਜ਼ਿਆਦਾਤਰ ਘੜੀਆਂ ਵਿੱਚ ਕਿਹੜਾ ਕ੍ਰਿਸਟਲ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ?", ["ਕੁਆਰਟਜ਼ (Quartz)", "ਲੋਹਾ", "ਪਾਰਾ", "ਨਮਕ"], 0],
+      ["ਇੱਕ ਮਾਈਕ੍ਰੋਸਕਿੰਟ ਇੱਕ ਸਕਿੰਟ ਦਾ ਕਿੰਨਵਾਂ ਹਿੱਸਾ ਹੁੰਦਾ ਹੈ?", ["ਦਸ ਲੱਖਵਾਂ (10⁻⁶)", "ਸੌਵਾਂ", "ਹਜ਼ਾਰਵਾਂ", "ਦਸਵਾਂ"], 0],
+      ["ਦਿੱਲੀ ਦੇ ਜੰਤਰ-ਮੰਤਰ ਵਿੱਚ ਕਿਹੜੀ ਪ੍ਰਾਚੀਨ ਘੜੀ ਸਥਿਤ ਹੈ?", ["ਧੁੱਪ-ਘੜੀ (Sundial)", "ਰੇਤ-ਘੜੀ", "ਪੈਂਡੂਲਮ ਘੜੀ", "ਕੁਆਰਟਜ਼ ਘੜੀ"], 0],
+      ["ਕਿਸ ਵਿਗਿਆਨੀ ਨੇ ਪੈਂਡੂਲਮ ਦੇ ਆਵਰਤ ਕਾਲ ਦੇ ਨਿਯਮ ਦੀ ਖੋਜ ਕੀਤੀ?", ["ਗੈਲੀਲੀਓ ਗੈਲੀਲੀ", "ਨਿਊਟਨ", "ਆਈਨਸਟਾਈਨ", "ਫਲੇਮਿੰਗ"], 0],
+      ["72 km/h ਕਿਸ ਦੇ ਬਰਾਬਰ ਹੈ?", ["20 m/s", "10 m/s", "36 m/s", "72 m/s"], 0]
+    ]
+  },
+  {
+    id: 10, title: "ਬਿਜਲਈ ਧਾਰਾ ਅਤੇ ਇਸ ਦੇ ਪ੍ਰਭਾਵ",
+    q: [
+      ["ਬਿਜਲਈ ਸੈੱਲ ਦੇ ਪ੍ਰਤੀਕ ਵਿੱਚ ਲੰਬੀ ਰੇਖਾ ਕਿਸ ਟਰਮੀਨਲ ਨੂੰ ਦਰਸਾਉਂਦੀ ਹੈ?", ["ਧਨ (+) ਟਰਮੀਨਲ", "ਰਿਣ (-) ਟਰਮੀਨਲ", "ਸਵਿੱਚ", "ਬਲਬ"], 0],
+      ["ਦੋ ਜਾਂ ਦੋ ਤੋਂ ਵੱਧ ਸੈੱਲਾਂ ਦੇ ਸੁਮੇਲ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਬੈਟਰੀ", "ਫਿਊਜ਼", "ਸਵਿੱਚ", "ਕੁੰਡਲੀ"], 0],
+      ["ਕਿਸੇ ਤਾਰ ਵਿੱਚੋਂ ਬਿਜਲਈ ਧਾਰਾ ਲੰਘਣ 'ਤੇ ਉਸ ਦਾ ਗਰਮ ਹੋਣਾ ਕੀ ਅਖਵਾਉਂਦਾ ਹੈ?", ["ਬਿਜਲਈ ਧਾਰਾ ਦਾ ਤਾਪ ਪ੍ਰਭਾਵ", "ਚੁੰਬਕੀ ਪ੍ਰਭਾਵ", "ਰਸਾਇਣਿਕ ਪ੍ਰਭਾਵ", "ਪ੍ਰਕਾਸ਼ ਪ੍ਰਭਾਵ"], 0],
+      ["ਬਿਜਲੀ ਦੀ ਪ੍ਰੈੱਸ ਅਤੇ ਹੀਟਰ ਵਿੱਚ ਤਾਰ ਦੀ ਕੁੰਡਲੀ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਐਲੀਮੈਂਟ (Element)", "ਫਿਊਜ਼", "ਬੈਟਰੀ", "ਸਵਿੱਚ"], 0],
+      ["ਬਿਜਲਈ ਹੀਟਰ ਅਤੇ ਪ੍ਰੈੱਸ ਕਿਸ ਪ੍ਰਭਾਵ 'ਤੇ ਕੰਮ ਕਰਦੇ ਹਨ?", ["ਤਾਪ ਪ੍ਰਭਾਵ", "ਚੁੰਬਕੀ ਪ੍ਰਭਾਵ", "ਰਸਾਇਣਿਕ ਪ੍ਰਭਾਵ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਬਿਜਲਈ ਬਲਬ ਵਿੱਚ ਗਰਮ ਹੋ ਕੇ ਪ੍ਰਕਾਸ਼ ਦੇਣ ਵਾਲੀ ਬਰੀਕ ਤਾਰ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਫਿਲਾਮੈਂਟ (ਤੰਤੂ)", "ਫਿਊਜ਼", "ਸਵਿੱਚ", "ਚੁੰਬਕ"], 0],
+      ["ਘਰਾਂ ਦੇ ਬਿਜਲੀ ਸਰਕਟ ਨੂੰ ਸ਼ਾਰਟ ਸਰਕਟ ਅਤੇ ਓਵਰਲੋਡਿੰਗ ਤੋਂ ਬਚਾਉਣ ਵਾਲਾ ਸੁਰੱਖਿਆ ਯੰਤਰ ਕਿਹੜਾ ਹੈ?", ["ਬਿਜਲਈ ਫਿਊਜ਼", "ਬਲਬ", "ਸੈੱਲ", "ਪੱਖਾ"], 0],
+      ["ਅੱਜ-ਕੱਲ੍ਹ ਫਿਊਜ਼ ਦੀ ਥਾਂ ਕਿਹੜੇ ਸਵੈ-ਚਾਲਿਤ ਸਵਿੱਚ ਵਰਤੇ ਜਾਂਦੇ ਹਨ?", ["MCB", "LED", "CFL", "CPU"], 0],
+      ["MCB ਦਾ ਪੂਰਾ ਨਾਮ ਕੀ ਹੈ?", ["Miniature Circuit Breaker", "Main Current Box", "Mini Copper Bulb", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਫਿਊਜ਼ ਦੀ ਤਾਰ ਦਾ ਪਿਘਲਣ ਦਰਜਾ (Melting Point) ਕਿਹੋ ਜਿਹਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ?", ["ਘੱਟ", "ਬਹੁਤ ਵੱਧ", "ਅਨੰਤ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸਭ ਤੋਂ ਘੱਟ ਬਿਜਲੀ ਖ਼ਪਤ ਕਰਨ ਵਾਲਾ ਪ੍ਰਕਾਸ਼ ਸਰੋਤ ਕਿਹੜਾ ਹੈ?", ["ਸਾਧਾਰਨ ਬਲਬ", "LED ਬਲਬ", "ਟਿਊਬ", "ਹੀਟਰ"], 1],
+      ["ਬਿਜਲੀ ਦੇ ਉਪਕਰਨਾਂ ਦੀ ਗੁਣਵੱਤਾ ਦੀ ਪਛਾਣ ਲਈ ਕਿਹੜਾ ਨਿਸ਼ਾਨ ਦੇਖਣਾ ਚਾਹੀਦਾ ਹੈ?", ["ISI ਨਿਸ਼ਾਨ", "AGMARK", "FSSAI", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਬਿਜਲਈ ਧਾਰਾ ਦੇ ਚੁੰਬਕੀ ਪ੍ਰਭਾਵ ਦੀ ਖੋਜ ਕਿਸ ਵਿਗਿਆਨੀ ਨੇ ਕੀਤੀ?", ["ਹੈਂਸ ਕ੍ਰਿਸ਼ਚੀਅਨ ਓਰਸਟੈੱਡ", "ਨਿਊਟਨ", "ਗੈਲੀਲੀਓ", "ਪਾਸਚਰ"], 0],
+      ["ਜਦੋਂ ਕਿਸੇ ਤਾਰ ਵਿੱਚੋਂ ਬਿਜਲਈ ਧਾਰਾ ਲੰਘਦੀ ਹੈ, ਤਾਂ ਉਹ ਕਿਸ ਵਾਂਗ ਵਿਵਹਾਰ ਕਰਦੀ ਹੈ?", ["ਚੁੰਬਕ ਵਾਂਗ", "ਸ਼ੀਸ਼ੇ ਵਾਂਗ", "ਪਲਾਸਟਿਕ ਵਾਂਗ", "ਲੱਕੜ ਵਾਂਗ"], 0],
+      ["ਬਿਜਲਈ ਧਾਰਾ ਲੰਘਾ ਕੇ ਬਣਾਏ ਗਏ ਅਸਥਾਈ ਚੁੰਬਕ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਬਿਜਲਈ ਚੁੰਬਕ (Electromagnet)", "ਸਥਾਈ ਚੁੰਬਕ", "ਫਿਊਜ਼", "ਸੈੱਲ"], 0],
+      ["ਬਿਜਲਈ ਘੰਟੀ (Electric Bell) ਕਿਸ ਪ੍ਰਭਾਵ 'ਤੇ ਕੰਮ ਕਰਦੀ ਹੈ?", ["ਤਾਪ ਪ੍ਰਭਾਵ", "ਬਿਜਲਈ ਚੁੰਬਕ (ਚੁੰਬਕੀ ਪ੍ਰਭਾਵ)", "ਰਸਾਇਣਿਕ ਪ੍ਰਭਾਵ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਕਬਾੜ ਵਿੱਚੋਂ ਲੋਹੇ ਦੀਆਂ ਵਸਤੂਆਂ ਨੂੰ ਵੱਖ ਕਰਨ ਲਈ ਕ੍ਰੇਨਾਂ ਵਿੱਚ ਕੀ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ?", ["ਬਿਜਲਈ ਚੁੰਬਕ", "ਫਿਊਜ਼", "ਬਲਬ", "ਹੀਟਰ"], 0],
+      ["ਬਿਜਲਈ ਚੁੰਬਕ ਦੀ ਤਾਕਤ ਕਿਵੇਂ ਵਧਾਈ ਜਾ ਸਕਦੀ ਹੈ?", ["ਕੁੰਡਲੀ ਦੇ ਫੇਰੇ ਅਤੇ ਧਾਰਾ ਵਧਾ ਕੇ", "ਤਾਰ ਕੱਟ ਕੇ", "ਧਾਰਾ ਬੰਦ ਕਰਕੇ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜਦੋਂ ਸਵਿੱਚ 'ON' ਸਥਿਤੀ ਵਿੱਚ ਹੁੰਦਾ ਹੈ, ਤਾਂ ਸਰਕਟ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਬੰਦ (ਪੂਰਾ)", "ਖੁੱਲ੍ਹਾ (ਟੁੱਟਿਆ)", "ਖ਼ਰਾਬ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਬਿਜਲਈ ਧਾਰਾ ਲੰਘਣ 'ਤੇ ਚੁੰਬਕੀ ਸੂਈ ਦਾ ਵਿਖੇਪਣ ਕੀ ਦਰਸਾਉਂਦਾ ਹੈ?", ["ਚੁੰਬਕੀ ਪ੍ਰਭਾਵ", "ਤਾਪ ਪ੍ਰਭਾਵ", "ਰਸਾਇਣਿਕ ਪ੍ਰਭਾਵ", "ਧੁਨੀ ਪ੍ਰਭਾਵ"], 0]
+    ]
+  },
+  {
+    id: 11, title: "ਪ੍ਰਕਾਸ਼",
+    q: [
+      ["ਪ੍ਰਕਾਸ਼ ਹਮੇਸ਼ਾ ਕਿਸ ਰੇਖਾ ਵਿੱਚ ਗਤੀ ਕਰਦਾ ਹੈ?", ["ਸਿੱਧੀ ਰੇਖਾ ਵਿੱਚ", "ਟੇਢੀ ਰੇਖਾ ਵਿੱਚ", "ਗੋਲ ਚੱਕਰ ਵਿੱਚ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਿਸੇ ਚਮਕਦਾਰ ਸਤ੍ਹਾ (ਦਰਪਣ) ਤੋਂ ਪ੍ਰਕਾਸ਼ ਦੇ ਟਕਰਾ ਕੇ ਵਾਪਸ ਮੁੜਨ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਪਰਾਵਰਤਨ", "ਵਿਖੇਪਣ", "ਸੰਵਹਿਣ", "ਚਾਲਨ"], 0],
+      ["ਸਮਤਲ ਦਰਪਣ ਦੁਆਰਾ ਬਣਿਆ ਪ੍ਰਤੀਬਿੰਬ ਕਿਹੋ ਜਿਹਾ ਹੁੰਦਾ ਹੈ?", ["ਸਿੱਧਾ, ਆਭਾਸੀ ਅਤੇ ਵਸਤੂ ਦੇ ਬਰਾਬਰ", "ਉਲਟਾ ਅਤੇ ਵੱਡਾ", "ਵਾਸਤਵਿਕ", "ਛੋਟਾ"], 0],
+      ["ਜਿਸ ਪ੍ਰਤੀਬਿੰਬ ਨੂੰ ਪਰਦੇ 'ਤੇ ਪ੍ਰਾਪਤ ਕੀਤਾ ਜਾ ਸਕੇ, ਉਸ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਵਾਸਤਵਿਕ ਪ੍ਰਤੀਬਿੰਬ", "ਆਭਾਸੀ ਪ੍ਰਤੀਬਿੰਬ", "ਸਿੱਧਾ ਪ੍ਰਤੀਬਿੰਬ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜਿਸ ਪ੍ਰਤੀਬਿੰਬ ਨੂੰ ਪਰਦੇ 'ਤੇ ਪ੍ਰਾਪਤ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ:", ["ਵਾਸਤਵਿਕ", "ਆਭਾਸੀ ਪ੍ਰਤੀਬਿੰਬ", "ਉਲਟਾ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਐਂਬੂਲੈਂਸ (AMBULANCE) ਸ਼ਬਦ ਗੱਡੀ ਦੇ ਅੱਗੇ ਉਲਟਾ ਕਿਉਂ ਲਿਖਿਆ ਹੁੰਦਾ ਹੈ?", ["ਪਾਸੇ-ਉਲਟਾ (Lateral Inversion) ਕਾਰਨ ਸ਼ੀਸ਼ੇ ਵਿੱਚ ਸਿੱਧਾ ਦਿਸੇ", "ਸੁੰਦਰਤਾ ਲਈ", "ਗਲਤੀ ਨਾਲ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਵਾਹਨਾਂ ਦੇ ਪਾਸਿਆਂ (Side/Rear-view) ਵਾਲੇ ਸ਼ੀਸ਼ਿਆਂ ਵਿੱਚ ਕਿਹੜਾ ਦਰਪਣ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ?", ["ਉੱਤਲ ਦਰਪਣ (Convex Mirror)", "ਅਵਤਲ ਦਰਪਣ", "ਸਮਤਲ ਦਰਪਣ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਦੰਦਾਂ ਦੇ ਡਾਕਟਰ ਦੰਦਾਂ ਦਾ ਵੱਡਾ ਪ੍ਰਤੀਬਿੰਬ ਦੇਖਣ ਲਈ ਕਿਹੜਾ ਦਰਪਣ ਵਰਤਦੇ ਹਨ?", ["ਅਵਤਲ ਦਰਪਣ (Concave Mirror)", "ਉੱਤਲ ਦਰਪਣ", "ਸਮਤਲ ਦਰਪਣ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਾਰਾਂ ਦੀਆਂ ਹੈੱਡਲਾਈਟਾਂ ਅਤੇ ਟਾਰਚਾਂ ਦੇ ਪਰਾਵਰਤਕ ਕਿਸ ਆਕਾਰ ਦੇ ਹੁੰਦੇ ਹਨ?", ["ਅਵਤਲ (Concave)", "ਉੱਤਲ", "ਸਮਤਲ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਿਹੜਾ ਦਰਪਣ ਹਮੇਸ਼ਾ ਸਿੱਧਾ, ਆਭਾਸੀ ਅਤੇ ਵਸਤੂ ਤੋਂ ਛੋਟਾ ਪ੍ਰਤੀਬਿੰਬ ਬਣਾਉਂਦਾ ਹੈ?", ["ਉੱਤਲ ਦਰਪਣ", "ਅਵਤਲ ਦਰਪਣ", "ਸਮਤਲ ਦਰਪਣ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਿਹੜਾ ਲੈਂਜ਼ ਵਿਚਕਾਰੋਂ ਮੋਟਾ ਅਤੇ ਕਿਨਾਰਿਆਂ ਤੋਂ ਪਤਲਾ ਹੁੰਦਾ ਹੈ?", ["ਉੱਤਲ ਲੈਂਜ਼ (Convex Lens)", "ਅਵਤਲ ਲੈਂਜ਼ (Concave Lens)", "ਸਮਤਲ ਕੱਚ", "ਪ੍ਰਿਜ਼ਮ"], 0],
+      ["ਕਿਹੜਾ ਲੈਂਜ਼ ਵਿਚਕਾਰੋਂ ਪਤਲਾ ਅਤੇ ਕਿਨਾਰਿਆਂ ਤੋਂ ਮੋਟਾ ਹੁੰਦਾ ਹੈ?", ["ਉੱਤਲ ਲੈਂਜ਼", "ਅਵਤਲ ਲੈਂਜ਼", "ਪ੍ਰਿਜ਼ਮ", "ਕੋਈ ਨਹੀਂ"], 1],
+      ["ਵੱਡਦਰਸ਼ੀ ਸ਼ੀਸ਼ੇ (Magnifying Glass) ਵਜੋਂ ਕਿਸ ਦੀ ਵਰਤੋਂ ਕੀਤੀ ਜਾਂਦੀ ਹੈ?", ["ਉੱਤਲ ਲੈਂਜ਼", "ਅਵਤਲ ਲੈਂਜ਼", "ਉੱਤਲ ਦਰਪਣ", "ਸਮਤਲ ਦਰਪਣ"], 0],
+      ["ਕਿਹੜਾ ਲੈਂਜ਼ ਪ੍ਰਕਾਸ਼ ਦੀਆਂ ਕਿਰਨਾਂ ਨੂੰ ਇੱਕ ਬਿੰਦੂ 'ਤੇ ਕੇਂਦਰਿਤ (ਅਭਿਸਾਰਿਤ) ਕਰਦਾ ਹੈ?", ["ਉੱਤਲ ਲੈਂਜ਼", "ਅਵਤਲ ਲੈਂਜ਼", "ਸਮਤਲ ਕੱਚ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਿਹੜਾ ਲੈਂਜ਼ ਹਮੇਸ਼ਾ ਆਭਾਸੀ, ਸਿੱਧਾ ਅਤੇ ਵਸਤੂ ਤੋਂ ਛੋਟਾ ਪ੍ਰਤੀਬਿੰਬ ਬਣਾਉਂਦਾ ਹੈ?", ["ਅਵਤਲ ਲੈਂਜ਼", "ਉੱਤਲ ਲੈਂਜ਼", "ਪ੍ਰਿਜ਼ਮ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸੂਰਜ ਦਾ ਚਿੱਟਾ ਪ੍ਰਕਾਸ਼ ਕਿੰਨੇ ਰੰਗਾਂ ਦਾ ਮਿਸ਼ਰਣ ਹੈ?", ["3", "5", "7", "9"], 2],
+      ["ਸੂਰਜ ਦੇ ਪ੍ਰਕਾਸ਼ ਨੂੰ 7 ਰੰਗਾਂ ਵਿੱਚ ਵੱਖ ਕਰਨ ਲਈ ਕੀ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ?", ["ਕੱਚ ਦਾ ਪ੍ਰਿਜ਼ਮ", "ਸਮਤਲ ਦਰਪਣ", "ਲੱਕੜ", "ਚੁੰਬਕ"], 0],
+      ["ਸੱਤ ਰੰਗਾਂ ਵਾਲੀ ਡਿਸਕ ਜਿਸ ਨੂੰ ਤੇਜ਼ ਘੁਮਾਉਣ 'ਤੇ ਉਹ ਚਿੱਟੀ ਦਿਖਾਈ ਦਿੰਦੀ ਹੈ:", ["ਨਿਊਟਨ ਦੀ ਡਿਸਕ", "ਪੈਂਡੂਲਮ", "ਸਪੀਡੋਮੀਟਰ", "ਕੈਲਾਈਡੋਸਕੋਪ"], 0],
+      ["ਜੇ ਕੋਈ ਵਿਅਕਤੀ ਸਮਤਲ ਦਰਪਣ ਤੋਂ 4 ਮੀਟਰ ਦੂਰ ਖੜ੍ਹਾ ਹੈ, ਤਾਂ ਉਸ ਦੇ ਅਤੇ ਪ੍ਰਤੀਬਿੰਬ ਵਿਚਕਾਰ ਦੂਰੀ ਕਿੰਨੀ ਹੋਵੇਗੀ?", ["4 ਮੀਟਰ", "8 ਮੀਟਰ", "2 ਮੀਟਰ", "16 ਮੀਟਰ"], 1],
+      ["ਸਤਰੰਗੀ ਪੀਂਘ (Rainbow) ਆਮ ਤੌਰ 'ਤੇ ਕਦੋਂ ਦਿਖਾਈ ਦਿੰਦੀ ਹੈ?", ["ਮੀਂਹ ਤੋਂ ਬਾਅਦ ਜਦੋਂ ਸੂਰਜ ਅਸਮਾਨ ਵਿੱਚ ਨੀਵਾਂ ਹੋਵੇ", "ਰਾਤ ਨੂੰ", "ਦੁਪਹਿਰ 12 ਵਜੇ", "ਕੋਈ ਨਹੀਂ"], 0]
+    ]
+  },
+  {
+    id: 12, title: "ਜੰਗਲ : ਸਾਡੀ ਜੀਵਨ ਰੇਖਾ",
+    q: [
+      ["ਜੰਗਲਾਂ ਨੂੰ ਧਰਤੀ ਦੇ 'ਹਰੇ ਫੇਫੜੇ' ਕਿਉਂ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?", ["ਇਹ ਆਕਸੀਜਨ ਅਤੇ CO2 ਦਾ ਸੰਤੁਲਨ ਬਣਾਈ ਰੱਖਦੇ ਹਨ", "ਇਹ ਹਰੇ ਹੁੰਦੇ ਹਨ", "ਇਹ ਉੱਚੇ ਹੁੰਦੇ ਹਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਿਸੇ ਰੁੱਖ ਦੇ ਤਣੇ ਦੇ ਉੱਪਰਲੇ ਟਾਹਣੀਆਂ ਵਾਲੇ ਭਾਗ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸ਼ਿਖ਼ਰ (Crown)", "ਜੜ੍ਹ", "ਛਿੱਲ", "ਹਿਊਮਸ"], 0],
+      ["ਜੰਗਲ ਵਿੱਚ ਉੱਚੇ ਰੁੱਖਾਂ ਦੀਆਂ ਟਾਹਣੀਆਂ ਦੁਆਰਾ ਬਣੀ ਛੱਤ ਵਰਗੀ ਬਣਤਰ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਵਿਤਾਣ (Canopy)", "ਅੰਡਰਸਟੋਰੀ", "ਹਿਊਮਸ", "ਭੋਜਨ ਲੜੀ"], 0],
+      ["ਮ੍ਰਿਤ ਪੌਦਿਆਂ ਅਤੇ ਜੰਤੂਆਂ ਨੂੰ ਹਿਊਮਸ ਵਿੱਚ ਬਦਲਣ ਵਾਲੇ ਸੂਖ਼ਮਜੀਵਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਅਪਘਟਕ (Decomposers)", "ਉਤਪਾਦਕ", "ਸ਼ਾਕਾਹਾਰੀ", "ਮਾਸਾਹਾਰੀ"], 0],
+      ["ਮ੍ਰਿਤ ਪੱਤਿਆਂ ਅਤੇ ਜੀਵਾਂ ਦੇ ਗਲ਼ਣ-ਸੜਨ ਨਾਲ ਬਣਿਆ ਗੂੜ੍ਹੇ ਰੰਗ ਦਾ ਪਦਾਰਥ ਕੀ ਅਖਵਾਉਂਦਾ ਹੈ?", ["ਹਿਊਮਸ (ਮੱਲੜ)", "ਰੇਤ", "ਪੱਥਰ", "ਪਲਾਸਟਿਕ"], 0],
+      ["ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕਿਹੜਾ ਜੰਗਲ ਤੋਂ ਪ੍ਰਾਪਤ ਉਤਪਾਦ ਨਹੀਂ ਹੈ?", ["ਗੂੰਦ", "ਪਲਾਈਵੁੱਡ", "ਲਾਖ", "ਮਿੱਟੀ ਦਾ ਤੇਲ"], 3],
+      ["ਭੋਜਨ ਲੜੀ ਦਾ ਸਹੀ ਕ੍ਰਮ ਕਿਹੜਾ ਹੈ?", ["ਘਾਹ → ਕੀੜੇ → ਡੱਡੂ → ਸੱਪ → ਇੱਲ", "ਸੱਪ → ਘਾਹ → ਡੱਡੂ", "ਇੱਲ → ਘਾਹ → ਕੀੜੇ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜੰਗਲ ਦੀ ਜ਼ਮੀਨ 'ਤੇ ਵੱਖ-ਵੱਖ ਉਚਾਈਆਂ ਵਾਲੇ ਪੌਦਿਆਂ ਦੀਆਂ ਪਰਤਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਅੰਡਰਸਟੋਰੀ (Understorey)", "ਵਿਤਾਣ", "ਸ਼ਿਖ਼ਰ", "ਹਿਊਮਸ"], 0],
+      ["ਜੰਗਲ ਵਿੱਚ ਰੁੱਖਾਂ ਦੀਆਂ ਜੜ੍ਹਾਂ ਮਿੱਟੀ ਨੂੰ ਕਿਸ ਤੋਂ ਬਚਾਉਂਦੀਆਂ ਹਨ?", ["ਭੂਮੀ-ਖੋਰ (Soil Erosion)", "ਧੁੱਪ", "ਹਵਾ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜੰਗਲ ਮੀਂਹ ਦੇ ਪਾਣੀ ਦੇ ਕੁਦਰਤੀ ਸੋਖਕ ਵਜੋਂ ਕੰਮ ਕਰਕੇ ਕਿਸ ਦਾ ਪੱਧਰ ਬਣਾਈ ਰੱਖਦੇ ਹਨ?", ["ਧਰਤੀ ਹੇਠਲੇ ਪਾਣੀ (ਭੂਮੀ-ਜਲ) ਦਾ", "ਪ੍ਰਦੂਸ਼ਣ ਦਾ", "ਤਾਪਮਾਨ ਦਾ", "ਸ਼ੋਰ ਦਾ"], 0],
+      ["ਜੇ ਜੰਗਲ ਅਲੋਪ ਹੋ ਜਾਣ, ਤਾਂ ਵਾਯੂਮੰਡਲ ਵਿੱਚ ਕਿਸ ਗੈਸ ਦੀ ਮਾਤਰਾ ਵੱਧ ਜਾਵੇਗੀ?", ["ਆਕਸੀਜਨ", "ਕਾਰਬਨ ਡਾਈਆਕਸਾਈਡ", "ਨਾਈਟ੍ਰੋਜਨ", "ਹੀਲੀਅਮ"], 1],
+      ["ਜੰਗਲ ਵਿੱਚ ਕਿਹੜੀ ਚੀਜ਼ ਵਿਅਰਥ (Waste) ਨਹੀਂ ਜਾਂਦੀ?", ["ਕੋਈ ਵੀ ਨਹੀਂ—ਸਭ ਕੁਝ ਪੁਨਰ-ਚੱਕਰਿਤ ਹੁੰਦਾ ਹੈ", "ਸੁੱਕੇ ਪੱਤੇ", "ਟੁੱਟੀਆਂ ਟਾਹਣੀਆਂ", "ਗੋਬਰ"], 0],
+      ["ਪ੍ਰਕਾਸ਼-ਸੰਸ਼ਲੇਸ਼ਣ ਰਾਹੀਂ ਭੋਜਨ ਬਣਾਉਣ ਵਾਲੇ ਹਰੇ ਪੌਦਿਆਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਉਤਪਾਦਕ (Producers)", "ਅਪਘਟਕ", "ਮਾਸਾਹਾਰੀ", "ਪਰਜੀਵੀ"], 0],
+      ["ਜੰਗਲਾਂ ਦੀ ਕਟਾਈ ਨਾਲ ਕਿਸ ਦਾ ਖ਼ਤਰਾ ਵੱਧ ਜਾਂਦਾ ਹੈ?", ["ਹੜ੍ਹਾਂ ਅਤੇ ਗਲੋਬਲ ਵਾਰਮਿੰਗ ਦਾ", "ਆਕਸੀਜਨ ਵਧਣ ਦਾ", "ਠੰਡ ਵਧਣ ਦਾ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜੰਗਲ ਨੇੜੇ ਦੀਆਂ ਸੜਕਾਂ ਤੋਂ ਆਉਣ ਵਾਲੇ ਕਿਸ ਪ੍ਰਦੂਸ਼ਣ ਨੂੰ ਸੋਖ ਕੇ ਘਟਾਉਂਦੇ ਹਨ?", ["ਸ਼ੋਰ ਪ੍ਰਦੂਸ਼ਣ", "ਪ੍ਰਕਾਸ਼", "ਚੁੰਬਕੀ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਹੇਠ ਲਿਖਿਆਂ ਵਿੱਚੋਂ ਕਿਹੜਾ ਅਪਘਟਕ ਦੀ ਉਦਾਹਰਨ ਹੈ?", ["ਜੀਵਾਣੂ ਅਤੇ ਉੱਲੀ", "ਸ਼ੇਰ", "ਹਿਰਨ", "ਇੱਲ"], 0],
+      ["ਜੰਗਲ ਵਿੱਚ ਜੰਤੂ ਪੌਦਿਆਂ ਦੀ ਕਿਵੇਂ ਮਦਦ ਕਰਦੇ ਹਨ?", ["ਪਰਾਗਣ, ਬੀਜਾਂ ਦੇ ਖਿੰਡਾਅ ਅਤੇ ਗੋਬਰ ਰਾਹੀਂ ਪੋਸ਼ਕ ਤੱਤ ਦੇ ਕੇ", "ਪੱਤੇ ਕੱਟ ਕੇ", "ਜੜ੍ਹਾਂ ਪੁੱਟ ਕੇ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਕਈ ਭੋਜਨ ਲੜੀਆਂ ਆਪਸ ਵਿੱਚ ਜੁੜ ਕੇ ਕੀ ਬਣਾਉਂਦੀਆਂ ਹਨ?", ["ਭੋਜਨ ਜਾਲ (Food Web)", "ਵਿਤਾਣ", "ਹਿਊਮਸ", "ਸ਼ਿਖ਼ਰ"], 0],
+      ["ਜੰਗਲਾਂ ਨੂੰ 'ਗਤੀਸ਼ੀਲ ਜੀਵਿਤ ਇਕਾਈ' ਕਿਉਂ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?", ["ਇਹ ਜੀਵਨ ਅਤੇ ਜੀਵਨ-ਸ਼ਕਤੀ ਨਾਲ ਭਰਪੂਰ ਹਨ", "ਇਹ ਤੁਰਦੇ ਹਨ", "ਇਹ ਪੱਥਰ ਹਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸਾਲ, ਸਾਗਵਾਨ, ਸ਼ੀਸ਼ਮ ਅਤੇ ਨਿੰਮ ਕਿਸ ਦੀਆਂ ਕਿਸਮਾਂ ਹਨ?", ["ਜੰਗਲੀ ਰੁੱਖਾਂ ਦੀਆਂ", "ਨਦੀਨਾਂ ਦੀਆਂ", "ਕਾਈ ਦੀਆਂ", "ਉੱਲੀ ਦੀਆਂ"], 0]
+    ]
+  },
+  {
+    id: 13, title: "ਵਿਅਰਥ ਪਾਣੀ ਦੀ ਕਹਾਣੀ",
+    q: [
+      ["ਘਰਾਂ, ਉਦਯੋਗਾਂ ਅਤੇ ਹਸਪਤਾਲਾਂ ਤੋਂ ਨਿਕਲਣ ਵਾਲੇ ਗੰਦੇ ਪਾਣੀ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸੀਵੇਜ (ਵਾਹਿਤ ਮਲ)", "ਕਸ਼ੀਦਿਤ ਪਾਣੀ", "ਮੀਂਹ ਦਾ ਪਾਣੀ", "ਭੂਮੀ-ਜਲ"], 0],
+      ["ਸੀਵੇਜ ਵਿੱਚ ਮੌਜੂਦ ਘੁਲੇ ਹੋਏ ਅਤੇ ਲਟਕਦੇ ਅਸ਼ੁੱਧ ਪਦਾਰਥਾਂ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਪ੍ਰਦੂਸ਼ਕ (Contaminants)", "ਪੋਸ਼ਕ", "ਖਣਿਜ", "ਵਿਟਾਮਿਨ"], 0],
+      ["ਸੀਵੇਜ ਨੂੰ ਲੈ ਜਾਣ ਵਾਲੀਆਂ ਜ਼ਮੀਨਦੋਜ਼ ਪਾਈਪਾਂ ਦੇ ਜਾਲ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸੀਵਰੇਜ", "ਸਿੰਚਾਈ", "ਨਹਿਰ", "ਖੂਹ"], 0],
+      ["ਸੀਵਰੇਜ ਲਾਈਨਾਂ ਦੀ ਸਫ਼ਾਈ ਅਤੇ ਜਾਂਚ ਲਈ ਹਰ 50-60 ਮੀਟਰ 'ਤੇ ਕੀ ਬਣਾਏ ਜਾਂਦੇ ਹਨ?", ["ਮੈਨਹੋਲ", "ਟੂਟੀਆਂ", "ਖੂਹ", "ਤਲਾਅ"], 0],
+      ["ਗੰਦੇ ਪਾਣੀ ਨੂੰ ਸਾਫ਼ ਕਰਨ ਵਾਲੇ ਪਲਾਂਟ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["WWTP (ਵਿਅਰਥ ਪਾਣੀ ਉਪਚਾਰ ਪਲਾਂਟ)", "ਪੈਟਰੋਲ ਪੰਪ", "ਥਰਮਲ ਪਲਾਂਟ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["WWTP ਵਿੱਚ ਸਭ ਤੋਂ ਪਹਿਲਾਂ ਗੰਦੇ ਪਾਣੀ ਨੂੰ ਵੱਡੀਆਂ ਵਸਤੂਆਂ (ਕੱਪੜੇ, ਪਲਾਸਟਿਕ) ਹਟਾਉਣ ਲਈ ਕਿਸ ਵਿੱਚੋਂ ਲੰਘਾਇਆ ਜਾਂਦਾ ਹੈ?", ["ਬਾਰ ਸਕਰੀਨ (ਜਾਲੀਆਂ)", "ਰੇਤ", "ਕਲੋਰੀਨ", "ਪੱਖੇ"], 0],
+      ["ਪਾਣੀ ਦੀ ਸਤ੍ਹਾ 'ਤੇ ਤੈਰਨ ਵਾਲੇ ਤੇਲ ਅਤੇ ਗ੍ਰੀਸ ਨੂੰ ਹਟਾਉਣ ਵਾਲੇ ਯੰਤਰ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਸਕਿਮਰ (Skimmer)", "ਬਾਰ ਸਕਰੀਨ", "ਪੰਪ", "ਫਿਲਟਰ"], 0],
+      ["ਟੈਂਕੀ ਦੇ ਤਲੇ 'ਤੇ ਬੈਠੇ ਠੋਸ ਮਲ ਨੂੰ ਕੀ ਕਿਹਾ ਜਾਂਦਾ ਹੈ?", ["ਸਲੱਜ (Sludge)", "ਬਾਇਓਗੈਸ", "ਹਿਊਮਸ", "ਕੋਕ"], 0],
+      ["ਸਲੱਜ ਦੇ ਅਣਆਕਸੀ ਜੀਵਾਣੂਆਂ ਦੁਆਰਾ ਅਪਘਟਨ ਤੋਂ ਕਿਹੜੀ ਉਪਯੋਗੀ ਗੈਸ ਬਣਦੀ ਹੈ?", ["ਬਾਇਓਗੈਸ", "ਆਕਸੀਜਨ", "ਕਲੋਰੀਨ", "ਨਾਈਟ੍ਰੋਜਨ"], 0],
+      ["ਸੁੱਕੇ ਹੋਏ ਸਲੱਜ ਦੀ ਵਰਤੋਂ ਕਿਸ ਵਜੋਂ ਕੀਤੀ ਜਾਂਦੀ ਹੈ?", ["ਖਾਦ ਵਜੋਂ", "ਬਾਲਣ ਵਜੋਂ", "ਦਵਾਈ ਵਜੋਂ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸਾਫ਼ ਕੀਤੇ ਪਾਣੀ ਨੂੰ ਰੋਗਾਣੂ-ਮੁਕਤ ਕਰਨ ਲਈ ਕਿਹੜੇ ਰਸਾਇਣ ਵਰਤੇ ਜਾਂਦੇ ਹਨ?", ["ਕਲੋਰੀਨ ਅਤੇ ਓਜ਼ੋਨ", "ਨਮਕ ਅਤੇ ਖੰਡ", "ਤੇਲ ਅਤੇ ਗ੍ਰੀਸ", "ਸਿਰਕਾ"], 0],
+      ["ਵਿਸ਼ਵ ਜਲ ਦਿਵਸ (World Water Day) ਹਰ ਸਾਲ ਕਦੋਂ ਮਨਾਇਆ ਜਾਂਦਾ ਹੈ?", ["22 ਮਾਰਚ", "5 ਜੂਨ", "15 ਅਗਸਤ", "26 ਜਨਵਰੀ"], 0],
+      ["ਰਸੋਈ ਦੇ ਸਿੰਕ ਵਿੱਚ ਖਾਣਾ ਪਕਾਉਣ ਵਾਲਾ ਤੇਲ ਅਤੇ ਚਰਬੀ ਕਿਉਂ ਨਹੀਂ ਸੁੱਟਣੀ ਚਾਹੀਦੀ?", ["ਇਹ ਪਾਈਪਾਂ ਵਿੱਚ ਜੰਮ ਕੇ ਉਹਨਾਂ ਨੂੰ ਬੰਦ ਕਰ ਦਿੰਦੇ ਹਨ", "ਇਹ ਪਾਣੀ ਸਾਫ਼ ਕਰਦੇ ਹਨ", "ਇਹ ਖੁਸ਼ਬੂ ਦਿੰਦੇ ਹਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਪੇਂਟ, ਕੀਟਨਾਸ਼ਕ ਅਤੇ ਦਵਾਈਆਂ ਨਾਲੀਆਂ ਵਿੱਚ ਕਿਉਂ ਨਹੀਂ ਸੁੱਟਣੀਆਂ ਚਾਹੀਦੀਆਂ?", ["ਇਹ ਪਾਣੀ ਸਾਫ਼ ਕਰਨ ਵਾਲੇ ਲਾਭਦਾਇਕ ਸੂਖ਼ਮਜੀਵਾਂ ਨੂੰ ਮਾਰ ਦਿੰਦੇ ਹਨ", "ਇਹ ਪਾਈਪਾਂ ਸਾਫ਼ ਕਰਦੇ ਹਨ", "ਇਹ ਮਹਿੰਗੇ ਹਨ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਸੀਵੇਜ ਦੇ ਤਲਾਬਾਂ ਦੇ ਆਲੇ-ਦੁਆਲੇ ਕਿਹੜੇ ਰੁੱਖ ਲਗਾਉਣ ਦੀ ਸਲਾਹ ਦਿੱਤੀ ਜਾਂਦੀ ਹੈ?", ["ਸਫ਼ੈਦੇ (Eucalyptus) ਦੇ ਰੁੱਖ", "ਕੈਕਟਸ", "ਗੁਲਾਬ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਦੂਸ਼ਿਤ ਪਾਣੀ ਪੀਣ ਨਾਲ ਕਿਹੜੇ ਰੋਗ ਫੈਲਦੇ ਹਨ?", ["ਹੈਜ਼ਾ ਅਤੇ ਟਾਈਫਾਈਡ", "ਗਿੱਲ੍ਹੜ", "ਅੰਧਰਾਤਾ", "ਸ਼ੂਗਰ"], 0],
+      ["ਗੰਡੋਇਆਂ ਦੀ ਮਦਦ ਨਾਲ ਮਨੁੱਖੀ ਮਲ ਨੂੰ ਖਾਦ ਵਿੱਚ ਬਦਲਣ ਵਾਲੇ ਪਖਾਨੇ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਵਰਮੀ-ਪ੍ਰੋਸੈਸਿੰਗ ਟਾਇਲਟ", "ਸੈਪਟਿਕ ਟੈਂਕ", "ਬਾਰ ਸਕਰੀਨ", "ਸਕਿਮਰ"], 0],
+      ["ਭਾਰਤ ਸਰਕਾਰ ਦੁਆਰਾ ਸਫ਼ਾਈ ਲਈ ਸ਼ੁਰੂ ਕੀਤੀ ਗਈ ਮੁਹਿੰਮ ਕਿਹੜੀ ਹੈ?", ["ਸਵੱਛ ਭਾਰਤ ਅਭਿਆਨ", "ਪ੍ਰੋਜੈਕਟ ਟਾਈਗਰ", "ਹਰੀ ਕ੍ਰਾਂਤੀ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਜਿੱਥੇ ਸੀਵਰੇਜ ਪ੍ਰਣਾਲੀ ਨਹੀਂ ਹੁੰਦੀ, ਉੱਥੇ ਕਿਹੜਾ ਬਦਲਵਾਂ ਪ੍ਰਬੰਧ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ?", ["ਸੈਪਟਿਕ ਟੈਂਕ / ਬਾਇਓਗੈਸ ਪਲਾਂਟ", "ਖੁੱਲ੍ਹੀਆਂ ਨਾਲੀਆਂ", "ਸੜਕ", "ਕੋਈ ਨਹੀਂ"], 0],
+      ["ਪਾਣੀ ਨੂੰ ਸਾਫ਼ ਕਰਨ ਲਈ ਹਵਾ ਪੰਪ ਕਰਨ ਦੀ ਪ੍ਰਕਿਰਿਆ ਨੂੰ ਕੀ ਕਹਿੰਦੇ ਹਨ?", ["ਵਾਯੂਕਰਨ (Aeration)", "ਕ੍ਰਿਸਟਲੀਕਰਨ", "ਖਮੀਰਨ", "ਪਰਾਵਰਤਨ"], 0]
+    ]
+  }
+];
+
+// --- State ---
+const TAGS = ['ੳ', 'ਅ', 'ੲ', 'ਸ'];
+const TIME_LIMIT = 15;
+let currentChIdx = 0;
+let activeQuestions = [];
+let currentQIdx = 0;
+let score = 0;
+let streak = 0;
+let answered = false;
+let playerName = '';
+let timerInterval = null;
+let timeLeft = TIME_LIMIT;
+let totalTimeUsed = 0;
+let lastRunId = null;
+
+function resetNameField() {
+  playerName = '';
+  const input = document.getElementById('playerNameInput');
+  input.value = '';
+  document.getElementById('nameWarn').style.display = 'none';
+}
+
+function onNameInput() {
+  playerName = document.getElementById('playerNameInput').value.trim();
+  if (playerName) document.getElementById('nameWarn').style.display = 'none';
+}
+
+// --- Leaderboard Helpers (Class 7 Separate Storage) ---
+function getLeaderboard(chId) {
+  try {
+    return JSON.parse(localStorage.getItem('pseb7_sci_lb_' + chId) || '[]');
+  } catch { return []; }
+}
+
+function addLeaderboardEntry(chId, name, sc, timeSec) {
+  const list = getLeaderboard(chId);
+  const runId = Date.now();
+  lastRunId = runId;
+  list.push({ id: runId, name, score: sc, time: timeSec, date: new Date().toLocaleDateString('pa-IN') });
+  list.sort((a, b) => (b.score - a.score) || (a.time - b.time));
+  const top = list.slice(0, 15);
+  localStorage.setItem('pseb7_sci_lb_' + chId, JSON.stringify(top));
+  return top;
+}
+
+function renderLeaderboardHTML(chId, highlightId = null) {
+  const list = getLeaderboard(chId);
+  if (!list.length) {
+    return '<div class="lb-empty">ਅਜੇ ਕੋਈ ਸਕੋਰ ਦਰਜ ਨਹੀਂ ਹੋਇਆ। ਪਹਿਲੇ ਖਿਡਾਰੀ ਬਣੋ!</div>';
+  }
+  const medals = ['🥇', '🥈', '🥉'];
+  let rows = list.map((r, i) => `
+    <tr class="${r.id === highlightId ? 'me' : ''}">
+      <td>${medals[i] || (i + 1)}</td>
+      <td>${escapeHtml(r.name)}</td>
+      <td><strong>${r.score}/20</strong></td>
+      <td>${r.time}s</td>
+    </tr>
+  `).join('');
+  return `
+    <table class="lb-table">
+      <thead><tr><th>#</th><th>ਖਿਡਾਰੀ</th><th>ਸਕੋਰ</th><th>ਸਮਾਂ</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+function openLbModal(chId, chTitle) {
+  playSound('click');
+  document.getElementById('modalLbTitle').textContent = `🏆 ਅਧਿਆਇ ${chId}: ${chTitle}`;
+  document.getElementById('modalLbBody').innerHTML = renderLeaderboardHTML(chId);
+  document.getElementById('lbModal').classList.remove('hidden');
+}
+
+function closeLbModal() {
+  playSound('click');
+  document.getElementById('lbModal').classList.add('hidden');
+}
+
+function closeModalBg(e) {
+  if (e.target.id === 'lbModal') closeLbModal();
+}
+
+// --- Home Screen ---
+function renderHome() {
+  const grid = document.getElementById('chapterGrid');
+  grid.innerHTML = '';
+  CHAPTERS.forEach((ch, idx) => {
+    const lb = getLeaderboard(ch.id);
+    const top = lb.length ? lb[0] : null;
+    const card = document.createElement('div');
+    card.className = 'ch-card';
+    card.innerHTML = `
+      <div class="ch-clickable" onclick="startChapter(${idx})">
+        <div class="ch-num">ਅਧਿਆਇ ${ch.id} • 20 MCQ</div>
+        <div class="ch-title">${ch.title}</div>
+      </div>
+      <div class="ch-meta">
+        <span class="badge ${top ? 'done' : ''}" onclick="startChapter(${idx})" style="cursor:pointer;">
+          ${top ? '🥇 ' + escapeHtml(top.name) + ' (' + top.score + '/20)' : '▶ ਸ਼ੁਰੂ ਕਰੋ'}
+        </span>
+        <button class="btn btn-lb" onclick="openLbModal(${ch.id}, '${ch.title.replace(/'/g, "\\'")}')">🏆 ਲੀਡਰਬੋਰਡ</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// --- Quiz Flow & 15s Timer ---
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function startTimer() {
+  stopTimer();
+  timeLeft = TIME_LIMIT;
+  updateTimerUI();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft > 0 && timeLeft <= 5) playSound('tick');
+    if (timeLeft <= 0) {
+      stopTimer();
+      handleTimeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const pill = document.getElementById('timerPill');
+  const fill = document.getElementById('timerFill');
+  pill.textContent = `⏱️ ${timeLeft}s`;
+  fill.style.width = `${(timeLeft / TIME_LIMIT) * 100}%`;
+  if (timeLeft <= 5) {
+    pill.classList.add('danger');
+    fill.classList.add('danger');
+  } else {
+    pill.classList.remove('danger');
+    fill.classList.remove('danger');
+  }
+}
+
+function prepareShuffledQuestions(ch) {
+  return shuffleArray(ch.q).map(([questionText, options, correctIdx]) => {
+    const tagged = options.map((opt, idx) => ({ text: opt, isCorrect: idx === correctIdx }));
+    const shuffledOpts = shuffleArray(tagged);
+    return {
+      text: questionText,
+      options: shuffledOpts.map(o => o.text),
+      correctIdx: shuffledOpts.findIndex(o => o.isCorrect)
+    };
+  });
+}
+
+function startChapter(idx) {
+  playerName = document.getElementById('playerNameInput').value.trim() || playerName;
+  if (!playerName) {
+    playSound('wrong');
+    document.getElementById('nameWarn').style.display = 'inline';
+    document.getElementById('playerNameInput').focus();
+    return;
+  }
+  enterFullscreen();
+  playSound('click');
+  currentChIdx = idx;
+  activeQuestions = prepareShuffledQuestions(CHAPTERS[idx]);
+  currentQIdx = 0;
+  score = 0;
+  streak = 0;
+  totalTimeUsed = 0;
+  document.getElementById('activePlayer').textContent = playerName;
+  document.getElementById('homeScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const ch = CHAPTERS[currentChIdx];
+  const item = activeQuestions[currentQIdx];
+  document.getElementById('qChapter').textContent = `ਅਧਿਆਇ ${ch.id}: ${ch.title}`;
+  document.getElementById('qCount').textContent = `${currentQIdx + 1}/${activeQuestions.length}`;
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+  document.getElementById('progressFill').style.width = `${(currentQIdx / activeQuestions.length) * 100}%`;
+  document.getElementById('qText').textContent = `${currentQIdx + 1}. ${item.text}`;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('nextBtn').classList.add('hidden');
+
+  const box = document.getElementById('optionsBox');
+  box.innerHTML = '';
+  item.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-tag">${TAGS[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => checkAnswer(i, btn);
+    box.appendChild(btn);
+  });
+
+  startTimer();
+}
+
+function handleTimeUp() {
+  if (answered) return;
+  answered = true;
+  totalTimeUsed += TIME_LIMIT;
+  const item = activeQuestions[currentQIdx];
+  const correctIdx = item.correctIdx;
+  const allBtns = document.querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+  allBtns[correctIdx].classList.add('correct');
+  streak = 0;
+  playSound('wrong');
+
+  const fb = document.getElementById('feedback');
+  fb.textContent = `⏰ ਸਮਾਂ ਸਮਾਪਤ! ਸਹੀ ਉੱਤਰ: (${TAGS[correctIdx]}) ${item.options[correctIdx]}`;
+  fb.className = 'feedback no';
+  document.getElementById('streakVal').textContent = streak;
+  document.getElementById('progressFill').style.width = `${((currentQIdx + 1) / activeQuestions.length) * 100}%`;
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = (currentQIdx === activeQuestions.length - 1) ? 'ਨਤੀਜਾ ਦੇਖੋ 🏆' : 'ਅਗਲਾ ਪ੍ਰਸ਼ਨ ➡️';
+  nextBtn.classList.remove('hidden');
+}
+
+function checkAnswer(selectedIdx, btn) {
+  if (answered) return;
+  answered = true;
+  stopTimer();
+  totalTimeUsed += (TIME_LIMIT - timeLeft);
+
+  const item = activeQuestions[currentQIdx];
+  const correctIdx = item.correctIdx;
+  const allBtns = document.querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback');
+  if (selectedIdx === correctIdx) {
+    btn.classList.add('correct');
+    score++;
+    streak++;
+    playSound('correct');
+    fb.textContent = '✅ ਸ਼ਾਬਾਸ਼! ਬਿਲਕੁਲ ਸਹੀ ਉੱਤਰ!';
+    fb.className = 'feedback ok';
+  } else {
+    btn.classList.add('wrong');
+    allBtns[correctIdx].classList.add('correct');
+    streak = 0;
+    playSound('wrong');
+    fb.textContent = `❌ ਗਲਤ! ਸਹੀ ਉੱਤਰ: (${TAGS[correctIdx]}) ${item.options[correctIdx]}`;
+    fb.className = 'feedback no';
+  }
+
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+  document.getElementById('progressFill').style.width = `${((currentQIdx + 1) / activeQuestions.length) * 100}%`;
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = (currentQIdx === activeQuestions.length - 1) ? 'ਨਤੀਜਾ ਦੇਖੋ 🏆' : 'ਅਗਲਾ ਪ੍ਰਸ਼ਨ ➡️';
+  nextBtn.classList.remove('hidden');
+}
+
+function nextQuestion() {
+  playSound('click');
+  if (currentQIdx < activeQuestions.length - 1) {
+    currentQIdx++;
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  stopTimer();
+  const ch = CHAPTERS[currentChIdx];
+  addLeaderboardEntry(ch.id, playerName, score, totalTimeUsed);
+  playSound('win');
+
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  document.getElementById('resultPlayer').textContent = `👤 ${playerName} • ⏱️ ${totalTimeUsed} ਸਕਿੰਟ`;
+  document.getElementById('resultChapter').textContent = `ਅਧਿਆਇ ${ch.id}: ${ch.title}`;
+  document.getElementById('resultScore').textContent = `${score} / ${activeQuestions.length}`;
+
+  const pct = Math.round((score / activeQuestions.length) * 100);
+  let stars = '⭐', msg = 'ਹੋਰ ਅਭਿਆਸ ਕਰੋ! ਤੁਸੀਂ ਹੋਰ ਵਧੀਆ ਕਰ ਸਕਦੇ ਹੋ।';
+  if (pct >= 85) { stars = '⭐⭐⭐'; msg = 'ਸ਼ਾਨਦਾਰ ਪ੍ਰਦਰਸ਼ਨ! ਸਾਰੇ ਟੌਪਿਕ ਪੱਕੇ ਹਨ।'; }
+  else if (pct >= 60) { stars = '⭐⭐'; msg = 'ਵਧੀਆ ਕੋਸ਼ਿਸ਼! ਥੋੜ੍ਹੀ ਹੋਰ ਦੁਹਰਾਈ ਨਾਲ 100% ਆ ਸਕਦੇ ਹਨ।'; }
+  document.getElementById('resultStars').textContent = stars;
+  document.getElementById('resultMsg').textContent = `${pct}% — ${msg}`;
+
+  document.getElementById('resultLbTitle').textContent = `🏆 ਅਧਿਆਇ ${ch.id} — ਆਲ-ਟਾਈਮ ਲੀਡਰਬੋਰਡ`;
+  document.getElementById('resultLbBody').innerHTML = renderLeaderboardHTML(ch.id, lastRunId);
+}
+
+function restartChapter() {
+  startChapter(currentChIdx);
+}
+
+function goHome() {
+  stopTimer();
+  playSound('click');
+  resetNameField();
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('homeScreen').classList.remove('hidden');
+  renderHome();
+}
+
+resetNameField();
+renderHome();
+</script>
+</body>
+</html>
